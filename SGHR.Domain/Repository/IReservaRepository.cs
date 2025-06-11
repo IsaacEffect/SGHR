@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SGHR.Domain.Entities
+namespace SGHR.Domain.Repository
 {
-    internal class Clientes
+    internal interface IReservaRepository
     {
     }
 }
