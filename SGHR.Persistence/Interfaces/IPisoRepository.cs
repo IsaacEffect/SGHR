@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using SistemaGestionHotel.Domain.Entities;
-namespace SistemaGestionHotel.Application.Interfaces;
-
-public interface IPisoRepository
+namespace SGHR.Persistence.Interfaces
 {
-    Task<IEnumerable<Piso>> ObtenerTodosAsync();
-    Task<Piso> ObtenerPorIdAsync(int id);
-    Task AgregarAsync(Piso piso);
-    Task ActualizarAsync(Piso piso);
-    Task EliminarAsync(int id);
+    public interface IPisoRepository
+    {
+        Task<IEnumerable<Piso>> GetAllPisosAsync();
+        Task<Piso> GetPisoByIdAsync(int id);
+        Task CreatePisoAsync(Piso piso);
+        Task UpdatePisoAsync(Piso piso);
+        Task DeletePisoAsync(int id);
+    }
 }

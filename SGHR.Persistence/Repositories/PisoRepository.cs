@@ -4,51 +4,50 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using SistemaGestionHotel.Application.Interfaces;
-using SistemaGestionHotel.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using SGHR.Persistence.Context;
+using SGHR.Persistence.Domain;  // Cambié la referencia a Domain
+using SGHR.Persistence.Interfaces;
+using SGHR.Persistence.Base;
 
-namespace SistemaGestionHotel.Persistence.Repositories
+namespace SGHR.Persistence.Repositories
 {
-    public class PisoRepository : IPisoRepository
+    public class PisoRepository : BaseRepository<Piso>, IPisoRepository
     {
-        private readonly List<Piso> _pisos = new();
+        private readonly HotelContext _context;
 
-        public async Task<IEnumerable<Piso>> ObtenerTodosAsync()
+        public PisoRepository(HotelContext context) : base(context)
         {
-            return await Task.FromResult(_pisos);
+            _context = context;
         }
 
-        public async Task<Piso> ObtenerPorIdAsync(int id)
+        public async Task<IEnumerable<Piso>> GetAllPisosAsync()
         {
-            var piso = _pisos.FirstOrDefault(p => p.Id == id);
-            return await Task.FromResult(piso);
+            return await _context.Pisos.ToListAsync();
         }
 
-        public async Task AgregarAsync(Piso piso)
+        public async Task<Piso> GetPisoByIdAsync(int id)
         {
-            _pisos.Add(piso);
-            await Task.CompletedTask;
+            return await _context.Pisos.FindAsync(id);
         }
 
-        public async Task ActualizarAsync(Piso piso)
+        public async Task CreatePisoAsync(Piso piso)
         {
-            var existente = _pisos.FirstOrDefault(p => p.Id == piso.Id);
-            if (existente != null)
-            {
-                existente.Nombre = piso.Nombre;
-                existente.Nivel = piso.Nivel;
-            }
-            await Task.CompletedTask;
+            await base.CreateAsync(piso);
         }
 
-        public async Task EliminarAsync(int id)
+        public async Task UpdatePisoAsync(Piso piso)
         {
-            var piso = _pisos.FirstOrDefault(p => p.Id == id);
+            await base.UpdateAsync(piso);
+        }
+
+        public async Task DeletePisoAsync(int id)
+        {
+            var piso = await GetPisoByIdAsync(id);
             if (piso != null)
             {
-                _pisos.Remove(piso);
+                await base.DeleteAsync(piso);
             }
-            await Task.CompletedTask;
         }
     }
 }
