@@ -521,9 +521,9 @@ FodyWeavers.xsd
 *.msm
 *.msp
 
-# Ignorar archivos de configuración con datos sensibles
-appsettings.json
-appsettings.*.json
+# Ignorar configuraciones locales sensibles
+**/appsettings.json
+**/appsettings.*.json
 
 # JetBrains Rider
 
