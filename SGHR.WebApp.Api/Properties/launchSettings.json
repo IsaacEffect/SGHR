@@ -27,5 +27,8 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
+  },
+  "ConnectionStrings": {
+    "SGHR": "Server=localhost;Database=HotelReservaDB2;Trusted_Connection=True;"
   }
 }

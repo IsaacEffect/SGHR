@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SGHR.Domain.Repository
+namespace SGHR.Domain.Enums
 {
-    internal interface IReservaRepository
+    public enum EstadoReserva
     {
+        Pendiente,
+        Confirmada,
+        Cancelada
     }
 }

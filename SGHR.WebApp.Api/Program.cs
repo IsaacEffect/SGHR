@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using SGHR.Persistence.Context;
+using SGHR.Persistence.Interfaces;
 
 namespace SGHR.WebApp.Api
 {
@@ -7,16 +10,21 @@ namespace SGHR.WebApp.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            // Add services to the container.  
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle  
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // Fix for CS1061: Ensure the Microsoft.EntityFrameworkCore.SqlServer package is installed  
+            builder.Services.AddDbContext<SGHRDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("SGHR")));
+
+            builder.Services.AddScoped<ISqlConnectionFactory, SqlConnectionFactory>();
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            // Configure the HTTP request pipeline.  
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -25,10 +33,10 @@ namespace SGHR.WebApp.Api
 
             app.UseAuthorization();
 
-
             app.MapControllers();
 
             app.Run();
         }
     }
+            
 }
