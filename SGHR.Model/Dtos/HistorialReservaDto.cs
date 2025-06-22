@@ -1,24 +1,18 @@
-﻿using SGHR.Domain.Entities.Clientes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SGHR.Domain.Entities.Historial
+namespace SGHR.Model.Dtos
 {
-    public class HistorialReserva
+    public record HistorialReservaDto
     {
-        public int Id { get; set; }
         public DateTime FechaEntrada { get; set; }
         public DateTime FechaSalida { get; set; }
-        public string Estado { get; set; } // Confirmada, Cancelada, etc.
+        public string Estado { get; set; }
         public decimal Tarifa { get; set; }
         public string TipoHabitacion { get; set; }
         public string ServiciosAdicionales { get; set; }
-
-        // Relación con Cliente
-        public int ClienteId { get; set; }
-        public Cliente Cliente { get; set; }
     }
 }

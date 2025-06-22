@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SGHR.Domain.Entities.Habitaciones
+namespace SGHR.Domain.Base
 {
-    internal class Habitacion
+    internal class OperationResult
     {
     }
 }

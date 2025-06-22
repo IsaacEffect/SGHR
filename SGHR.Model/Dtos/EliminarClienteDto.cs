@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SGHR.Domain.Repository
+namespace SGHR.Model.Dtos
 {
-    internal interface IReservaRepository
+    public record EliminarClienteDto
     {
+        public int IdCliente { get; set; }
+
     }
 }

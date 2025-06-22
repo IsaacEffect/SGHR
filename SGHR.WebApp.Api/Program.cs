@@ -1,3 +1,9 @@
+using Microsoft.EntityFrameworkCore;
+using SGHR.Domain.Interfaces;
+using SGHR.Domain.Repository;
+using SGHR.IOC;
+using SGHR.Persistence;
+using SGHR.Persistence.Context;
 
 namespace SGHR.WebApp.Api
 {
@@ -14,6 +20,8 @@ namespace SGHR.WebApp.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.RegisterServices(builder.Configuration);
+            
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
