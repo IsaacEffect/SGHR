@@ -16,7 +16,7 @@ namespace SGHR.Persistence.Context
         }
 
         public DbSet<Reserva> Reservas { get; set; }
-        public DbSet<Servicio> Servicios { get; set; }
+        public DbSet<Servicios> Servicios { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

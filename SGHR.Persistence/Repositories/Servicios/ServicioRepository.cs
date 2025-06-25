@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace SGHR.Persistence.Repositories.Servicios
 {
-    public class ServicioRepository : BaseRepository<Servicio>, IServicioRepository
+    public class ServicioRepository : BaseRepository<Domain.Entities.Servicios.Servicios>, IServicioRepository
     {
         private readonly ISqlConnectionFactory _sqlConnectionFactory;
 
@@ -22,22 +22,22 @@ namespace SGHR.Persistence.Repositories.Servicios
             _sqlConnectionFactory = sqlConnectionFactory;
         }
 
-        public async Task<Servicio?> ObtenerPorIdAsync(int id)
+        public async Task<Domain.Entities.Servicios.Servicios?> ObtenerPorIdAsync(int id)
         {
             return await GetByIdAsync(id);
         }
 
-        public async Task<List<Servicio>> ObtenerTodosAsync()
+        public async Task<List<Domain.Entities.Servicios.Servicios>> ObtenerTodosAsync()
         {
             return await _dbSet.ToListAsync();
         }
 
-        public async Task AgregarServicioAsync(Servicio servicio)
+        public async Task AgregarServicioAsync(Domain.Entities.Servicios.Servicios servicio)
         {
  
             await AddAsync(servicio); ;    
         }
-        public async Task ActualizarServicioAsync(Servicio servicio)
+        public async Task ActualizarServicioAsync(Domain.Entities.Servicios.Servicios servicio)
         {
          
             await Task.Run(() =>

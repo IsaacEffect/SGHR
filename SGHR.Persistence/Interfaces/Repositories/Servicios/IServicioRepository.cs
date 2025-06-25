@@ -10,10 +10,10 @@ namespace SGHR.Persistence.Interfaces.Repositories.Servicios
     public interface IServicioRepository
     {
        
-        Task<Servicio?> ObtenerPorIdAsync(int id);
-        Task<List<Servicio>> ObtenerTodosAsync();
-        Task AgregarServicioAsync(Servicio servicio);
-        Task ActualizarServicioAsync(Servicio servicio);
+        Task<Domain.Entities.Servicios.Servicios?> ObtenerPorIdAsync(int id);
+        Task<List<Domain.Entities.Servicios.Servicios>> ObtenerTodosAsync();
+        Task AgregarServicioAsync(Domain.Entities.Servicios.Servicios servicio);
+        Task ActualizarServicioAsync(Domain.Entities.Servicios.Servicios servicio);
         Task EliminarServicioAsync(int id);
        
 

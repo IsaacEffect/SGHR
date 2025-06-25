@@ -1,7 +1,5 @@
 ﻿using SGHR.Application.DTOs.Reservas;
 using SGHR.Application.Interfaces.Reservas;
-using SGHR.Domain.Entities.Reservas;
-using SGHR.Persistence.Interfaces.Repositories.Reservas;
 
 namespace SGHR.Application.Services.Reservas
 {
