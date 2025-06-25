@@ -1,23 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SGHR.Domain.Entities.Servicios
+﻿namespace SGHR.Domain.Entities.Servicios
 {
     public class Servicio
     {
         public int IdServicio { get; private set; }
         public string Nombre { get; private set; }
         public decimal PrecioBase { get; private set; }
+        public string Descripcion { get; private set; } = string.Empty;
         public bool Activo { get; private set; }
 
-        public Servicio(int id, string nombre, decimal precioBase)
+        public Servicio(int id, string nombre, string descripcion, decimal precioBase)
         {
             IdServicio = id;
-            Nombre = nombre ?? throw new ArgumentNullException(nameof(nombre));
+            Nombre = nombre;
             PrecioBase = precioBase >= 0 ? precioBase : throw new ArgumentException("El precio debe ser positivo.");
+            Descripcion = descripcion;
             Activo = true;
         }
 

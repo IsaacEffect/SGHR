@@ -1,15 +1,15 @@
 ﻿using Dapper;
-using Microsoft.Data.SqlClient; 
+using Microsoft.Data.SqlClient;
 using SGHR.Persistence.Context;
 using SGHR.Persistence.Interfaces;
-using SGHR.Persistence.Interfaces.Repositories; 
+using SGHR.Persistence.Interfaces.Repositories.Servicios;
 using System;
-using System.Data; 
+using System.Data;
 using System.Threading.Tasks;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 
-namespace SGHR.Persistence.Repositories
+namespace SGHR.Persistence.Repositories.Servicios
 {
     public class ServicioCategoriaRepository : IServicioCategoriaRepository
     {

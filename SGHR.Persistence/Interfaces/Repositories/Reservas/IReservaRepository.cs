@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SGHR.Persistence.Interfaces.Repositories
+namespace SGHR.Persistence.Interfaces.Repositories.Reservas
 {
     public interface IReservaRepository
     {

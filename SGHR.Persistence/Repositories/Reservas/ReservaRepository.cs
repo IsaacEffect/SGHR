@@ -1,18 +1,18 @@
-﻿using Dapper; 
-using Microsoft.Data.SqlClient; 
+﻿using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SGHR.Domain.Entities.Reservas;
 using SGHR.Persistence.Base;
 using SGHR.Persistence.Context;
 using SGHR.Persistence.Interfaces;
-using SGHR.Persistence.Interfaces.Repositories;
+using SGHR.Persistence.Interfaces.Repositories.Reservas;
 using System;
 using System.Collections.Generic;
-using System.Data; 
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SGHR.Persistence.Repositories
+namespace SGHR.Persistence.Repositories.Reservas
 {
     
     public class ReservaRepository : BaseRepository<Reserva>, IReservaRepository
@@ -29,7 +29,7 @@ namespace SGHR.Persistence.Repositories
         public async Task<Reserva?> ObtenerPorIdAsync(int idReserva)
         {
             
-            return await base.GetByIdAsync(idReserva);
+            return await GetByIdAsync(idReserva);
         }
 
 
@@ -68,13 +68,13 @@ namespace SGHR.Persistence.Repositories
 
         public async Task CrearAsync(Reserva reserva)
         {
-            await base.AddAsync(reserva);
+            await AddAsync(reserva);
 
         }
 
         public async Task ActualizarAsync(Reserva reserva)
         {
-            base.Update(reserva); 
+            Update(reserva); 
             await _context.SaveChangesAsync(); 
 
             

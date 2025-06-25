@@ -1,49 +1,41 @@
-﻿using SGHR.Domain.Entities.Servicios;
-using SGHR.Domain.Enums;
-
+﻿using SGHR.Domain.Base;
+using SGHR.Domain.enums;    
 namespace SGHR.Domain.Entities.Reservas
 {
 
-    public class Reserva
+    public class Reserva : EntityBase
     {
-        public int IdReserva { get; private set; }
         public int ClienteId { get; private set; }
         public int IdCategoriaHabitacion { get; private set; }
         public DateTime FechaEntrada { get; private set; }
         public DateTime FechaSalida { get; private set; }
         public EstadoReserva Estado { get; private set; }
         public DateTime FechaCreacion { get; private set; }
-//        public List<ServicioReserva> ServiciosAdicionales { get; private set; }
 
-        public Reserva(int reservaId, int clienteId, int idCategoriaHabitacion, DateTime entrada, DateTime salida)
+
+        public Reserva(int reservaId, int clienteId, int idCategoriaHabitacion, DateTime entrada, DateTime salida, int estado)
         {
             if (entrada.Date < DateTime.Today || salida <= entrada)
                 throw new ArgumentException("Las fechas de la reserva no son válidas.");
 
-            IdReserva = reservaId; 
+            
             ClienteId = clienteId;
             IdCategoriaHabitacion = idCategoriaHabitacion;
             FechaEntrada = entrada;
             FechaSalida = salida;
             Estado = EstadoReserva.Confirmada;
             FechaCreacion = DateTime.UtcNow;
-            // ServiciosAdicionales = new List<ServicioReserva>();
+            
         }
+
+        protected Reserva() {}
 
         public void Cancelar()
         {
-            if (Estado == EstadoReserva.Cancelada)
-                throw new InvalidOperationException("La reserva ya fue cancelada.");
+            if (Estado != EstadoReserva.Confirmada)
+                throw new InvalidOperationException("Solo se pueden cancelar reservas confirmadas.");
             Estado = EstadoReserva.Cancelada;
         }
-
-    //    public void AgregarServicio(ServicioReserva servicio)
-    //    {
-    //        if (Estado == EstadoReserva.Cancelada)
-    //            throw new InvalidOperationException("No se pueden agregar servicios a una reserva cancelada.");
-
-    //        ServiciosAdicionales.Add(servicio);
-    //    }
     }
 }
 

@@ -4,14 +4,14 @@ using SGHR.Domain.Entities.Servicios;
 using SGHR.Persistence.Base;
 using SGHR.Persistence.Context;
 using SGHR.Persistence.Interfaces;
-using SGHR.Persistence.Interfaces.Repositories;
+using SGHR.Persistence.Interfaces.Repositories.Servicios;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SGHR.Persistence.Repositories
+namespace SGHR.Persistence.Repositories.Servicios
 {
     public class ServicioRepository : BaseRepository<Servicio>, IServicioRepository
     {
@@ -24,7 +24,7 @@ namespace SGHR.Persistence.Repositories
 
         public async Task<Servicio?> ObtenerPorIdAsync(int id)
         {
-            return await base.GetByIdAsync(id);
+            return await GetByIdAsync(id);
         }
 
         public async Task<List<Servicio>> ObtenerTodosAsync()
@@ -35,7 +35,7 @@ namespace SGHR.Persistence.Repositories
         public async Task AgregarServicioAsync(Servicio servicio)
         {
  
-            await base.AddAsync(servicio); ;    
+            await AddAsync(servicio); ;    
         }
         public async Task ActualizarServicioAsync(Servicio servicio)
         {
