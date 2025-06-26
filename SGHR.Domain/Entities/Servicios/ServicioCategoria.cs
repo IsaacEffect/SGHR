@@ -1,13 +1,14 @@
 ﻿using SGHR.Domain.Entities.Habitaciones;
+using SGHR.Domain.Base;
 namespace SGHR.Domain.Entities.Servicios
 {
-    public class ServicioCategoria
+    public class ServicioCategoria : EntityBase
     {
         public int ServicioId { get; private set; }
         public int CategoriaHabitacionId { get; private set; }
         public decimal Precio { get; private set; }
-        public Servicios Servicios { get; private set; }
-        public CategoriaHabitacion CategoriaHabitacion { get; private set; }
+        public Servicios? Servicios { get; private set; }
+        public CategoriaHabitacion? CategoriaHabitacion { get; private set; }
 
         protected ServicioCategoria()
         {

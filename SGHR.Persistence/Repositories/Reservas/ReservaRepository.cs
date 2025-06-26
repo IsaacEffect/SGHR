@@ -6,11 +6,8 @@ using SGHR.Persistence.Base;
 using SGHR.Persistence.Context;
 using SGHR.Persistence.Interfaces;
 using SGHR.Persistence.Interfaces.Repositories.Reservas;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace SGHR.Persistence.Repositories.Reservas
 {
@@ -44,7 +41,7 @@ namespace SGHR.Persistence.Repositories.Reservas
             return await _dbSet.Where(r => r.FechaEntrada <= hasta && r.FechaSalida >= desde).ToListAsync();
         }
 
-        // Métodos que usan Stored Procedures vía ADO.NET/Dapper
+        // Metodos que usan Stored Procedures vía ADO.NET/Dapper
 
         public async Task<bool> HayDisponibilidadAsync(int habitacionId, DateTime fechaEntrada, DateTime fechaSalida) 
         {

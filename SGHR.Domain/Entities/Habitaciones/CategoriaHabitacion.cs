@@ -1,6 +1,8 @@
-﻿namespace SGHR.Domain.Entities.Habitaciones
+﻿using SGHR.Domain.Base;
+namespace SGHR.Domain.Entities.Habitaciones
 {
-    public class CategoriaHabitacion
+    public class CategoriaHabitacion : EntityBase
     {
+
     }
 }

@@ -4,7 +4,7 @@ namespace SGHR.Application.Interfaces.Servicios
 {
     public interface IServicioApplicationService
     {
-        // Operaciones CRUD para Servicios
+        // Operaciones CRUD para servicios
         Task<ServicioDto> CrearServicioAsync(CrearServicioRequest request);
         Task ActualizarServicioAsync(ActualizarServicioRequest request);
         Task EliminarServicioAsync(int idServicio); 
@@ -13,7 +13,7 @@ namespace SGHR.Application.Interfaces.Servicios
         Task ActivarServicioAsync(int idServicio);
         Task DesactivarServicioAsync(int idServicio);
 
-        // Operaciones para la asignación de precios por categoría
+        // Operaciones para la asignacion de precios por categoria
         Task AsignarPrecioServicioCategoriaAsync(AsignarPrecioServicioCategoriaRequest request);
         Task EliminarPrecioServicioCategoriaAsync(int servicioId, int categoriaId);
         Task<List<ServicioCategoriaDto>> ObtenerPreciosServicioPorCategoriaAsync(int categoriaId);
