@@ -1,15 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SGHR.Persistence
+namespace SGHR.Persistence.Domain
 {
+    [Table("Piso")] // 
     public class Piso
     {
-        public int Id { get; set; }  
-        public string Numero { get; set; } 
-        public ICollection<Habitacion> Habitaciones { get; set; }  
+        [Key]
+        [Column("ID_Piso")]
+        public int Id { get; set; }
+
+        [Column("NumeroPiso")]
+        public int NumeroPiso { get; set; }
+
+        [Column("Descripcion")]
+        public string Descripcion { get; set; }
     }
 }

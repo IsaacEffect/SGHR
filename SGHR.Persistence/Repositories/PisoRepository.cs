@@ -1,52 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-using Microsoft.EntityFrameworkCore;
 using SGHR.Persistence.Context;
-using SGHR.Persistence.Domain;  // Cambié la referencia a Domain
+using SGHR.Persistence.Domain;
 using SGHR.Persistence.Interfaces;
-using SGHR.Persistence.Base;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SGHR.Persistence.Repositories
 {
-    public class PisoRepository : BaseRepository<Piso>, IPisoRepository
+    public class PisoRepository : IPisoRepository
     {
-        private readonly HotelContext _context;
+        private readonly SGHRContext _context;
 
-        public PisoRepository(HotelContext context) : base(context)
+        public PisoRepository(SGHRContext context)
         {
             _context = context;
         }
 
-        public async Task<IEnumerable<Piso>> GetAllPisosAsync()
+        public async Task<IEnumerable<Piso>> GetAllAsync()
         {
             return await _context.Pisos.ToListAsync();
         }
 
-        public async Task<Piso> GetPisoByIdAsync(int id)
+        public async Task<Piso> GetByIdAsync(int id)
         {
             return await _context.Pisos.FindAsync(id);
         }
 
-        public async Task CreatePisoAsync(Piso piso)
+        public async Task AddAsync(Piso piso)
         {
-            await base.CreateAsync(piso);
+            await _context.Pisos.AddAsync(piso);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task UpdatePisoAsync(Piso piso)
+        public async Task UpdateAsync(Piso piso)
         {
-            await base.UpdateAsync(piso);
+            _context.Pisos.Update(piso);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task DeletePisoAsync(int id)
+        public async Task DeleteAsync(int id)
         {
-            var piso = await GetPisoByIdAsync(id);
+            var piso = await _context.Pisos.FindAsync(id);
             if (piso != null)
             {
-                await base.DeleteAsync(piso);
+                _context.Pisos.Remove(piso);
+                await _context.SaveChangesAsync();
             }
         }
     }
