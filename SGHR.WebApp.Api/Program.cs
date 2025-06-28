@@ -17,7 +17,7 @@ using SGHR.Persistence.Repositories;
         builder.Services.AddDbContext<SGHRContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-        // Registrar el repositorio
+        // Registrar el repositoro
         builder.Services.AddScoped<IPisoRepository, PisoRepository>();
 
         // Add services to the container.
