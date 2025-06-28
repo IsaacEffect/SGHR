@@ -4,12 +4,13 @@ namespace SGHR.Application.Interfaces.Reservas
 {
     public interface IReservaApplicationService
     {
-        Task<ReservaDto> CrearReservaAsync(CrearReservaRequest request);
-        Task<ReservaDto?> ObtenerReservaPorIdAsync(int idReserva);
+        Task<ReservaDto?> ObtenerReservaPorIdAsync(int id);
         Task<List<ReservaDto>> ObtenerReservasPorClienteIdAsync(int idCliente);
         Task<List<ReservaDto>> ObtenerReservasEnRangoAsync(DateTime desde, DateTime hasta);
-        Task CancelaReservaAsync (int idReserva);
-        Task ActualizarReservaAsync(ActualizarReservaRequest request);
-        Task<DisponibilidadDto> VerificarDisponibilidadAsync(VerificarDisponibilidadRequest request);
+
+        Task<ReservaDto> CrearReservaAsync(CrearReservaRequest request);
+        Task<bool> ActualizarReservaAsync(int id, ActualizarReservaRequest request);
+        Task<bool> CancelarReservaAsync(int id);
+        Task<bool> VerificarDisponibilidadAsync(VerificarDisponibilidadRequest request);
     }
 }

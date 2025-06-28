@@ -1,8 +1,8 @@
-﻿using SGHR.Domain.Entities.Habitaciones;
-using SGHR.Domain.Base;
+﻿using SGHR.Domain.Base;
+using SGHR.Domain.Entities.Habitaciones;
 namespace SGHR.Domain.Entities.Servicios
 {
-    public class ServicioCategoria : EntityBase
+    public class ServicioCategoria : AuditableEntity
     {
         public int ServicioId { get; private set; }
         public int CategoriaHabitacionId { get; private set; }
@@ -10,10 +10,7 @@ namespace SGHR.Domain.Entities.Servicios
         public Servicios? Servicios { get; private set; }
         public CategoriaHabitacion? CategoriaHabitacion { get; private set; }
 
-        protected ServicioCategoria()
-        {
-            //
-        }
+   
 
         public ServicioCategoria(int servicioId, int categoriaHabitacionId, decimal precio)
         {
@@ -23,11 +20,12 @@ namespace SGHR.Domain.Entities.Servicios
                 throw new ArgumentException("El ID de la categoría de habitación debe ser mayor que cero.", nameof(categoriaHabitacionId));
             if (precio < 0)
                 throw new ArgumentException("El precio no puede ser negativo.", nameof(precio));
+            
             ServicioId = servicioId;
             CategoriaHabitacionId = categoriaHabitacionId;
             Precio = precio;
-        }
 
+        }
         public void ActualizarPrecio(decimal nuevoPrecio)
         {
             if (nuevoPrecio < 0)

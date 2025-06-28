@@ -1,13 +1,17 @@
-﻿namespace SGHR.Application.DTOs.Reservas
+﻿using SGHR.Domain.enums;
+
+namespace SGHR.Application.DTOs.Reservas
 {
     public class ReservaDto
     {
-        public int IdReserva { get; set; }
-        public int ClienteId { get; set; }
+        public int Id { get; set; }
+        public int IdCliente { get; set; }
         public int IdCategoriaHabitacion { get; set; }
         public DateTime FechaEntrada { get; set; }
         public DateTime FechaSalida { get; set; }
-        public int Estado { get; set; }
+        public EstadoReserva Estado { get; set; }
         public DateTime FechaCreacion { get; set; }
+        public DateTime? FechaModificacion { get; set; }
+        public bool Activo { get; set; }
     }
 }

@@ -5,6 +5,7 @@
         Confirmada,
         Cancelada,
         Pendiente,
+        Finalizada
 
     }
 }

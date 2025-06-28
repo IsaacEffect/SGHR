@@ -4,7 +4,10 @@
     {
         public int Id { get; protected set; }
         
-
         protected EntityBase() { }
+        public EntityBase(int id) 
+        {
+            Id = id;
+        }
     }
 }

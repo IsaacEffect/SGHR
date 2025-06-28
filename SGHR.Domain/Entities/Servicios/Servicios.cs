@@ -2,18 +2,17 @@
 
 namespace SGHR.Domain.Entities.Servicios
 {
-    public class Servicios : EntityBase
+    public class Servicios : AuditableEntity
     {
-        public string Nombre { get; private set; }
-        public string Descripcion { get; private set; }
-        public bool Activo { get; private set; }
+        public string Nombre { get; private set; } = string.Empty;
+        public string Descripcion { get; private set; } = string.Empty;
 
-        
+        public ICollection<ServicioCategoria> ServicioCategorias { get; private set; }
+
+
         protected Servicios()
         {
-            Nombre = string.Empty; 
-            Descripcion = string.Empty; 
-            Activo = false; 
+            ServicioCategorias = new HashSet<ServicioCategoria>();
         }
 
         public Servicios(string nombre, string descripcion)
@@ -25,7 +24,7 @@ namespace SGHR.Domain.Entities.Servicios
 
             Nombre = nombre;
             Descripcion = descripcion;
-            Activo = true;
+            ServicioCategorias = new HashSet<ServicioCategoria>();
         }
         public void Actualizar(string nuevoNombre, string nuevaDescripcion)
         {
@@ -35,16 +34,10 @@ namespace SGHR.Domain.Entities.Servicios
                 throw new ArgumentException("La descripción no puede estar vacía.", nameof(nuevaDescripcion));
             Nombre = nuevoNombre;
             Descripcion = nuevaDescripcion;
-           
+            SetFechaUltimaModificacion();
+
         }
-        public void Activar()
-        {
-            Activo = true;
-        }
-        public void Desactivar()
-        {
-            Activo = false;
-        }
+        
 
     }
 }
