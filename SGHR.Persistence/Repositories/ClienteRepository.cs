@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SGHR.Domain.Entities.Clientes;
-using SGHR.Domain.Repository;
+using SGHR.Domain.Interfaces.Repository;
 using SGHR.Persistence.Context;
 
 public class ClienteRepository : IClienteRepository

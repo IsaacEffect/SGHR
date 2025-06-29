@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SGHR.Domain.Interfaces;
+using SGHR.Domain.Interfaces.Service;
 
 namespace SGHR.WebApp.Api.Controllers
 {
@@ -7,27 +7,32 @@ namespace SGHR.WebApp.Api.Controllers
     [Route("api/[controller]")]
     public class HistorialController : ControllerBase
     {
-        private readonly IHistorialReservaRepository _repo;
+        private readonly IHistorialReservaService _historialService;
 
-        public HistorialController(IHistorialReservaRepository repo)
+        public HistorialController(IHistorialReservaService historialService)
         {
-            _repo = repo;
+            _historialService = historialService;
         }
 
-        //
-        [HttpGet]
-        public async Task<IActionResult> GetHistorial(
+        [HttpGet("filtrado")]
+        public async Task<IActionResult> GetHistorialFiltrado(
             [FromQuery] int clienteId,
-            [FromQuery] DateTime? fechaInicio,
-            [FromQuery] DateTime? fechaFin,
-            [FromQuery] string estado,
-            [FromQuery] string tipoHabitacion)
+            [FromQuery] DateTime? fechaInicio = null,
+            [FromQuery] DateTime? fechaFin = null,
+            [FromQuery] string estado = null,
+            [FromQuery] string tipoHabitacion = null)
         {
             try
             {
-                var historial = await _repo.GetHistorialByClienteAsync(
-                    clienteId, fechaInicio, fechaFin, estado, tipoHabitacion
-                );
+                var historial = await _historialService.ObtenerHistorialAsync(
+                    clienteId,
+                    fechaInicio,
+                    fechaFin,
+                    estado,
+                    tipoHabitacion);
+
+                if (historial == null || !historial.Any())
+                    return NotFound("No se encontraron reservas con los filtros aplicados");
 
                 return Ok(historial);
             }
@@ -37,15 +42,17 @@ namespace SGHR.WebApp.Api.Controllers
             }
         }
 
-        //
-        [HttpGet("detalle/{idReserva}")]
-        public async Task<IActionResult> GetDetalleReserva(int idReserva, [FromQuery] int clienteId)
+        [HttpGet("detalle/{idReserva}/{clienteId}")]
+        public async Task<IActionResult> GetDetalleReserva(
+            [FromRoute] int idReserva,
+            [FromRoute] int clienteId)
         {
             try
             {
-                var detalle = await _repo.GetDetalleReservaAsync(idReserva, clienteId);
+                var detalle = await _historialService.ObtenerDetalleAsync(idReserva, clienteId);
+
                 if (detalle == null)
-                    return NotFound("Reserva no encontrada.");
+                    return NotFound("Reserva no encontrada o no pertenece al cliente");
 
                 return Ok(detalle);
             }

@@ -1,15 +1,15 @@
-﻿using SGHR.Domain.Entities.Historial;
+﻿using SGHR.Model.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SGHR.Domain.Interfaces
+namespace SGHR.Domain.Interfaces.Service
 {
-    public interface IHistorialReservaRepository
+    public interface IHistorialReservaService
     {
-        Task<IEnumerable<HistorialReserva>> GetHistorialByClienteAsync(
+        Task<IEnumerable<HistorialReservaDto>> ObtenerHistorialAsync(
             int clienteId,
             DateTime? fechaInicio = null,
             DateTime? fechaFin = null,
@@ -17,6 +17,6 @@ namespace SGHR.Domain.Interfaces
             string tipoHabitacion = null
         );
 
-        Task<HistorialReserva> GetDetalleReservaAsync(int idReserva, int clienteId);
+        Task<HistorialReservaDto> ObtenerDetalleAsync(int idReserva, int clienteId);
     }
 }

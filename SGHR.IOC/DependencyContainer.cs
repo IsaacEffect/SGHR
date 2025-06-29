@@ -1,11 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SGHR.Domain.Interfaces;
-using SGHR.Domain.Repository;
+using SGHR.IOC.Modules;
 using SGHR.Persistence;
-using SGHR.Persistence.Context;
-using SGHR.Persistence.Repositories;
 
 namespace SGHR.IOC
 {
@@ -13,16 +10,12 @@ namespace SGHR.IOC
     {
         public static void RegisterServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped<IClienteRepository, ClienteRepository>();
-            services.AddScoped<IHistorialReservaRepository, HistorialReservaRepository>();
+            services.RegisterClientes(configuration);
+            services.RegisterHistorial(configuration);
+            services.RegisterDbContext(configuration);
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddLogging();
-            //
-
-            var connectionString = configuration.GetConnectionString("HotelDBConnection");
-            services.AddDbContext<HotelReservaDBContext>(options =>
-                options.UseSqlServer(connectionString));
         }
     }
 }

@@ -8,6 +8,7 @@ namespace SGHR.Model.Dtos
 {
     public record HistorialReservaDto
     {
+        public int Id { get; set; }
         public DateTime FechaEntrada { get; set; }
         public DateTime FechaSalida { get; set; }
         public string Estado { get; set; }

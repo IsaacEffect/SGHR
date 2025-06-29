@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SGHR.Domain.Entities.Clientes;
-using SGHR.Domain.Interfaces;
-using SGHR.Persistence.Context;
+using SGHR.Domain.Interfaces.Service;
+using SGHR.Model.Dtos;
 
 namespace SGHR.WebApp.Api.Controllers
 {
@@ -10,11 +8,11 @@ namespace SGHR.WebApp.Api.Controllers
     [Route("api/[controller]")]
     public class ClientesController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IClienteService _clienteService;
 
-        public ClientesController(IUnitOfWork unitOfWork)
+        public ClientesController(IClienteService clienteService)
         {
-            _unitOfWork = unitOfWork;
+            _clienteService = clienteService;
         }
 
         [HttpGet]
@@ -22,7 +20,7 @@ namespace SGHR.WebApp.Api.Controllers
         {
             try
             {
-                var clientes = await _unitOfWork.Clients.GetAllAsync();
+                var clientes = await _clienteService.ObtenerTodosAsync();
                 return Ok(clientes);
             }
             catch (Exception ex)
@@ -36,7 +34,7 @@ namespace SGHR.WebApp.Api.Controllers
         {
             try
             {
-                var cliente = await _unitOfWork.Clients.GetByIdAsync(id);
+                var cliente = await _clienteService.ObtenerPorIdAsync(id);
                 if (cliente == null)
                     return NotFound("Cliente no encontrado.");
 
@@ -45,6 +43,54 @@ namespace SGHR.WebApp.Api.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error al obtener cliente: {ex.Message}");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] InsertarClienteDto dto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                await _clienteService.InsertarAsync(dto);
+                return Ok("Cliente creado correctamente.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al crear cliente: {ex.Message}");
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Put([FromBody] ModificarClienteDto dto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                await _clienteService.ModificarAsync(dto);
+                return Ok("Cliente modificado correctamente.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al modificar cliente: {ex.Message}");
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                await _clienteService.EliminarAsync(id);
+                return Ok("Cliente eliminado correctamente.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al eliminar cliente: {ex.Message}");
             }
         }
     }

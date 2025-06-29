@@ -1,9 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using SGHR.Domain.Interfaces;
-using SGHR.Domain.Repository;
 using SGHR.IOC;
-using SGHR.Persistence;
-using SGHR.Persistence.Context;
 
 namespace SGHR.WebApp.Api
 {

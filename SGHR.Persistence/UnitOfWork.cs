@@ -1,14 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SGHR.Domain.Interfaces;
-using SGHR.Domain.Repository;
+using SGHR.Domain.Interfaces.Repository;
 using SGHR.Persistence.Context;
 using SGHR.Persistence.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SGHR.Persistence
 {

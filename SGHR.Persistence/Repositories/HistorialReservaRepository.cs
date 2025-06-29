@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SGHR.Domain.Entities.Historial;
-using SGHR.Domain.Interfaces;
+using SGHR.Domain.Interfaces.Repository;
 using SGHR.Persistence.Base;
 using System;
 using System.Collections.Generic;
