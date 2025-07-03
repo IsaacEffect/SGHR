@@ -1,11 +1,12 @@
-﻿using System.Linq.Expressions;
+﻿using SGHR.Domain.Entities.Users;
+using System.Linq.Expressions;
 
 
 namespace SGHR.Persistence.Interfaces.Repositories.Base
 {
     public interface IBaseRepository<TEntity> where TEntity : class
     {
-        Task<TEntity?> GetByIdAsync(int id); 
+        Task<TEntity?> ObtenerPorId(int id); 
         Task<IEnumerable<TEntity>> GetAllAsync();
         Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate);
 
@@ -15,5 +16,6 @@ namespace SGHR.Persistence.Interfaces.Repositories.Base
         void Update(TEntity entity); 
         void Remove(TEntity entity);
         void RemoveRange(IEnumerable<TEntity> entities);
+      
     }
 }

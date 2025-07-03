@@ -6,10 +6,7 @@ using SGHR.Persistence.Context;
 using SGHR.Persistence.Interfaces; 
 using SGHR.Persistence.Interfaces.Repositories.Reservas;
 using System.Data;
-using System; 
-using System.Collections.Generic;
-using System.Linq; 
-using System.Threading.Tasks;
+using EstadoEnum = SGHR.Domain.enums.EstadoReserva;
 
 namespace SGHR.Persistence.Repositories.Reservas
 {
@@ -18,21 +15,18 @@ namespace SGHR.Persistence.Repositories.Reservas
     {
         private readonly ISqlConnectionFactory _sqlConnectionFactory;
 
-        
         public ReservaRepository(SGHRDbContext context, ISqlConnectionFactory sqlConnectionFactory) : base(context)
         {
             _sqlConnectionFactory = sqlConnectionFactory;
         }
+
+       
+
         public async Task<List<Reserva>> ObtenerPorClienteIdAsync(int idCliente)
         {
             return await _dbSet
                 .Where(r => r.ClienteId == idCliente)
                 .ToListAsync();
-        }
-
-        public async Task<Reserva?> ObtenerPorIdAsync(int idReserva)
-        {
-            return await GetByIdAsync(idReserva);
         }
 
         public async Task<List<Reserva>> ObtenerReservasEnRangoAsync(DateTime desde, DateTime hasta)
@@ -42,11 +36,11 @@ namespace SGHR.Persistence.Repositories.Reservas
                 .ToListAsync();
         }
 
-        public async Task<bool> HayDisponibilidadAsync(int habitacionId, DateTime fechaEntrada, DateTime fechaSalida)
+        public async Task<bool> HayDisponibilidadAsync(int IdCategoriaHabitacion, DateTime fechaEntrada, DateTime fechaSalida)
         {
             using var connection = _sqlConnectionFactory.CreateConnection();
             var parameters = new DynamicParameters();
-            parameters.Add("@IdCategoriaHabitacion", habitacionId, DbType.Int32);
+            parameters.Add("@IdCategoriaHabitacion", IdCategoriaHabitacion, DbType.Int32);
             parameters.Add("@FechaEntrada", fechaEntrada, DbType.Date);
             parameters.Add("@FechaSalida", fechaSalida, DbType.Date);
             parameters.Add("@EstaDisponible", dbType: DbType.Boolean, direction: ParameterDirection.Output);
@@ -57,12 +51,17 @@ namespace SGHR.Persistence.Repositories.Reservas
                 commandType: CommandType.StoredProcedure
             );
             return parameters.Get<bool>("@EstaDisponible");
+        }
 
+        public async Task CrearAsync(Reserva reserva)
+        {
+            await _dbSet.AddAsync(reserva);
         }
 
         public async Task ActualizarAsync(Reserva reserva)
         {
             Update(reserva);
+            await _context.SaveChangesAsync();
         }
 
         public async Task CancelarReservaAsync(int idReserva)
@@ -78,13 +77,15 @@ namespace SGHR.Persistence.Repositories.Reservas
                 parameters,
                 commandType: CommandType.StoredProcedure
             );
-        }
 
-        public async Task CrearAsync(Reserva reserva)
-        {
-            await AddAsync(reserva);
+            var reserva = await _dbSet.FindAsync(idReserva);
+            if (reserva != null)
+            {
+                reserva.ActualizarEstado(EstadoEnum.Cancelada);
+                reserva.ActualizarMotivoCancelacion("Cancelada desde la aplicacion");
+                _context.Update(reserva);
+                await _context.SaveChangesAsync();
+            }
         }
-
-        
     }
 }

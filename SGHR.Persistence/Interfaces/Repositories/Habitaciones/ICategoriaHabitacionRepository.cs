@@ -1,8 +1,10 @@
-﻿
+﻿using SGHR.Domain.Entities.Habitaciones;
+using SGHR.Persistence.Interfaces.Repositories.Base;
+
 namespace SGHR.Persistence.Interfaces.Repositories.Habitaciones
 {
-    public interface ICategoriaHabitacionRepository
+    public interface ICategoriaHabitacionRepository : IBaseRepository<CategoriaHabitacion>
     {
-        Task<object?> ObtenerPorIdAsync(int categoriaId);
+        Task<CategoriaHabitacion> ObtenerPorIdAsync(int categoriaId);
     }
 }

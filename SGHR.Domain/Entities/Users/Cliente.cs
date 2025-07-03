@@ -5,35 +5,38 @@ namespace SGHR.Domain.Entities.Users
 {
     public class Cliente : AuditableEntity
     {
-        public string NombreUsuario { get; private set; } = string.Empty; 
-        public string HashedPassword { get; private set; } = string.Empty; 
-        public string Email { get; private set; } = string.Empty; 
-        public RolUsuario Rol { get; private set; }
-        public string? NombreCompleto { get; private set; }
+        public string Nombre { get; private set; } = string.Empty;
+        public string Apellido { get; private set; } = string.Empty;
+        public string Email { get; private set; } = string.Empty;
         public string? Telefono { get; private set; }
         public string? Direccion { get; private set; }
+        public string HashedPassword { get; private set; } = string.Empty;
+        public RolUsuario Rol { get; private set; }
 
         protected Cliente() { }
 
-        public Cliente(string nombreUsuario, string hashedPassword, string email, RolUsuario rol, string? nombreCompleto = null,
+        public Cliente(string nombre, string hashedPassword, string email, RolUsuario rol, string? apellido,
                     string? telefono = null, string? direccion = null)
         {
-            if (string.IsNullOrWhiteSpace(nombreUsuario)) throw new ArgumentException("El nombre de usuario es requerido.");
-            if (string.IsNullOrWhiteSpace(hashedPassword)) throw new ArgumentException("El hash de la contraseña es requerido.");
+            if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("El nombre es requerido.");
+            if (string.IsNullOrWhiteSpace(apellido)) throw new ArgumentException("El apellido es requerido."); 
+            if (string.IsNullOrWhiteSpace(hashedPassword)) throw new ArgumentException("La contraseña es requerida.");
             if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("El email es requerido.");
 
-            NombreUsuario = nombreUsuario;
+            Nombre = nombre;
             HashedPassword = hashedPassword;
             Email = email;
             Rol = rol;
-            NombreCompleto = nombreCompleto;
+            Apellido = apellido;
             Telefono = telefono;
             Direccion = direccion;
+            SetFechaUltimaModificacion();
         }
 
-        public void ActualizarPerfil(string? nombreCompleto, string? telefono, string? direccion, string email)
+        public void ActualizarPerfil(string? nombre, string? apellido, string? telefono, string? direccion, string email)
         {
-            NombreCompleto = nombreCompleto;
+            Nombre = nombre ?? Nombre; 
+            Apellido = apellido;
             Telefono = telefono;
             Direccion = direccion;
             Email = email;
@@ -47,6 +50,5 @@ namespace SGHR.Domain.Entities.Users
             HashedPassword = nuevoHashedPassword;
             SetFechaUltimaModificacion();
         }
-        
     }
 }

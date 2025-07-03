@@ -7,14 +7,15 @@ namespace SGHR.Domain.Entities.Reservas
 
     public class Reserva : AuditableEntity
     {
+        public int Id { get; protected set; }
         public int ClienteId { get; private set; }
         public int IdCategoriaHabitacion { get; private set; }
         public DateTime FechaEntrada { get; private set; }
         public DateTime FechaSalida { get; private set; }
         public EstadoReserva Estado { get; private set; }
         public sbyte NumeroHuespedes { get; private set; } = 1;
-        public string NumeroReservaUnico { get; private set; } = Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
-        public DateTime FechaCancelacion { get; private set; }
+        public string NumeroReservaUnico { get; private set; } 
+        public DateTime? FechaCancelacion { get; private set; }
         public string? MotivoCancelacion { get; private set; }
 
         public Cliente? Cliente { get; private set; }
@@ -23,6 +24,14 @@ namespace SGHR.Domain.Entities.Reservas
         protected Reserva() { }
         public Reserva(int clienteId, int idCategoriaHabitacion, DateTime fechaEntrada, DateTime fechaSalida, sbyte numeroHuespedes )
         {
+            if (clienteId <= 0)
+            {
+                throw new ArgumentException("El ID del cliente debe ser un número positivo.", nameof(clienteId));
+            }
+            if (idCategoriaHabitacion <= 0)
+            {
+                throw new ArgumentException("El ID de la categoría de habitación debe ser un número positivo.", nameof(idCategoriaHabitacion));
+            }
             if (fechaEntrada >= fechaSalida)
             {
                 throw new ArgumentException("La fecha de entrada debe ser anterior a la fecha de salida.");
@@ -39,13 +48,49 @@ namespace SGHR.Domain.Entities.Reservas
             NumeroHuespedes = numeroHuespedes; 
             Estado = EstadoReserva.Pendiente;
 
-            NumeroReservaUnico = Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
-            Activar();
+            NumeroReservaUnico = GenerarNumeroReservaUnico();
+            FechaCreacion = DateTime.Now;
+
 
         }
-        public void ActualizarDetalles(int clienteId, int idCategoriaHabitacion, DateTime fechaEntrada, DateTime fechaSalida)
-        {
 
+        public string GenerarNumeroReservaUnico()
+        {
+            return $"RSV-{Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper()}";
+        }
+        public void ActualizarEstado(EstadoReserva nuevoEstado)
+        {
+            Estado = nuevoEstado;
+        }
+        
+        public void ActualizarMotivoCancelacion(string motivo)
+        {
+            if (string.IsNullOrWhiteSpace(motivo))
+            {
+                throw new ArgumentException("El motivo de cancelación no puede estar vacío.", nameof(motivo));
+            }
+            MotivoCancelacion = motivo;
+            FechaCancelacion = DateTime.Now;
+        }
+
+        public void ActualizarDetalles(int clienteId, int idCategoriaHabitacion, DateTime fechaEntrada, DateTime fechaSalida, sbyte numeroHuespedes)
+        {
+            if (clienteId <= 0)
+            {
+                throw new ArgumentException("El ID del cliente debe ser un número positivo.", nameof(clienteId));
+            }
+            if (idCategoriaHabitacion <= 0)
+            {
+                throw new ArgumentException("El ID de la categoría de habitación debe ser un número positivo.", nameof(idCategoriaHabitacion));
+            }
+            if (fechaEntrada >= fechaSalida)
+            {
+                throw new ArgumentException("La fecha de entrada debe ser anterior a la fecha de salida.", nameof(fechaEntrada));
+            }
+            if (numeroHuespedes <= 0)
+            {
+                throw new ArgumentException("El número de huéspedes debe ser mayor que cero.", nameof(numeroHuespedes));
+            }
             if (fechaEntrada >= fechaSalida)
             {
                 throw new ArgumentException("La fecha de entrada debe ser anterior a la fecha de salida.");

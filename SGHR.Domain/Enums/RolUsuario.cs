@@ -4,6 +4,6 @@
     {
         Administrador,
         Recepcionista,
-        Cliente,
+        Cliente
     }
 }

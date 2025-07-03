@@ -6,7 +6,7 @@ namespace SGHR.Application.Interfaces.Servicios
     {
         // Operaciones CRUD para servicios
         Task<ServicioDto> AgregarServicioAsync(AgregarServicioRequest request);
-        Task ActualizarServicioAsync(ActualizarServicioRequest request); // <-- MODIFICADO
+        Task ActualizarServicioAsync(ActualizarServicioRequest request);
         Task EliminarServicioAsync(int id);
         Task<ServicioDto?> ObtenerServicioPorIdAsync(int id);
         Task<List<ServicioDto>> ObtenerTodosLosServiciosAsync();

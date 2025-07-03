@@ -30,7 +30,7 @@ namespace SGHR.Persistence.Repositories.Servicios
         }
         public async Task EliminarServicioAsync(int id)
         {
-            var servicio = await GetByIdAsync(id) ?? throw new KeyNotFoundException($"Servicio con ID {id} no encontrado.");
+            var servicio = await base.ObtenerPorId(id) ?? throw new KeyNotFoundException($"Servicio con ID {id} no encontrado.");
             _dbSet.Remove(servicio);
             await _context.SaveChangesAsync();
         }

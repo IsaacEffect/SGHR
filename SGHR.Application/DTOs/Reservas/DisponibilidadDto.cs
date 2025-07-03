@@ -2,7 +2,7 @@
 {
     public class DisponibilidadDto
     {
-        public int idCategoriaHabitacion { get; set; }
+        public int IdCategoriaHabitacion { get; set; }
         public bool Disponible { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using SGHR.Persistence.Interfaces.Repositories.Base;
+using SGHR.Domain.Entities.Users;
 
 namespace SGHR.Persistence.Base
 {
@@ -16,7 +17,7 @@ namespace SGHR.Persistence.Base
             _dbSet = _context.Set<TEntity>();
         }
 
-        public async Task<TEntity?> GetByIdAsync(int id)
+        public virtual async Task<TEntity?> ObtenerPorId(int id)
         {
             return await _dbSet.FindAsync(id);
         }
@@ -34,25 +35,31 @@ namespace SGHR.Persistence.Base
         public async Task AddAsync(TEntity entity)
         {
             await _dbSet.AddAsync(entity);
+            await _context.SaveChangesAsync();
         }
 
         public async Task AddRangeAsync(IEnumerable<TEntity> entities)
         {
             await _dbSet.AddRangeAsync(entities);
+            await _context.SaveChangesAsync();
         }
 
         public void Update(TEntity entity)
         {
             _dbSet.Update(entity);
+            _context.SaveChanges();
         }
+
         public void Remove(TEntity entity)
         {
             _dbSet.Remove(entity);
+            _context.SaveChanges();
         }
 
         public void RemoveRange(IEnumerable<TEntity> entities)
         {
             _dbSet.RemoveRange(entities);
+            _context.SaveChanges();
         }
     }
 }
