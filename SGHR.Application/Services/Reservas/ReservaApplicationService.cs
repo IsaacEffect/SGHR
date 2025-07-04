@@ -36,7 +36,6 @@ namespace SGHR.Application.Services.Reservas
             var dto = _mapper.Map<ReservaDto?>(reserva);
             return dto;
         }
-
         public async Task<List<ReservaDto>> ObtenerReservasPorClienteIdAsync(int idCliente)
         {
             var clienteExiste = await _clienteRepository.ObtenerPorId(idCliente) 
@@ -55,7 +54,6 @@ namespace SGHR.Application.Services.Reservas
             var dto = _mapper.Map<List<ReservaDto>>(reservas);
             return dto;
         }
-
         public async Task<ReservaDto> CrearReservaAsync(CrearReservaRequest request)
         {
 
@@ -123,17 +121,20 @@ namespace SGHR.Application.Services.Reservas
                     if (!categoriaExiste) throw new KeyNotFoundException($"Nueva Categoría de habitación con ID {request.IdCategoriaHabitacion} no encontrada.");
                 }
 
-                bool necesitaVerificarDisponibilidad =
+                bool fechaCambio =
                     reservaExistente.FechaEntrada != request.FechaEntrada ||
-                    reservaExistente.FechaSalida != request.FechaSalida ||
+                    reservaExistente.FechaSalida != request.FechaSalida;
+                bool habitacionCambio =
                     reservaExistente.IdCategoriaHabitacion != request.IdCategoriaHabitacion;
+                bool necesitaVerificarDisponibilidad = fechaCambio || habitacionCambio;
 
                 if (necesitaVerificarDisponibilidad)
                 {
                     var estaDisponible = await _reservaRepository.HayDisponibilidadAsync(
                         request.IdCategoriaHabitacion,
                         request.FechaEntrada,
-                        request.FechaSalida
+                        request.FechaSalida,
+                        id
                     );
                     if (!estaDisponible)
                     {
@@ -184,7 +185,6 @@ namespace SGHR.Application.Services.Reservas
                 throw new ArgumentException($"Error de validacion al actualizar la reserva: {ex.Message}");
             }
         }
-
         public async Task<bool> CancelarReservaAsync(int id)
         {
             var reservaExistente = await _reservaRepository.ObtenerPorId(id)
@@ -200,7 +200,6 @@ namespace SGHR.Application.Services.Reservas
                 throw new InvalidOperationException($"Error al cancelar la reserva: {ex.Message}");
             }
         }
-
         public async Task<bool> VerificarDisponibilidadAsync(VerificarDisponibilidadRequest request)
         {
             if(request.FechaEntrada >= request.FechaSalida)

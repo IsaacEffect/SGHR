@@ -36,7 +36,7 @@ namespace SGHR.Persistence.Repositories.Reservas
                 .ToListAsync();
         }
 
-        public async Task<bool> HayDisponibilidadAsync(int IdCategoriaHabitacion, DateTime fechaEntrada, DateTime fechaSalida)
+        public async Task<bool> HayDisponibilidadAsync(int IdCategoriaHabitacion, DateTime fechaEntrada, DateTime fechaSalida, int? idReservaActual = null)
         {
             using var connection = _sqlConnectionFactory.CreateConnection();
             var parameters = new DynamicParameters();
@@ -44,7 +44,7 @@ namespace SGHR.Persistence.Repositories.Reservas
             parameters.Add("@FechaEntrada", fechaEntrada, DbType.Date);
             parameters.Add("@FechaSalida", fechaSalida, DbType.Date);
             parameters.Add("@EstaDisponible", dbType: DbType.Boolean, direction: ParameterDirection.Output);
-
+            parameters.Add("@IdReservaActual", idReservaActual, DbType.Int32);
             await connection.ExecuteAsync(
                 "HayDisponibilidadHabitacion",
                 parameters,

@@ -13,7 +13,7 @@ namespace SGHR.Domain.Entities.Reservas
         public DateTime FechaEntrada { get; private set; }
         public DateTime FechaSalida { get; private set; }
         public EstadoReserva Estado { get; private set; }
-        public sbyte NumeroHuespedes { get; private set; } = 1;
+        public int NumeroHuespedes { get; private set; } = 1;
         public string NumeroReservaUnico { get; private set; } 
         public DateTime? FechaCancelacion { get; private set; }
         public string? MotivoCancelacion { get; private set; }
@@ -22,7 +22,7 @@ namespace SGHR.Domain.Entities.Reservas
         public CategoriaHabitacion? CategoriaHabitacion { get; private set; }
 
         protected Reserva() { }
-        public Reserva(int clienteId, int idCategoriaHabitacion, DateTime fechaEntrada, DateTime fechaSalida, sbyte numeroHuespedes )
+        public Reserva(int clienteId, int idCategoriaHabitacion, DateTime fechaEntrada, DateTime fechaSalida, int numeroHuespedes )
         {
             if (clienteId <= 0)
             {

@@ -21,7 +21,7 @@ namespace SGHR.Application.DTOs.Reservas
         public EstadoReserva Estado { get; set; }
         
         [Required(ErrorMessage = "El numero de huespedes es requerido")]
-        [Range(1, sbyte.MaxValue, ErrorMessage = "El numero de huespedes debe ser al menos 1 y no exceder 255")]
+        [Range(1, int.MaxValue, ErrorMessage = "El numero de huespedes debe ser al menos 1 y no exceder 255")]
         public sbyte NumeroHuespedes { get; set; }
 
     }
