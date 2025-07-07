@@ -8,11 +8,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SGHR.Application.Mapping
+namespace SGHR.Application.Mapping.Reservas
 {
     public class ReservaProfile : Profile
     {
-        public ReservaProfile() // Ensure a constructor is defined for the Profile class
+        public ReservaProfile() 
         {
             CreateMap<CrearReservaRequest, Reserva>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())

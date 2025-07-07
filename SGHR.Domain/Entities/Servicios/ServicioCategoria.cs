@@ -10,7 +10,8 @@ namespace SGHR.Domain.Entities.Servicios
         public Servicios? Servicios { get; private set; }
         public CategoriaHabitacion? CategoriaHabitacion { get; private set; }
 
-   
+        
+        protected ServicioCategoria() { }
 
         public ServicioCategoria(int servicioId, int categoriaHabitacionId, decimal precio)
         {
