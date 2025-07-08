@@ -1,5 +1,5 @@
 ﻿using SGHR.Domain.Base;
-using SGHR.Domain.enums;
+using SGHR.Domain.Enums;
 
 namespace SGHR.Domain.Entities.Users
 {

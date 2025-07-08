@@ -15,21 +15,25 @@ namespace SGHR.Application.Services.Servicios
         private readonly ICategoriaHabitacionRepository _categoriaHabitacionRepository;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;  
+        private readonly IServicioRules _servicioRules;
         public ServicioApplicationService(
             IServicioRepository serviciosRepository,
             IServicioCategoriaRepository servicioCategoriaRepository,
             ICategoriaHabitacionRepository categoriaHabitacionRepository,
             IMapper mapper,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IServicioRules servicioRules)
         {
             _serviciosRepository = serviciosRepository;
             _servicioCategoriaRepository = servicioCategoriaRepository;
             _categoriaHabitacionRepository = categoriaHabitacionRepository;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _servicioRules = servicioRules;
         }
         public async Task<ServicioDto> AgregarServicioAsync(AgregarServicioRequest request)
         {
+            await _servicioRules.ValidarDatosBasicosAsync(request.Nombre, request.Descripcion);
             var nuevoServicio = _mapper.Map<ServiciosEntity>(request);
             await _serviciosRepository.AgregarServicioAsync(nuevoServicio);
             await _unitOfWork.CommitAsync();
@@ -37,8 +41,9 @@ namespace SGHR.Application.Services.Servicios
         }
         public async Task ActualizarServicioAsync(ActualizarServicioRequest request)
         {
-            var servicio = await _serviciosRepository.ObtenerPorIdAsync(request.IdServicio) ?? throw new KeyNotFoundException($"Servicio con ID {request.IdServicio} no encontrado.");
-            if (string.IsNullOrWhiteSpace(request.Nombre)) throw new ArgumentException("El nombre del servicio es requerido.", nameof(request.Nombre));
+            await _servicioRules.ValidarExistenciaSerivicioAsync(request.IdServicio);
+            var servicio = await _serviciosRepository.ObtenerPorIdAsync(request.IdServicio);
+            await _servicioRules.ValidarDatosBasicosAsync(request.Nombre, request.Descripcion);
 
             servicio.Actualizar(request.Nombre, request.Descripcion);
             if (request.Activo) servicio.Activar(); else servicio.Desactivar();
@@ -48,16 +53,16 @@ namespace SGHR.Application.Services.Servicios
         }
         public async Task EliminarServicioAsync(int idServicio)
         {
-            var servicio = await _serviciosRepository.ObtenerPorIdAsync(idServicio)
-                           ?? throw new KeyNotFoundException($"Servicio con ID {idServicio} no encontrado.");
+            await _servicioRules.ValidarExistenciaSerivicioAsync(idServicio);
+            await _serviciosRepository.ObtenerPorIdAsync(idServicio);
             await _serviciosRepository.EliminarServicioAsync(idServicio);
             await _unitOfWork.CommitAsync();
 
         }
         public async Task ActivarServicioAsync(int idServicio)
         {
-            var servicio = await _serviciosRepository.ObtenerPorIdAsync(idServicio)
-                           ?? throw new KeyNotFoundException($"Servicio con ID {idServicio} no encontrado.");
+            await _servicioRules.ValidarExistenciaSerivicioAsync(idServicio);
+            var servicio = await _serviciosRepository.ObtenerPorIdAsync(idServicio);
             servicio.Activar();
             await _serviciosRepository.ActualizarServicioAsync(servicio);
             await _unitOfWork.CommitAsync();
@@ -65,8 +70,8 @@ namespace SGHR.Application.Services.Servicios
         }
         public async Task DesactivarServicioAsync(int idServicio)
         {
-            var servicio = await _serviciosRepository.ObtenerPorIdAsync(idServicio)
-                           ?? throw new KeyNotFoundException($"Servicio con ID {idServicio} no encontrado.");
+            await _servicioRules.ValidarExistenciaSerivicioAsync(idServicio);
+            var servicio = await _serviciosRepository.ObtenerPorIdAsync(idServicio);
             servicio.Desactivar();
             await _serviciosRepository.ActualizarServicioAsync(servicio);
             await _unitOfWork.CommitAsync();
@@ -84,44 +89,43 @@ namespace SGHR.Application.Services.Servicios
         }
         public async Task AsignarPrecioServicioCategoriaAsync(AsignarPrecioServicioCategoriaRequest request)
         {
-            if (request.Precio <= 0) throw new ArgumentException("El precio debe ser mayor que cero.", nameof(request.Precio));
-
-            var servicioExistente = await _serviciosRepository.ObtenerPorIdAsync(request.IdServicio) != null;
-            if (!servicioExistente) throw new KeyNotFoundException($"Servicio con ID {request.IdServicio} no encontrado.");
-
+            _servicioRules.ValidarPrecioServicio(request.Precio);
+            _ = await _serviciosRepository.ObtenerPorIdAsync(request.IdServicio);
+            await _servicioRules.ValidarExistenciaSerivicioAsync(request.IdServicio);
             var categoriaExiste = await _categoriaHabitacionRepository.ObtenerPorIdAsync(request.IdCategoriaHabitacion) != null;
-            if (!categoriaExiste) throw new KeyNotFoundException($"Categoría de habitación con ID {request.IdCategoriaHabitacion} no encontrada.");
-
+            if (!categoriaExiste) throw new KeyNotFoundException($"Categoría de habitación con ID {request.IdCategoriaHabitacion} no encontrada."); // Se puede implementar una base para las validaciones
             await _servicioCategoriaRepository.AgregarPrecioServicioCategoriaAsync( 
                 request.IdServicio,
                 request.IdCategoriaHabitacion,
                 request.Precio
             );
-          
         }
         public async Task EliminarPrecioServicioCategoriaAsync(int servicioId, int categoriaId)
         {
+            await _servicioRules.ValidarExistenciaSerivicioAsync(servicioId);
+            _ = await _categoriaHabitacionRepository.ObtenerPorIdAsync(categoriaId) 
+                ?? throw new KeyNotFoundException($"Categoría de habitación con ID {categoriaId} no encontrada."); // aqui tambien se puede implementar una base para las validaciones
             await _servicioCategoriaRepository.EliminarPrecioServicioCategoriaAsync(servicioId, categoriaId); 
           
         }
         public async Task<List<ServicioCategoriaDto>> ObtenerPreciosServicioPorCategoriaAsync(int categoriaId)
         {
-            var categoria = await _categoriaHabitacionRepository.ObtenerPorIdAsync(categoriaId)
-                            ?? throw new KeyNotFoundException($"Categoría de habitación con el ID {categoriaId} no encontrada.");
+            _ = await _categoriaHabitacionRepository.ObtenerPorIdAsync(categoriaId)
+                            ?? throw new KeyNotFoundException($"Categoría de habitación con el ID {categoriaId} no encontrada."); // aqui tambien se puede implementar una base para las validaciones
 
             var precios = await _servicioCategoriaRepository.ObtenerPreciosPorCategoriaAsync(categoriaId); 
             return _mapper.Map<List<ServicioCategoriaDto>>(precios);
         }
         public async Task<List<ServicioCategoriaDto>> ObtenerPreciosCategoriaPorServicioAsync(int servicioId)
         {
-            var servicio = await _serviciosRepository.ObtenerPorIdAsync(servicioId)
-                           ?? throw new KeyNotFoundException($"Servicio con ID {servicioId} no encontrado.");
-
+            await _servicioRules.ValidarExistenciaSerivicioAsync(servicioId);
             var precios = await _servicioCategoriaRepository.ObtenerPreciosPorServicioAsync(servicioId); 
             return _mapper.Map<List<ServicioCategoriaDto>>(precios);
         }
         public async Task<ServicioCategoriaDto?> ObtenerPrecioServicioCategoriaEspecificoAsync(int servicioId, int categoriaId)
         {
+            _ = await _categoriaHabitacionRepository.ObtenerPorIdAsync(categoriaId) 
+                ?? throw new KeyNotFoundException($"Categoría de habitación con el ID {categoriaId} no encontrada."); // aqui tambien se puede implementar una base para las validaciones
             var precio = await _servicioCategoriaRepository.ObtenerPrecioServicioCategoriaEspecificoAsync(servicioId, categoriaId); 
             return _mapper.Map<ServicioCategoriaDto>(precio);
         }

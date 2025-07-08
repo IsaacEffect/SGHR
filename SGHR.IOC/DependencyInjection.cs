@@ -3,6 +3,7 @@ using SGHR.Application.Interfaces.Reservas;
 using SGHR.Application.Interfaces.Servicios;
 using SGHR.Application.Services.Reservas;
 using SGHR.Application.Services.Servicios;
+using SGHR.Application.Validations;
 using SGHR.Domain.Interfaces;
 using SGHR.Persistence.Interfaces.Repositories.Clientes;
 using SGHR.Persistence.Interfaces.Repositories.Habitaciones;
@@ -38,7 +39,9 @@ namespace SGHR.IOC
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             // Validations
-            
+            services.AddScoped<IReservaRules, ReservaRules>();
+            services.AddScoped<IServicioRules, ServicioRules>();
+
 
             return services;
         }
