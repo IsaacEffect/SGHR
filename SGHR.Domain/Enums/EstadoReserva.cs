@@ -1,4 +1,4 @@
-﻿namespace SGHR.Domain.enums
+﻿namespace SGHR.Domain.Enums
 {
     public enum EstadoReserva
     {

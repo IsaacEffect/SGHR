@@ -6,7 +6,7 @@ using SGHR.Persistence.Context;
 using SGHR.Persistence.Interfaces; 
 using SGHR.Persistence.Interfaces.Repositories.Reservas;
 using System.Data;
-using EstadoEnum = SGHR.Domain.enums.EstadoReserva;
+using SGHR.Domain.Enums;
 
 namespace SGHR.Persistence.Repositories.Reservas
 {
@@ -58,10 +58,10 @@ namespace SGHR.Persistence.Repositories.Reservas
             await _dbSet.AddAsync(reserva);
         }
 
-        public async Task ActualizarAsync(Reserva reserva)
+        public Task ActualizarAsync(Reserva reserva)
         {
             Update(reserva);
-            await _context.SaveChangesAsync();
+            return Task.CompletedTask;
         }
 
         public async Task CancelarReservaAsync(int idReserva)
@@ -81,7 +81,7 @@ namespace SGHR.Persistence.Repositories.Reservas
             var reserva = await _dbSet.FindAsync(idReserva);
             if (reserva != null)
             {
-                reserva.ActualizarEstado(EstadoEnum.Cancelada);
+                reserva.ActualizarEstado(EstadoReserva.Cancelada);
                 reserva.ActualizarMotivoCancelacion("Cancelada desde la aplicacion");
                 _context.Update(reserva);
                 await _context.SaveChangesAsync();

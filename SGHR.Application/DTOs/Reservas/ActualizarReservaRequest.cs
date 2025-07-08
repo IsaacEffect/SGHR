@@ -1,4 +1,4 @@
-﻿using SGHR.Domain.enums;
+﻿using SGHR.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace SGHR.Application.DTOs.Reservas

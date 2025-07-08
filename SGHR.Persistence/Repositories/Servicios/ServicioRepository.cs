@@ -8,7 +8,7 @@ using ServiciosEntity = SGHR.Domain.Entities.Servicios.Servicios;
 
 namespace SGHR.Persistence.Repositories.Servicios
 {
-    public class ServicioRepository(SGHRDbContext context, ISqlConnectionFactory sqlConnectionFactory) : BaseRepository<Domain.Entities.Servicios.Servicios>(context), IServicioRepository
+    public class ServicioRepository(SGHRDbContext context, ISqlConnectionFactory sqlConnectionFactory) : BaseRepository<ServiciosEntity>(context), IServicioRepository
     {
         private readonly ISqlConnectionFactory _sqlConnectionFactory = sqlConnectionFactory;
 
@@ -20,19 +20,17 @@ namespace SGHR.Persistence.Repositories.Servicios
         {
             ArgumentNullException.ThrowIfNull(servicio);
             await _dbSet.AddAsync(servicio);
-            await _context.SaveChangesAsync();
         }
-        public async Task ActualizarServicioAsync(ServiciosEntity servicio)
+        public Task ActualizarServicioAsync(ServiciosEntity servicio)
         {
             ArgumentNullException.ThrowIfNull(servicio);
             _dbSet.Update(servicio);
-            await _context.SaveChangesAsync();
+            return Task.CompletedTask;
         }
         public async Task EliminarServicioAsync(int id)
         {
             var servicio = await base.ObtenerPorId(id) ?? throw new KeyNotFoundException($"Servicio con ID {id} no encontrado.");
             _dbSet.Remove(servicio);
-            await _context.SaveChangesAsync();
         }
 
         public Task ActivarServicioAsync(int id, bool activo)

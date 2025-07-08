@@ -1,5 +1,4 @@
-﻿using SGHR.Domain.enums;
-
+﻿using SGHR.Domain.Enums;
 namespace SGHR.Application.DTOs.Reservas
 {
     public class CrearReservaRequest

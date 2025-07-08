@@ -2,8 +2,8 @@
 using SGHR.Application.Interfaces.Servicios;
 using SGHR.Persistence.Interfaces.Repositories.Habitaciones;
 using SGHR.Persistence.Interfaces.Repositories.Servicios;
-using SGHR.Persistence.Context;
 using ServiciosEntity = SGHR.Domain.Entities.Servicios.Servicios;
+using SGHR.Domain.Interfaces;
 using AutoMapper;
 
 namespace SGHR.Application.Services.Servicios
@@ -14,26 +14,25 @@ namespace SGHR.Application.Services.Servicios
         private readonly IServicioCategoriaRepository _servicioCategoriaRepository;
         private readonly ICategoriaHabitacionRepository _categoriaHabitacionRepository;
         private readonly IMapper _mapper;
-        private readonly SGHRDbContext _dbContext; 
-
+        private readonly IUnitOfWork _unitOfWork;  
         public ServicioApplicationService(
             IServicioRepository serviciosRepository,
             IServicioCategoriaRepository servicioCategoriaRepository,
             ICategoriaHabitacionRepository categoriaHabitacionRepository,
             IMapper mapper,
-            SGHRDbContext dbContext)
+            IUnitOfWork unitOfWork)
         {
             _serviciosRepository = serviciosRepository;
             _servicioCategoriaRepository = servicioCategoriaRepository;
             _categoriaHabitacionRepository = categoriaHabitacionRepository;
             _mapper = mapper;
-            _dbContext = dbContext;
+            _unitOfWork = unitOfWork;
         }
         public async Task<ServicioDto> AgregarServicioAsync(AgregarServicioRequest request)
         {
             var nuevoServicio = _mapper.Map<ServiciosEntity>(request);
             await _serviciosRepository.AgregarServicioAsync(nuevoServicio);
-            await _dbContext.SaveChangesAsync(); 
+            await _unitOfWork.CommitAsync();
             return _mapper.Map<ServicioDto>(nuevoServicio);
         }
         public async Task ActualizarServicioAsync(ActualizarServicioRequest request)
@@ -45,14 +44,15 @@ namespace SGHR.Application.Services.Servicios
             if (request.Activo) servicio.Activar(); else servicio.Desactivar();
 
             await _serviciosRepository.ActualizarServicioAsync(servicio);
-            await _dbContext.SaveChangesAsync(); 
+            await _unitOfWork.CommitAsync();
         }
         public async Task EliminarServicioAsync(int idServicio)
         {
             var servicio = await _serviciosRepository.ObtenerPorIdAsync(idServicio)
                            ?? throw new KeyNotFoundException($"Servicio con ID {idServicio} no encontrado.");
             await _serviciosRepository.EliminarServicioAsync(idServicio);
-            await _dbContext.SaveChangesAsync(); 
+            await _unitOfWork.CommitAsync();
+
         }
         public async Task ActivarServicioAsync(int idServicio)
         {
@@ -60,7 +60,8 @@ namespace SGHR.Application.Services.Servicios
                            ?? throw new KeyNotFoundException($"Servicio con ID {idServicio} no encontrado.");
             servicio.Activar();
             await _serviciosRepository.ActualizarServicioAsync(servicio);
-            await _dbContext.SaveChangesAsync(); 
+            await _unitOfWork.CommitAsync();
+
         }
         public async Task DesactivarServicioAsync(int idServicio)
         {
@@ -68,7 +69,8 @@ namespace SGHR.Application.Services.Servicios
                            ?? throw new KeyNotFoundException($"Servicio con ID {idServicio} no encontrado.");
             servicio.Desactivar();
             await _serviciosRepository.ActualizarServicioAsync(servicio);
-            await _dbContext.SaveChangesAsync(); 
+            await _unitOfWork.CommitAsync();
+
         }
         public async Task<ServicioDto?> ObtenerServicioPorIdAsync(int idServicio)
         {

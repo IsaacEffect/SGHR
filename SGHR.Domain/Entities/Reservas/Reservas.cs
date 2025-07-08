@@ -1,7 +1,7 @@
 ﻿using SGHR.Domain.Base;
 using SGHR.Domain.Entities.Habitaciones;
 using SGHR.Domain.Entities.Users;
-using SGHR.Domain.enums;
+using SGHR.Domain.Enums;
 namespace SGHR.Domain.Entities.Reservas
 {
 
