@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SGHR.IOC\SGHR.IOC.csproj" />
     <ProjectReference Include="..\SGHR.Persistence\SGHR.Persistence.csproj" />
   </ItemGroup>
 

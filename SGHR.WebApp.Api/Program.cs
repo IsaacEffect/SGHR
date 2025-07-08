@@ -5,6 +5,7 @@ namespace SGHR.WebApp.Api
 using SGHR.Persistence.Context;
 using SGHR.Persistence.Interfaces;
 using SGHR.Persistence.Repositories;
+    using SGHR.IOC;
 
 
     public class Program
@@ -26,6 +27,7 @@ using SGHR.Persistence.Repositories;
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            IOCServices.Register(builder.Services);
 
             var app = builder.Build();
 
