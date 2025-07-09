@@ -1,8 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
-using SGHR.Domain.Entities.Clientes;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using SGHR.Application.Base;
+using SGHR.Application.Base.Mappers;
+using SGHR.Application.Contracts.Service;
+using SGHR.Application.Dtos;
+using SGHR.Domain.Base;
 using SGHR.Domain.Interfaces;
-using SGHR.Domain.Interfaces.Service;
-using SGHR.Model.Dtos;
 
 namespace SGHR.Application.Services
 {
@@ -10,6 +13,7 @@ namespace SGHR.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<ClienteService> _logger;
+        private readonly PasswordHasher<string> _passwordHasher = new();
 
         public ClienteService(IUnitOfWork unitOfWork, ILogger<ClienteService> logger)
         {
@@ -17,86 +21,118 @@ namespace SGHR.Application.Services
             _logger = logger;
         }
 
-        public async Task<IEnumerable<ObtenerClienteDto>> ObtenerTodosAsync()
+        public async Task<OperationResult<IEnumerable<ObtenerClienteDto>>> ObtenerTodosAsync()
         {
-            var clientes = await _unitOfWork.Clients.GetAllAsync();
-
-            return clientes.Select(c => new ObtenerClienteDto
+            return await ServiceExecutor.ExecuteAsync(_logger, async () =>
             {
-                IdCliente = c.Id,
-                Nombre = c.Nombre,
-                Apellido = c.Apellido,
-                Email = c.Correo,
-                Telefono = c.Telefono,
-                Direccion = c.Direccion,
-                FechaRegistro = c.FechaRegistro
-            });
+                var clientes = await _unitOfWork.Clients.GetAllAsync();
+                return clientes.ToDtoList();
+            }, "Error inesperado al obtener los clientes.");
         }
 
-        public async Task<ObtenerClienteDto> ObtenerPorIdAsync(int id)
+        public async Task<OperationResult<ObtenerClienteDto>> ObtenerPorIdAsync(int id)
         {
-            var cliente = await _unitOfWork.Clients.GetByIdAsync(id);
-
-            if (cliente == null)
-                return null;
-
-            return new ObtenerClienteDto
+            return await ServiceExecutor.ExecuteAsync(_logger, async () =>
             {
-                IdCliente = cliente.Id,
-                Nombre = cliente.Nombre,
-                Apellido = cliente.Apellido,
-                Email = cliente.Correo,
-                Telefono = cliente.Telefono,
-                Direccion = cliente.Direccion,
-                FechaRegistro = cliente.FechaRegistro
-            };
+                var cliente = await _unitOfWork.Clients.GetByIdAsync(id);
+                if (cliente == null)
+                    throw new InvalidOperationException("Cliente no encontrado.");
+
+                return cliente.ToDto();
+            }, "Error inesperado al buscar el cliente.", $"ClienteId: {id}");
         }
 
-        public async Task InsertarAsync(InsertarClienteDto dto)
+        public async Task<OperationResult> InsertarAsync(InsertarClienteDto dto)
         {
-            var nuevoCliente = new Cliente
+            return await ServiceExecutor.ExecuteAsync(_logger, async () =>
             {
-                Nombre = dto.Nombre,
-                Apellido = dto.Apellido,
-                Correo = dto.Email,
-                Contrasena = dto.ContrasenaHashed,
-                Direccion = dto.Direccion,
-                Telefono = dto.Telefono,
-                FechaRegistro = DateTime.UtcNow,
-                Rol = "Cliente" // Rol por defecto, se puede cambiar
-            };
+                var existente = await _unitOfWork.Clients.GetByEmailAsync(dto.Email);
+                if (existente != null)
+                    throw new InvalidOperationException("El correo ya está registrado por otro cliente.");
 
-            await _unitOfWork.Clients.AddAsync(nuevoCliente);
-            await _unitOfWork.SaveChangesAsync();
+                var hash = _passwordHasher.HashPassword(null, dto.ContrasenaHashed);
+                var nuevoCliente = dto.ToEntity(hash);
 
-            _logger.LogInformation("Cliente creado: {Email}", dto.Email);
+                await _unitOfWork.Clients.AddAsync(nuevoCliente);
+                await _unitOfWork.SaveChangesAsync();
+
+                _logger.LogInformation("Cliente creado: {Email}", dto.Email);
+            }, "Error al crear cliente.", $"Email: {dto.Email}");
         }
 
-        public async Task ModificarAsync(ModificarClienteDto dto)
+        public async Task<OperationResult> ModificarAsync(ModificarClienteDto dto)
         {
-            var cliente = await _unitOfWork.Clients.GetByIdAsync(dto.Id);
-            if (cliente == null)
-                throw new Exception("Cliente no encontrado.");
+            return await ServiceExecutor.ExecuteAsync(_logger, async () =>
+            {
+                var cliente = await _unitOfWork.Clients.GetByIdAsync(dto.Id);
+                if (cliente == null)
+                    throw new InvalidOperationException("Cliente no encontrado.");
 
-            cliente.Nombre = dto.Nombre;
-            cliente.Apellido = dto.Apellido;
-            cliente.Correo = dto.Correo;
-            cliente.Direccion = dto.Direccion;
-            cliente.Telefono = dto.Telefono;
+                if (!string.Equals(cliente.Correo, dto.Correo, StringComparison.OrdinalIgnoreCase))
+                {
+                    var otroConEseCorreo = await _unitOfWork.Clients.GetByEmailAsync(dto.Correo);
+                    if (otroConEseCorreo != null && otroConEseCorreo.Id != cliente.Id)
+                        throw new InvalidOperationException("Ese correo ya está en uso por otro cliente.");
+                }
 
-            await _unitOfWork.Clients.UpdateAsync(cliente);
-            await _unitOfWork.SaveChangesAsync();
+                dto.MapToExisting(cliente);
+                await _unitOfWork.Clients.UpdateAsync(cliente);
+                await _unitOfWork.SaveChangesAsync();
 
-            _logger.LogInformation("Cliente modificado: {Id}", dto.Id);
+                _logger.LogInformation("Cliente modificado: {Id}", dto.Id);
+            }, "Error al modificar cliente.", $"ClienteId: {dto.Id}");
         }
 
-        public async Task EliminarAsync(int id)
+        public async Task<OperationResult> CambiarContrasenaAsync(CambiarContrasenaDto dto)
         {
-            await _unitOfWork.Clients.DeleteAsync(id);
-            await _unitOfWork.SaveChangesAsync();
+            return await ServiceExecutor.ExecuteAsync(_logger, async () =>
+            {
+                var cliente = await _unitOfWork.Clients.GetByIdAsync(dto.IdCliente);
+                if (cliente == null)
+                    throw new InvalidOperationException("Cliente no encontrado.");
 
-            _logger.LogInformation("Cliente eliminado: {Id}", id);
+                var resultadoHash = _passwordHasher.VerifyHashedPassword(null, cliente.Contrasena, dto.ContrasenaActual);
+                if (resultadoHash == PasswordVerificationResult.Failed)
+                    throw new InvalidOperationException("La contraseña actual es incorrecta.");
+
+                cliente.Contrasena = _passwordHasher.HashPassword(null, dto.NuevaContrasena);
+
+                await _unitOfWork.Clients.UpdateAsync(cliente);
+                await _unitOfWork.SaveChangesAsync();
+
+                _logger.LogInformation("Contraseña actualizada para cliente {Id}", dto.IdCliente);
+            }, "Error al cambiar la contraseña.", $"ClienteId: {dto.IdCliente}");
+        }
+
+        public async Task<OperationResult> EliminarAsync(int id)
+        {
+            return await ServiceExecutor.ExecuteAsync(_logger, async () =>
+            {
+                var cliente = await _unitOfWork.Clients.GetByIdAsync(id);
+                if (cliente == null)
+                    throw new InvalidOperationException("Cliente no encontrado.");
+
+                await _unitOfWork.Clients.DeleteAsync(id);
+                await _unitOfWork.SaveChangesAsync();
+
+                _logger.LogInformation("Cliente eliminado: {Id}", id);
+            }, "Error al eliminar cliente.", $"ClienteId: {id}");
+        }
+
+        public async Task<OperationResult<ObtenerClienteDto>> ValidarCredencialesAsync(string email, string contrasena)
+        {
+            return await ServiceExecutor.ExecuteAsync(_logger, async () =>
+            {
+                var cliente = await _unitOfWork.Clients.GetByEmailAsync(email);
+                if (cliente == null)
+                    throw new InvalidOperationException("Credenciales inválidas.");
+
+                var resultadoHash = _passwordHasher.VerifyHashedPassword(null, cliente.Contrasena, contrasena);
+                if (resultadoHash == PasswordVerificationResult.Failed)
+                    throw new InvalidOperationException("Credenciales inválidas.");
+
+                return cliente.ToDto();
+            }, "Error al validar las credenciales.", $"Email: {email}");
         }
     }
 }
-

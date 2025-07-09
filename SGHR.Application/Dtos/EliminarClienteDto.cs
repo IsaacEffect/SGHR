@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SGHR.Model.Dtos
+namespace SGHR.Application.Dtos
 {
-    public record CambiarContrasenaDto
+    public record EliminarClienteDto
     {
         public int IdCliente { get; set; }
-        public string ContrasenaActual { get; set; }
-        public string NuevaContrasena { get; set; }
+
     }
 }

@@ -14,12 +14,16 @@ public class ClienteRepository : IClienteRepository
 
     public async Task<Cliente> GetByIdAsync(int id)
     {
-        return await _context.Clientes.FindAsync(id);
+        return await _context.Clientes
+        .Where(c => c.Id == id && c.Estado && c.Rol == "Cliente")
+        .FirstOrDefaultAsync();
     }
 
     public async Task<IEnumerable<Cliente>> GetAllAsync()
     {
-        return await _context.Clientes.ToListAsync();
+        return await _context.Clientes
+        .Where(c => c.Estado && c.Rol == "Cliente")
+        .ToListAsync();
     }
 
     public async Task AddAsync(Cliente cliente)
@@ -38,7 +42,14 @@ public class ClienteRepository : IClienteRepository
         var cliente = await _context.Clientes.FindAsync(id);
         if (cliente != null)
         {
-            _context.Clientes.Remove(cliente);
+            cliente.Estado = false;
+            _context.Clientes.Update(cliente);
         }
+    }
+
+    public async Task<Cliente> GetByEmailAsync(string email)
+    {
+        return await _context.Clientes
+            .FirstOrDefaultAsync(c => c.Correo.ToLower() == email.ToLower());
     }
 }

@@ -1,9 +1,4 @@
 ﻿using SGHR.Domain.Entities.Clientes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SGHR.Domain.Interfaces.Repository
 {
@@ -14,5 +9,6 @@ namespace SGHR.Domain.Interfaces.Repository
         Task AddAsync(Cliente cliente);
         Task UpdateAsync(Cliente cliente);
         Task DeleteAsync(int id);
+        Task<Cliente> GetByEmailAsync(string email);
     }
 }

@@ -3,10 +3,6 @@ using Microsoft.Extensions.Logging;
 using SGHR.Domain.Entities.Historial;
 using SGHR.Domain.Interfaces.Repository;
 using SGHR.Persistence.Base;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Threading.Tasks;
 
 namespace SGHR.Persistence.Repositories
 {
@@ -45,16 +41,7 @@ namespace SGHR.Persistence.Repositories
                     _connectionString,
                     "dbo.ObtenerHistorialClienteFiltrado",
                     parameters,
-                    reader => new HistorialReserva
-                    {
-                        Id = Convert.ToInt32(reader["Id"]),
-                        FechaEntrada = Convert.ToDateTime(reader["FechaEntrada"]),
-                        FechaSalida = Convert.ToDateTime(reader["FechaSalida"]),
-                        Estado = reader["Estado"].ToString(),
-                        Tarifa = Convert.ToDecimal(reader["Tarifa"]),
-                        TipoHabitacion = reader["TipoHabitacion"].ToString(),
-                        ServiciosAdicionales = reader["ServiciosAdicionales"].ToString()
-                    });
+                    HistorialReservaReaderMapper.FromReader);
 
                 _logger.LogInformation("Historial obtenido correctamente para el cliente con ID: {ClienteId}", clienteId);
                 return historial;
@@ -82,16 +69,7 @@ namespace SGHR.Persistence.Repositories
                     _connectionString,
                     "dbo.ObtenerDetalleReservaCliente",
                     parameters,
-                    reader => new HistorialReserva
-                    {
-                        Id = Convert.ToInt32(reader["Id"]),
-                        FechaEntrada = Convert.ToDateTime(reader["FechaEntrada"]),
-                        FechaSalida = Convert.ToDateTime(reader["FechaSalida"]),
-                        Estado = reader["Estado"].ToString(),
-                        Tarifa = Convert.ToDecimal(reader["Tarifa"]),
-                        TipoHabitacion = reader["TipoHabitacion"].ToString(),
-                        ServiciosAdicionales = reader["ServiciosAdicionales"].ToString()
-                    });
+                    HistorialReservaReaderMapper.FromReader);
 
                 var detalle = resultados.FirstOrDefault();
 

@@ -1,14 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SGHR.Application.Contracts.Service;
 using SGHR.Application.Services;
 using SGHR.Domain.Interfaces.Repository;
-using SGHR.Domain.Interfaces.Service;
 using SGHR.Persistence.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SGHR.IOC.Modules
 {

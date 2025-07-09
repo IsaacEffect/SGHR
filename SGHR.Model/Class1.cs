@@ -4,11 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SGHR.Model.Dtos
+namespace SGHR.Model
 {
-    public record EliminarClienteDto
+    internal class Class1
     {
-        public int IdCliente { get; set; }
-
     }
 }

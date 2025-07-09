@@ -13,6 +13,7 @@ namespace SGHR.Domain.Entities.Clientes
         public string Telefono { get; set; }
         public DateTime FechaRegistro { get; set; }
         public string Rol { get; set; }
+        public bool Estado { get; set; } = true;
 
         public ICollection<HistorialReserva>? Historial { get; set; }
     }

@@ -1,4 +1,4 @@
-﻿namespace SGHR.Model.Dtos;
+﻿namespace SGHR.Application.Dtos;
 
 public record ObtenerClienteDto
 {

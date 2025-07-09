@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SGHR.Domain.Interfaces.Service;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SGHR.Application.Contracts.Service;
+using SGHR.WebApp.Api.Extensions;
 
 namespace SGHR.WebApp.Api.Controllers
 {
+    [Authorize(Roles = "Cliente")]
     [ApiController]
     [Route("api/[controller]")]
     public class HistorialController : ControllerBase
@@ -22,24 +25,10 @@ namespace SGHR.WebApp.Api.Controllers
             [FromQuery] string estado = null,
             [FromQuery] string tipoHabitacion = null)
         {
-            try
-            {
-                var historial = await _historialService.ObtenerHistorialAsync(
-                    clienteId,
-                    fechaInicio,
-                    fechaFin,
-                    estado,
-                    tipoHabitacion);
+            var result = await _historialService.ObtenerHistorialAsync(
+                clienteId, fechaInicio, fechaFin, estado, tipoHabitacion);
 
-                if (historial == null || !historial.Any())
-                    return NotFound("No se encontraron reservas con los filtros aplicados");
-
-                return Ok(historial);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al obtener historial: {ex.Message}");
-            }
+            return result.ToActionResult();
         }
 
         [HttpGet("detalle/{idReserva}/{clienteId}")]
@@ -47,20 +36,8 @@ namespace SGHR.WebApp.Api.Controllers
             [FromRoute] int idReserva,
             [FromRoute] int clienteId)
         {
-            try
-            {
-                var detalle = await _historialService.ObtenerDetalleAsync(idReserva, clienteId);
-
-                if (detalle == null)
-                    return NotFound("Reserva no encontrada o no pertenece al cliente");
-
-                return Ok(detalle);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al obtener el detalle: {ex.Message}");
-            }
+            var result = await _historialService.ObtenerDetalleAsync(idReserva, clienteId);
+            return result.ToActionResult();
         }
     }
-
 }
