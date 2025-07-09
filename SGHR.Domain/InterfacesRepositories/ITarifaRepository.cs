@@ -12,6 +12,6 @@ namespace SGHR.Domain.InterfacesRepositories
         Task DefinirTarifaAsync(Tarifa tarifa);
         Task DefinirTarifaPorTemporadaAsync(Tarifa tarifa);
         Task ActualizarTarifaAsync(Tarifa tarifa);
-       
+        Task<Tarifa?> ObtenerTarifaPorID(int id);
     }
 }

@@ -59,12 +59,12 @@ namespace SGHR.WebApp.Api.Controllers
         {
             var categoriaID = await _services.ObtenerPorIdAsync(id);
 
-            if(id != categoriaID.IdCategoriaHabitacion)
+            if(categoriaID is null)
             { 
                 return NotFound();
             }
 
-           await _services.EliminarCategoriaAsync(id);
+           await _services.EliminarCategoriaAsync(categoriaID.IdCategoriaHabitacion);
             return Ok("Categoria eliminada");
         }
     }

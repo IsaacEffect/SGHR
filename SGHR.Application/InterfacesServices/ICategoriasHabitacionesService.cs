@@ -15,5 +15,6 @@ namespace SGHR.Domain.InterfacesServices
         Task<CategoriasHabitacion> CrearCategoriaAsync(CrearCategoriaDto crearCategoriaDto);
         Task ActualizarCategoriaAsync(int? id, ActualizarCategoriaDto actualizarCategoriaDto);
         Task EliminarCategoriaAsync(int id);
+        Task GuardarCambiosAsync();
     }
 }

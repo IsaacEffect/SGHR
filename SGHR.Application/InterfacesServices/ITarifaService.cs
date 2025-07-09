@@ -10,8 +10,8 @@ namespace SGHR.Application.InterfacesServices
 {
     public interface ITarifaService
     {
-        Task ActualizarTarifaAsync(ActualizarTarifaDto dto);
-        Task DefinirTarifaAsync(DefinirTarifaBaseDto dto);
-        Task DefinirTarifaPorTemporadaAsync(DefinirTarifaPorTemporadaDto dto);
+        Task ActualizarTarifaAsync(int id, ActualizarTarifaDto dto);
+        Task DefinirTarifaAsync(int idCategoria, DefinirTarifaBaseDto dto);
+        Task DefinirTarifaPorTemporadaAsync(int id, DefinirTarifaPorTemporadaDto dto);
     }
 }

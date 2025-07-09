@@ -19,31 +19,31 @@ namespace SGHR.WebApp.Api.Controllers
 
         // POST api/<TarifaController>
         [HttpPost("DefinirTarifaBase")]
-        public async Task<IActionResult> DefinirTarifaBase([FromBody] DefinirTarifaBaseDto dto)
+        public async Task<IActionResult> DefinirTarifaBase(int id, [FromBody] DefinirTarifaBaseDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            await _service.DefinirTarifaAsync(dto);
+            await _service.DefinirTarifaAsync(id, dto);
             return Ok("Tarifa base definida correctamente.");
         }
 
         // PUT api/<TarifaController>/5
-        [HttpPut("ActualizarTarifa")]
-        public async Task<IActionResult> ActualizarTarifa(int id, [FromBody] ActualizarTarifaDto dto)
+        [HttpPut("ActualizarTarifaBase")]
+        public async Task<IActionResult> ActualizarTarifaBase(int id, [FromBody] ActualizarTarifaDto dto)
          {
-                if (!ModelState.IsValid) return BadRequest(ModelState);
+                if (!ModelState.IsValid) return BadRequest();
 
-                await _service.ActualizarTarifaAsync(dto);
+                await _service.ActualizarTarifaAsync(id, dto);
                 return Ok($"Tarifa con ID {id} actualizada correctamente.");
         }
 
        // DELETE api/<TarifaController>/5
        [HttpPost("DefinirTarifaPorTemporada")]
-       public async Task<IActionResult> DefinirTarifaPorTemporada([FromBody] DefinirTarifaPorTemporadaDto dto)
+       public async Task<IActionResult> DefinirTarifaPorTemporada(int id, [FromBody] DefinirTarifaPorTemporadaDto dto)
        { 
                 if (!ModelState.IsValid) return BadRequest(ModelState);
 
-                await _service.DefinirTarifaPorTemporadaAsync(dto);
+                await _service.DefinirTarifaPorTemporadaAsync(id, dto);
                 return Ok($"Tarifa para la temporada '{dto.TipoTemporada}' definida correctamente.");
         
        }

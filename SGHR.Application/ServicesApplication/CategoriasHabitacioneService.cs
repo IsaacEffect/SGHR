@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using SGHR.Application.DTOs;
+using SGHR.Domain.InterfacesDomainServices;
 using SGHR.Domain.InterfacesRepositories;
 using SGHR.Domain.InterfacesServices;
 using SGHR.Persistance.Models;
@@ -10,11 +11,14 @@ namespace SGHR.Application.ServicesApplication
     {
         private readonly ICategoriasHabitacionRepository _categoriasHabitacionRepository;
         private readonly ILogger _logger;
+        private readonly ICategoriasHabitacionesDomainService _categoriasHabitacionesDomain;
         public CategoriasHabitacioneService(ICategoriasHabitacionRepository categoriasHabitacionRepository,
-                                            ILogger<CategoriasHabitacioneService> logger)
+                                            ILogger<CategoriasHabitacioneService> logger,
+                                            ICategoriasHabitacionesDomainService categoriasHabitacionesDomainService)
         {
             _categoriasHabitacionRepository = categoriasHabitacionRepository;
             _logger = logger;
+            _categoriasHabitacionesDomain = categoriasHabitacionesDomainService;
         }
 
         
@@ -32,7 +36,6 @@ namespace SGHR.Application.ServicesApplication
 
                 categoria.Nombre = actualizarCategoriaDto.Nombre;
                 categoria.Descripcion = actualizarCategoriaDto.Descripcion;
-                categoria.TarifaBase = actualizarCategoriaDto.TarifaBase;
                 categoria.Caracteristicas = actualizarCategoriaDto.Caracteristicas;
                 categoria.Estado = actualizarCategoriaDto.Estado;
 
@@ -54,18 +57,18 @@ namespace SGHR.Application.ServicesApplication
 
                 if (categoria == null)
                 {
-                    _logger.LogWarning($"No se encontró la categoría con ID {id} para eliminar.");
+                    _logger.LogError($"No se encontró la categoría con ID {id} para eliminar.");
                     return;
                 }
 
+                await _categoriasHabitacionesDomain.NoEliminarCategoriasConHabitacionesAsignadas(categoria.IdCategoriaHabitacion);
                 await _categoriasHabitacionRepository.EliminarCategoriaAsync(categoria);
-                _logger.LogInformation($"Categoría con ID {id} eliminada correctamente.");
 
-                await _categoriasHabitacionRepository.GuardarCambiosAsync();
+                _logger.LogInformation($"Categoría con ID {id} eliminada correctamente.");
             }
             catch (Exception) 
             {
-                _logger.LogError("No se puso eliminar la categoria correctamente");
+                _logger.LogError("No se pudo eliminar la categoria correctamente");
             }
             
         }
@@ -103,9 +106,10 @@ namespace SGHR.Application.ServicesApplication
 
                 var resultado = categorias.Select(c => new ObtenerTodoCategoriaDto
                 {
+                    Id = c.IdCategoriaHabitacion,
                     Nombre = c.Nombre,
                     Descripcion = c.Descripcion,
-                    TarifaBase = c.TarifaBase,
+                    TarifaBase = c.TarifaBase ?? 0,
                     Caracteristicas = c.Caracteristicas,
                     Estado = c.Estado
                 });
@@ -127,13 +131,19 @@ namespace SGHR.Application.ServicesApplication
             try
             {
                 if (crearCategoriaDto == null)
+                {
                     throw new ArgumentNullException(nameof(crearCategoriaDto));
+                }
+
+                if (await _categoriasHabitacionRepository.ExisteCategoriaPorNombre(crearCategoriaDto.Nombre))
+                {
+                    throw new Exception("Ya existe una categoria con ese nombre");
+                }
 
                 var categoria = new CategoriasHabitacion(
                     crearCategoriaDto.Nombre,
                     crearCategoriaDto.Descripcion,
-                    crearCategoriaDto.Caracteristicas,
-                    crearCategoriaDto.TarifaBase
+                    crearCategoriaDto.Caracteristicas
                 );
 
                 await _categoriasHabitacionRepository.CrearCategoriaAsync(categoria);
@@ -147,6 +157,11 @@ namespace SGHR.Application.ServicesApplication
                 _logger.LogError(ex, "No se guardó correctamente la categoría");
                 throw; 
             }
+        }
+
+        public async Task GuardarCambiosAsync()
+        {
+            await _categoriasHabitacionRepository.GuardarCambiosAsync();
         }
     }
 }

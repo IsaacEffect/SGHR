@@ -13,7 +13,9 @@ namespace SGHR.Domain.InterfacesRepositories
        Task<IEnumerable<CategoriasHabitacion>> ObtenerTodasCategoriasAsync();
        Task CrearCategoriaAsync(CategoriasHabitacion categoriasHabitacion);
        Task ActualizarCategoriaAsync(CategoriasHabitacion categoriasHabitacion);
-       void EliminarCategoriaAsync(CategoriasHabitacion categoriasHabitacion);
+       Task EliminarCategoriaAsync(CategoriasHabitacion categoriasHabitacion);
+       Task<CategoriasHabitacion?> ObtenerPorIdAsync(int? id);
+       Task<bool> ExisteCategoriaPorNombre(string nombre); 
        Task GuardarCambiosAsync(); 
     }
 }
