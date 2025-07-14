@@ -10,20 +10,23 @@ using SGHR.Persistence.Interfaces.Repositories.Reservas;
 
 namespace SGHR.Application.Services.Reservas
 {
+
     public class ReservaApplicationService(
         IReservaRepository reservaRepository,
         ICategoriaHabitacionRepository categoriaHabitacionRepository,
         IClienteRepository clienteRepository,
         IMapper mapper,
         IUnitOfWork unitOfWork,
-        IReservaRules reservaRules) : IReservaApplicationService
+        IReservaRules reservaRules ) : IReservaApplicationService
     {
         private readonly IReservaRepository _reservaRepository = reservaRepository;
-        private readonly ICategoriaHabitacionRepository _categoriaHabitacionRepository = categoriaHabitacionRepository; 
-        private readonly IClienteRepository _clienteRepository = clienteRepository; 
+        private readonly ICategoriaHabitacionRepository _categoriaHabitacionRepository = categoriaHabitacionRepository;
+        private readonly IClienteRepository _clienteRepository = clienteRepository;
         private readonly IMapper _mapper = mapper;
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IReservaRules _reservaRules = reservaRules;
+    
+     
         public async Task<ReservaDto?> ObtenerReservaPorIdAsync(int id)
         {
             await _reservaRules.ValidarReservaExistenteAsync(id);
@@ -40,26 +43,34 @@ namespace SGHR.Application.Services.Reservas
         }
         public async Task<List<ReservaDto>> ObtenerReservasEnRangoAsync(DateTime desde, DateTime hasta)
         {
-            await _reservaRules.ValidarRangoFechasAsync(desde, hasta);
+            await _reservaRules.ValidarFechaEntradaMayorSalida(desde, hasta);
             var reservas = await _reservaRepository.ObtenerReservasEnRangoAsync(desde, hasta);
             var dto = _mapper.Map<List<ReservaDto>>(reservas);
             return dto;
         }
         public async Task<ReservaDto> CrearReservaAsync(CrearReservaRequest request)
         {
+            var estaDisponible = await _categoriaHabitacionRepository.HayDisponibilidadAsync
+               (
+                   request.IdCategoriaHabitacion,
+                   request.FechaEntrada,
+                   request.FechaSalida,
+                   null
+               );
 
             await _reservaRules.ValidarFechaEntradaMayorSalida(request.FechaEntrada, request.FechaSalida);
-            try {
-                
+            try
+            {
+
                 await _reservaRules.ValidarExistenciaClienteAsync(request.ClienteId);
-                await _reservaRules.ValidarExistenciaCategoriaAsync(request.IdCategoriaHabitacion);
+                await _reservaRules.ValidarExistenciaCategoriaAsync(request.IdCategoriaHabitacion, estaDisponible);
                 var nuevaReserva = _mapper.Map<Reserva>(request);
                 nuevaReserva.GenerarNumeroReservaUnico();
                 nuevaReserva.SetFechaUltimaModificacion();
 
                 nuevaReserva.Activar();
 
-                
+
                 await _reservaRepository.CrearAsync(nuevaReserva);
                 await _unitOfWork.CommitAsync();
                 var dto = _mapper.Map<ReservaDto>(nuevaReserva);
@@ -74,76 +85,59 @@ namespace SGHR.Application.Services.Reservas
             {
                 throw new InvalidOperationException($"Error al crear la reserva: {ex.Message}");
             }
-           
+
         }
         public async Task<bool> ActualizarReservaAsync(int id, ActualizarReservaRequest request)
         {
-            await _reservaRules.ValidarReservaExistenteAsync(id); 
 
-            try
-            {
-                var reservaExistente = await _reservaRepository.ObtenerPorId(id)
+            await _reservaRules.ValidarReservaExistenteAsync(id);
+            var reservaExistente = await _reservaRepository.ObtenerPorId(id)
                     ?? throw new KeyNotFoundException($"Reserva con ID {id} no encontrada.");
 
-                await _reservaRules.ValidarFechaEntradaMayorSalida(request.FechaEntrada, request.FechaSalida);
-                await _reservaRules.ValidarExistenciaClienteAsync(request.IdCliente);
-                await _reservaRules.ValidarExistenciaCategoriaAsync(request.IdCategoriaHabitacion);
+            await _reservaRules.ValidarFechaEntradaMayorSalida(request.FechaEntrada, request.FechaSalida);
+            await _reservaRules.ValidarExistenciaClienteAsync(request.IdCliente);
 
-                bool fechaCambio =
-                    reservaExistente.FechaEntrada != request.FechaEntrada ||
-                    reservaExistente.FechaSalida != request.FechaSalida;
-                bool habitacionCambio =
-                    reservaExistente.IdCategoriaHabitacion != request.IdCategoriaHabitacion;
-                bool necesitaVerificarDisponibilidad = fechaCambio || habitacionCambio;
+            bool fechaCambio =
+                reservaExistente.FechaEntrada != request.FechaEntrada ||
+                reservaExistente.FechaSalida != request.FechaSalida;
+            bool habitacionCambio =
+                reservaExistente.IdCategoriaHabitacion != request.IdCategoriaHabitacion;
+            bool necesitaVerificarDisponibilidad = fechaCambio || habitacionCambio;
 
-                if (necesitaVerificarDisponibilidad)
-                {
-                    var estaDisponible = await _reservaRepository.HayDisponibilidadAsync(
+            if (necesitaVerificarDisponibilidad)
+            {
+                var estaDisponible = await _categoriaHabitacionRepository.HayDisponibilidadAsync
+                    (
                         request.IdCategoriaHabitacion,
                         request.FechaEntrada,
                         request.FechaSalida,
                         id
-                    );
-                    if (!estaDisponible)
-                    {
-                        throw new InvalidOperationException($"No hay disponibilidad para la categoría de habitación {request.IdCategoriaHabitacion} en el rango de fechas especificado para la actualización.");
-                    }
-                }
-
-                reservaExistente.ActualizarDetalles(
-                    request.IdCliente,
-                    request.IdCategoriaHabitacion,
-                    request.FechaEntrada,
-                    request.FechaSalida,
-                    request.NumeroHuespedes
-                );
-
-                await _reservaRules.ValidarTransicionEstadoAsync(reservaExistente.Estado, request.Estado);
-                
-                if (request.Estado == EstadoReserva.Confirmada)
-                    reservaExistente.Confirmar();
-                else if (request.Estado == EstadoReserva.Finalizada)
-                    reservaExistente.Finalizar();
-                else if (request.Estado == EstadoReserva.Cancelada)
-                    reservaExistente.Cancelar();
-
-                await _reservaRepository.ActualizarAsync(reservaExistente);
-                await _unitOfWork.CommitAsync();
-
-                return true;
+                     );
+                await _reservaRules.ValidarExistenciaCategoriaAsync(request.IdCategoriaHabitacion, estaDisponible);
             }
-            catch (KeyNotFoundException ex)
-            {
-                throw new KeyNotFoundException($"Reserva con ID {id} no encontrada: {ex.Message}");
-            }
-            catch (InvalidOperationException ex)
-            {
-                throw new InvalidOperationException($"Error al actualizar la reserva: {ex.Message}");
-            }
-            catch (ArgumentException ex)
-            {
-                throw new ArgumentException($"Error de validación al actualizar la reserva: {ex.Message}");
-            }
+
+            reservaExistente.ActualizarDetalles(
+                request.IdCliente,
+                request.IdCategoriaHabitacion,
+                request.FechaEntrada,
+                request.FechaSalida,
+                request.NumeroHuespedes
+            );
+
+            await _reservaRules.ValidarTransicionEstadoAsync(reservaExistente.Estado, request.Estado);
+
+            if (request.Estado == EstadoReserva.Confirmada)
+                reservaExistente.Confirmar();
+            else if (request.Estado == EstadoReserva.Finalizada)
+                reservaExistente.Finalizar();
+            else if (request.Estado == EstadoReserva.Cancelada)
+                reservaExistente.Cancelar();
+
+            await _reservaRepository.ActualizarAsync(reservaExistente);
+            await _unitOfWork.CommitAsync();
+
+            return true;
+            
         }
         public async Task<bool> CancelarReservaAsync(int id)
         {
@@ -162,8 +156,9 @@ namespace SGHR.Application.Services.Reservas
         }
         public async Task<bool> VerificarDisponibilidadAsync(VerificarDisponibilidadRequest request)
         {
+
             await _reservaRules.ValidarFechaEntradaMayorSalida(request.FechaEntrada, request.FechaSalida);
-            await _reservaRules.ValidarExistenciaCategoriaAsync(request.IdCategoriaHabitacion);
+            await _reservaRules.ValidarExistenciaCategoriaAsync(request.IdCategoriaHabitacion, true);
             return await _reservaRepository.HayDisponibilidadAsync(
                 request.IdCategoriaHabitacion,
                 request.FechaEntrada,

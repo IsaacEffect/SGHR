@@ -15,7 +15,7 @@ namespace SGHR.Domain.Entities.Users
 
         protected Cliente() { }
 
-        public Cliente(string nombre, string hashedPassword, string email, RolUsuario rol, string? apellido,
+        public Cliente(string nombre, string hashedPassword, string email, RolUsuario rol, string apellido,
                     string? telefono = null, string? direccion = null)
         {
             if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("El nombre es requerido.");
@@ -33,7 +33,7 @@ namespace SGHR.Domain.Entities.Users
             SetFechaUltimaModificacion();
         }
 
-        public void ActualizarPerfil(string? nombre, string? apellido, string? telefono, string? direccion, string email)
+        public void ActualizarPerfil(string? nombre, string apellido, string? telefono, string? direccion, string email)
         {
             Nombre = nombre ?? Nombre; 
             Apellido = apellido;

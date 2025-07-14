@@ -3,6 +3,7 @@ using SGHR.Persistence.Interfaces.Repositories.Clientes;
 using SGHR.Persistence.Interfaces.Repositories.Reservas;
 using SGHR.Application.Interfaces.Reservas;
 using SGHR.Domain.Enums;
+using Azure.Core;
 
 namespace SGHR.Application.Validations
 {
@@ -20,8 +21,10 @@ namespace SGHR.Application.Validations
             _ = await _clienteRepository.ObtenerPorId(clienteId)
                 ?? throw new ArgumentException($"El cliente con el ID {clienteId} no existe.");
         }
-        public async Task ValidarExistenciaCategoriaAsync(int categoriaId)
+        public async Task ValidarExistenciaCategoriaAsync(int categoriaId, bool estaDisponible)
         {
+            
+            if (!estaDisponible)
             _ = await _categoriaHabitacionRepository.ObtenerPorId(categoriaId)
                 ?? throw new ArgumentException($"La categoria con ID {categoriaId} no existe.");
         }
@@ -32,20 +35,12 @@ namespace SGHR.Application.Validations
                 ?? throw new InvalidOperationException($"No se encontró una reserva con el ID {idReserva}.");
 
         }
-        public async Task ValidarRangoFechasAsync(DateTime desde, DateTime hasta)
-        {
-            if (desde >= hasta)
-            {
-                throw new ArgumentException("La fecha de inicio debe ser anterior a la fecha de fin.");
-            }
-            await Task.CompletedTask;
-        }
-
+ 
         public Task ValidarFechaEntradaMayorSalida(DateTime entrada, DateTime salida)
         {
-            if (entrada >= salida)
+            if (entrada > salida)
             {
-                throw new ArgumentException("La fecha de entrada debe ser anterior a la fecha de salida.");
+                throw new ArgumentException("La fecha de entrada no puede ser posterior a la fecha de salida.");
             }
             return Task.CompletedTask;
         }

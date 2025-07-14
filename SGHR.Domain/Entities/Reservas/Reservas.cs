@@ -32,9 +32,9 @@ namespace SGHR.Domain.Entities.Reservas
             {
                 throw new ArgumentException("El ID de la categoría de habitación debe ser un número positivo.", nameof(idCategoriaHabitacion));
             }
-            if (fechaEntrada >= fechaSalida)
+            if (fechaEntrada > fechaSalida)
             {
-                throw new ArgumentException("La fecha de entrada debe ser anterior a la fecha de salida.");
+                throw new ArgumentException("La fecha de entrada no puede ser posterior a la fecha de salida.");
             }
             if (numeroHuespedes <= 0)
             {
@@ -83,19 +83,15 @@ namespace SGHR.Domain.Entities.Reservas
             {
                 throw new ArgumentException("El ID de la categoría de habitación debe ser un número positivo.", nameof(idCategoriaHabitacion));
             }
-            if (fechaEntrada >= fechaSalida)
+            if (fechaEntrada > fechaSalida)
             {
-                throw new ArgumentException("La fecha de entrada debe ser anterior a la fecha de salida.", nameof(fechaEntrada));
+                throw new ArgumentException("La fecha de entrada no puede ser posterior a la fecha de salida.", nameof(fechaEntrada));
             }
             if (numeroHuespedes <= 0)
             {
                 throw new ArgumentException("El número de huéspedes debe ser mayor que cero.", nameof(numeroHuespedes));
             }
-            if (fechaEntrada >= fechaSalida)
-            {
-                throw new ArgumentException("La fecha de entrada debe ser anterior a la fecha de salida.");
-            }
-
+            
             ClienteId = clienteId;
             IdCategoriaHabitacion = idCategoriaHabitacion;
             FechaEntrada = fechaEntrada;
