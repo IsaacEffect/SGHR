@@ -120,7 +120,7 @@ namespace SGHR.Application.Services.Reservas
             await _reservaRules.ValidarTransicionEstadoAsync(reservaExistente.Estado, request.Estado);
             await _reservaRules.AplicarCambiosDeEstado(reservaExistente, request.Estado);
 
-            await _reservaRepository.ActualizarAsync(reservaExistente);
+            await _reservaRepository.ActualizarReservaAsync(reservaExistente);
             await _unitOfWork.CommitAsync();
 
             return true;
@@ -135,11 +135,10 @@ namespace SGHR.Application.Services.Reservas
                 throw new InvalidOperationException("No se puede cancelar una reserva que ya esta finalizada.");
             try
             {
-               
-
                 await _reservaRules.ValidarTransicionEstadoAsync(reservaExistente.Estado, EstadoReserva.Cancelada);
                 await _reservaRules.ValidarReservaExistenteAsync(id);
 
+                
                 await _reservaRepository.CancelarReservaAsync(id);
                 await _unitOfWork.CommitAsync();
                 return true;

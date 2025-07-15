@@ -58,7 +58,7 @@ namespace SGHR.Persistence.Repositories.Reservas
             await _dbSet.AddAsync(reserva);
         }
 
-        public Task ActualizarAsync(Reserva reserva)
+        public Task ActualizarReservaAsync(Reserva reserva)
         {
             Update(reserva);
             return Task.CompletedTask;

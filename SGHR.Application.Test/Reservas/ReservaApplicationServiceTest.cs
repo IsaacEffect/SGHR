@@ -34,9 +34,6 @@ namespace SGHR.Application.Test.Reservas
                 _unitOfWorkMock.Object,
                 _reservaRulesMock.Object);
         }
-
-
-
         [Fact]
         public async Task CrearReservaAsync_CreaReservaCorrectamente()
         {
@@ -150,6 +147,68 @@ namespace SGHR.Application.Test.Reservas
             var ex = await Assert.ThrowsAsync<ArgumentException>(() => _service.CrearReservaAsync(request));
             Assert.Contains("El cliente con ID 1 no existe.", ex.Message);
         }
+
+        [Fact]
+        public async Task ActualizarReservaAsync_DebeActualizarReservaCorrectamente()
+        {
+            var reserva = new Reserva(1, 1, DateTime.Today, DateTime.Today.AddDays(5), 2);
+            _reservaRepMock.Setup(r => r.ObtenerPorId(1)).ReturnsAsync(reserva);
+            var request = new ActualizarReservaRequest
+            {
+                IdCliente = 1,
+                IdCategoriaHabitacion = 1,
+                FechaEntrada = DateTime.Today.AddDays(1),
+                FechaSalida = DateTime.Today.AddDays(3),
+                NumeroHuespedes = 2,
+                Estado = EstadoReserva.Pendiente
+            };
+            _reservaRulesMock.Setup(r => r.ValidarExistenciaClienteAsync(request.IdCliente)).Returns(Task.CompletedTask);
+            _reservaRulesMock.Setup(r => r.ValidarFechaEntradaMayorSalida(request.FechaEntrada, request.FechaSalida)).Returns(Task.CompletedTask);
+            _reservaRulesMock.Setup(r => r.ValidarExistenciaCategoriaAsync(request.IdCategoriaHabitacion, true)).Returns(Task.CompletedTask);
+            _categoriaHabitacionRepMock.Setup(c => c.HayDisponibilidadAsync(
+                    request.IdCategoriaHabitacion,
+                    request.FechaEntrada,
+                    request.FechaSalida,
+                    reserva.Id
+            )).ReturnsAsync(true);
+            _reservaRepMock.Setup(r => r.ActualizarReservaAsync(reserva)).Returns(Task.CompletedTask);
+            await _service.ActualizarReservaAsync(1, request);
+            
+            Assert.Equal(request.FechaEntrada, reserva.FechaEntrada);
+            Assert.Equal(request.FechaSalida, reserva.FechaSalida);
+        }
+        [Fact]
+        public async Task ActualizarReservaAsync_NoDebePermitirFechasInvalidas()
+        {
+
+            var reserva = new Reserva(1, 1, DateTime.Today, DateTime.Today.AddDays(5), 2);
+            _reservaRepMock.Setup(r => r.ObtenerPorId(1)).ReturnsAsync(reserva);
+
+            var request = new ActualizarReservaRequest
+            {
+                IdCliente = 1,
+                IdCategoriaHabitacion = 1,
+                FechaEntrada = DateTime.Today.AddDays(6),
+                FechaSalida = DateTime.Today.AddDays(4),
+                NumeroHuespedes = 2,
+                Estado = EstadoReserva.Pendiente
+            };
+
+            var ex = await Assert.ThrowsAsync<ArgumentException>(() => _service.ActualizarReservaAsync(1, request));
+            Assert.Contains("La fecha de entrada no puede ser posterior", ex.Message);
+        }
+    
+        [Fact]        
+        public async Task CancelarReservaAsycn_DebeCancelarReservaCorrectamente()
+        {
+            var reserva = new Reserva(1, 1, DateTime.Today, DateTime.Today.AddDays(5), 2);
+            _reservaRepMock.Setup(r => r.ObtenerPorId(It.IsAny<int>())).ReturnsAsync(reserva);
+            _reservaRepMock.Setup(r => r.CancelarReservaAsync(It.IsAny<int>())).Callback(() => reserva.ActualizarEstado(EstadoReserva.Cancelada)).Returns(Task.CompletedTask);
+
+            await _service.CancelarReservaAsync(1);
+            Assert.True(reserva.Estado == EstadoReserva.Cancelada);
+            Assert.Equal(EstadoReserva.Cancelada, reserva.Estado);
+        }
         [Fact]
         public async Task CancelarReservaAsync_NoDebePermitirCancelarFinalizada()
         {
@@ -161,25 +220,37 @@ namespace SGHR.Application.Test.Reservas
             var ex = await Assert.ThrowsAsync<InvalidOperationException>(()=> _service.CancelarReservaAsync(1));
             Assert.Contains("No se puede cancelar una reserva que ya", ex.Message);
         }
+
         [Fact]
-        public async Task ActualizarReservaAsync_NoDebePermitirFechasInvalidas()
+        public async Task ObtenerReservaPorIdAsync_DevuelveReservaCorrectamente()
         {
-            
-            var reserva = new Reserva(1, 1, DateTime.Today, DateTime.Today.AddDays(5), 2);
-            _reservaRepMock.Setup(r => r.ObtenerPorId(1)).ReturnsAsync(reserva);
+            var reserva = new Reserva(1, 1, DateTime.Today, DateTime.Today.AddDays(5), 4);
+            _reservaRepMock.Setup(r => r.ObtenerPorId(It.IsAny<int>())).ReturnsAsync(reserva);
 
-            var request = new ActualizarReservaRequest 
-            { 
-                IdCliente = 1,
-                IdCategoriaHabitacion = 1,
-                FechaEntrada = DateTime.Today.AddDays(6),
-                FechaSalida = DateTime.Today.AddDays(4),
-                NumeroHuespedes = 2,
-                Estado = EstadoReserva.Pendiente 
-            };
+            _mapperMock.Setup(m => m.Map<ReservaDto>(It.IsAny<Reserva>()))
+                .Returns(new ReservaDto
+                {
+                    Id = 1,
+                    IdCliente = reserva.ClienteId,
+                    IdCategoriaHabitacion = reserva.IdCategoriaHabitacion,
+                    FechaEntrada = reserva.FechaEntrada,
+                    FechaSalida = reserva.FechaSalida,
+                    Estado = reserva.Estado,
+                    NumeroHuespedes = reserva.NumeroHuespedes
+                });
 
-            var ex = await Assert.ThrowsAsync<ArgumentException>(() => _service.ActualizarReservaAsync(1, request));
-            Assert.Contains("La fecha de entrada no puede ser posterior", ex.Message);
+            var resultado = await _service.ObtenerReservaPorIdAsync(1);
+
+            Assert.NotNull(resultado);
+            Assert.Equal(reserva.FechaEntrada, resultado.FechaEntrada);
+            Assert.Equal(1, resultado.Id);
+        }
+        [Fact]
+        public async Task ObtenerReservaPorIdAsync_NoDebeEncontrarReserva()
+        {
+            _reservaRepMock.Setup(r => r.ObtenerPorId(It.IsAny<int>())).ReturnsAsync((Reserva)null);
+            var resultado = await _service.ObtenerReservaPorIdAsync(1);
+            Assert.Null(resultado);
         }
         [Fact]
         public async Task VerificarDisponibilidadAsync_DevuelveFalseSiNoExisteCategoria()
