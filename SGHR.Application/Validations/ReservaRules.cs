@@ -1,9 +1,11 @@
-﻿using SGHR.Persistence.Interfaces.Repositories.Habitaciones;
-using SGHR.Persistence.Interfaces.Repositories.Clientes;
-using SGHR.Persistence.Interfaces.Repositories.Reservas;
+﻿using Azure.Core;
+using SGHR.Application.DTOs.Reservas;
 using SGHR.Application.Interfaces.Reservas;
+using SGHR.Domain.Entities.Reservas;
 using SGHR.Domain.Enums;
-using Azure.Core;
+using SGHR.Persistence.Interfaces.Repositories.Clientes;
+using SGHR.Persistence.Interfaces.Repositories.Habitaciones;
+using SGHR.Persistence.Interfaces.Repositories.Reservas;
 
 namespace SGHR.Application.Validations
 {
@@ -23,19 +25,19 @@ namespace SGHR.Application.Validations
         }
         public async Task ValidarExistenciaCategoriaAsync(int categoriaId, bool estaDisponible)
         {
-            
+
             if (!estaDisponible)
-            _ = await _categoriaHabitacionRepository.ObtenerPorId(categoriaId)
-                ?? throw new ArgumentException($"La categoria con ID {categoriaId} no existe.");
+                _ = await _categoriaHabitacionRepository.ObtenerPorId(categoriaId)
+                    ?? throw new ArgumentException($"La categoria con ID {categoriaId} no existe.");
         }
-        
+
         public async Task ValidarReservaExistenteAsync(int idReserva)
         {
             _ = await _reservaRepository.ObtenerPorId(idReserva)
                 ?? throw new InvalidOperationException($"No se encontró una reserva con el ID {idReserva}.");
 
         }
- 
+
         public Task ValidarFechaEntradaMayorSalida(DateTime entrada, DateTime salida)
         {
             if (entrada > salida)
@@ -47,12 +49,52 @@ namespace SGHR.Application.Validations
 
         public Task ValidarTransicionEstadoAsync(EstadoReserva actual, EstadoReserva nuevo)
         {
-            if (nuevo == EstadoReserva.Confirmada && actual == EstadoReserva.Pendiente) return Task.CompletedTask; 
-            if (nuevo == EstadoReserva.Finalizada && actual == EstadoReserva.Confirmada) return Task.CompletedTask; 
+            if (nuevo == EstadoReserva.Confirmada && actual == EstadoReserva.Pendiente) return Task.CompletedTask;
+            if (nuevo == EstadoReserva.Finalizada && actual == EstadoReserva.Confirmada) return Task.CompletedTask;
             if (nuevo == EstadoReserva.Cancelada && actual == EstadoReserva.Confirmada) return Task.CompletedTask;
             if (nuevo != actual)
                 throw new InvalidOperationException($"El estado de la reserva no puede ser cambiado a {nuevo} desde el estado actual {actual}.");
 
+            return Task.CompletedTask;
+        }
+
+
+        public Task VerificarReservaFinalizada(EstadoReserva estado)
+        {
+            if(estado == EstadoReserva.Finalizada)
+            {
+                throw new InvalidOperationException("No se puede cancelar una reserva que ya ha sido finalizada");
+            }
+
+           return Task.CompletedTask;
+        }
+
+        public Task<bool> RequiereVerificarDisponibilidad(Reserva reserva, ActualizarReservaRequest request)
+        {
+            bool fechaCambio = reserva.FechaEntrada != request.FechaEntrada || reserva.FechaSalida != request.FechaSalida;
+            bool habitacionCambio = reserva.IdCategoriaHabitacion != request.IdCategoriaHabitacion;
+
+            return Task.FromResult(fechaCambio || habitacionCambio);
+        }
+
+        public Task AplicarCambiosDeEstado(Reserva reserva, EstadoReserva nuevoEstado)
+        {
+            switch (nuevoEstado)
+            {
+                case EstadoReserva.Confirmada:
+                    reserva.Activar();
+                    break;
+                case EstadoReserva.Cancelada:
+                    reserva.Cancelar();
+                    break;
+                case EstadoReserva.Finalizada:
+                    reserva.Finalizar();
+                    break;
+                default:
+                    throw new InvalidOperationException($"El estado {nuevoEstado} no es válido para aplicar cambios.");
+
+
+            }
             return Task.CompletedTask;
         }
     }

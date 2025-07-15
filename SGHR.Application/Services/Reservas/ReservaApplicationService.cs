@@ -97,14 +97,7 @@ namespace SGHR.Application.Services.Reservas
             await _reservaRules.ValidarFechaEntradaMayorSalida(request.FechaEntrada, request.FechaSalida);
             await _reservaRules.ValidarExistenciaClienteAsync(request.IdCliente);
 
-            bool fechaCambio =
-                reservaExistente.FechaEntrada != request.FechaEntrada ||
-                reservaExistente.FechaSalida != request.FechaSalida;
-            bool habitacionCambio =
-                reservaExistente.IdCategoriaHabitacion != request.IdCategoriaHabitacion;
-            bool necesitaVerificarDisponibilidad = fechaCambio || habitacionCambio;
-
-            if (necesitaVerificarDisponibilidad)
+            if (await _reservaRules.RequiereVerificarDisponibilidad(reservaExistente, request))
             {
                 var estaDisponible = await _categoriaHabitacionRepository.HayDisponibilidadAsync
                     (
@@ -115,7 +108,7 @@ namespace SGHR.Application.Services.Reservas
                      );
                 await _reservaRules.ValidarExistenciaCategoriaAsync(request.IdCategoriaHabitacion, estaDisponible);
             }
-
+            
             reservaExistente.ActualizarDetalles(
                 request.IdCliente,
                 request.IdCategoriaHabitacion,
@@ -125,13 +118,7 @@ namespace SGHR.Application.Services.Reservas
             );
 
             await _reservaRules.ValidarTransicionEstadoAsync(reservaExistente.Estado, request.Estado);
-
-            if (request.Estado == EstadoReserva.Confirmada)
-                reservaExistente.Confirmar();
-            else if (request.Estado == EstadoReserva.Finalizada)
-                reservaExistente.Finalizar();
-            else if (request.Estado == EstadoReserva.Cancelada)
-                reservaExistente.Cancelar();
+            await _reservaRules.AplicarCambiosDeEstado(reservaExistente, request.Estado);
 
             await _reservaRepository.ActualizarAsync(reservaExistente);
             await _unitOfWork.CommitAsync();
@@ -146,7 +133,14 @@ namespace SGHR.Application.Services.Reservas
                 var reservaExistente = await _reservaRepository.ObtenerPorId(id)
                    ?? throw new KeyNotFoundException($"Reserva con ID {id} no encontrada.");
 
+                await _reservaRules.VerificarReservaFinalizada(reservaExistente.Estado);
+                await _reservaRules.ValidarTransicionEstadoAsync(reservaExistente.Estado, EstadoReserva.Cancelada);
+                await _reservaRules.ValidarReservaExistenteAsync(id);
+                
+                
+                
                 await _reservaRepository.CancelarReservaAsync(id);
+                await _unitOfWork.CommitAsync();
                 return true;
             }
             catch (InvalidCastException ex)

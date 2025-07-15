@@ -84,7 +84,6 @@ namespace SGHR.Persistence.Repositories.Reservas
                 reserva.ActualizarEstado(EstadoReserva.Cancelada);
                 reserva.ActualizarMotivoCancelacion("Cancelada desde la aplicacion");
                 _context.Update(reserva);
-                await _context.SaveChangesAsync();
             }
         }
     }

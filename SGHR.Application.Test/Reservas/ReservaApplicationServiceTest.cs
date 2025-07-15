@@ -83,6 +83,7 @@ namespace SGHR.Application.Test.Reservas
             _reservaRepMock.Setup(r => r.ObtenerPorId(It.IsAny<int>())).ReturnsAsync(reserva);
 
             var ex = await Assert.ThrowsAsync<InvalidOperationException>(()=> _service.CancelarReservaAsync(1));
+            Assert.Contains("Solo se pueden cancelar reservas confirmadas.", ex.Message);
         }
         
         
