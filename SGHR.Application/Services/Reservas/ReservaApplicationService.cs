@@ -128,17 +128,18 @@ namespace SGHR.Application.Services.Reservas
         }
         public async Task<bool> CancelarReservaAsync(int id)
         {
+            var reservaExistente = await _reservaRepository.ObtenerPorId(id)
+                  ?? throw new KeyNotFoundException($"Reserva con ID {id} no encontrada.");
+
+            if (reservaExistente.Estado == EstadoReserva.Finalizada)
+                throw new InvalidOperationException("No se puede cancelar una reserva que ya esta finalizada.");
             try
             {
-                var reservaExistente = await _reservaRepository.ObtenerPorId(id)
-                   ?? throw new KeyNotFoundException($"Reserva con ID {id} no encontrada.");
+               
 
-                await _reservaRules.VerificarReservaFinalizada(reservaExistente.Estado);
                 await _reservaRules.ValidarTransicionEstadoAsync(reservaExistente.Estado, EstadoReserva.Cancelada);
                 await _reservaRules.ValidarReservaExistenteAsync(id);
-                
-                
-                
+
                 await _reservaRepository.CancelarReservaAsync(id);
                 await _unitOfWork.CommitAsync();
                 return true;

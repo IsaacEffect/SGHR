@@ -83,7 +83,7 @@ namespace SGHR.Application.Test.Reservas
             _reservaRepMock.Setup(r => r.ObtenerPorId(It.IsAny<int>())).ReturnsAsync(reserva);
 
             var ex = await Assert.ThrowsAsync<InvalidOperationException>(()=> _service.CancelarReservaAsync(1));
-            Assert.Contains("Solo se pueden cancelar reservas confirmadas.", ex.Message);
+            Assert.Contains("No se puede cancelar una reserva que ya", ex.Message);
         }
         
         
@@ -107,7 +107,7 @@ namespace SGHR.Application.Test.Reservas
             var ex = await Assert.ThrowsAsync<ArgumentException>(() => _service.ActualizarReservaAsync(1, request));
             Assert.Contains("La fecha de entrada no puede ser posterior", ex.Message);
         }
-        
+
         [Fact]
         public async Task VerificarDisponibilidadAsync_DevuelveFalseSiNoExisteCategoria()
         {
@@ -118,12 +118,12 @@ namespace SGHR.Application.Test.Reservas
                 FechaSalida = DateTime.Today.AddDays(5)
             };
 
-            _categoriaHabitacionRepMock.Setup(c => c.ObtenerPorId(request.IdCategoriaHabitacion)).ReturnsAsync((CategoriaHabitacion)null);
-            
-            await Assert.ThrowsAsync<ArgumentException>(() => _service.VerificarDisponibilidadAsync(request));
-        }
+            _reservaRulesMock
+                .Setup(r => r.ValidarExistenciaCategoriaAsync(request.IdCategoriaHabitacion, true))
+                .ThrowsAsync(new ArgumentException("La categoria con ID 1 no existe."));
 
-        
-    
+            var ex = await Assert.ThrowsAsync<ArgumentException>(() => _service.VerificarDisponibilidadAsync(request));
+            Assert.Contains("La categoria con ID 1 no existe.", ex.Message);
+        }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using SGHR.Application.DTOs.Reservas;
+﻿using SGHR.Application.DTOs.Reservas;
 using SGHR.Application.Interfaces.Reservas;
 using SGHR.Domain.Entities.Reservas;
 using SGHR.Domain.Enums;
@@ -59,16 +58,7 @@ namespace SGHR.Application.Validations
         }
 
 
-        public Task VerificarReservaFinalizada(EstadoReserva estado)
-        {
-            if(estado == EstadoReserva.Finalizada)
-            {
-                throw new InvalidOperationException("No se puede cancelar una reserva que ya ha sido finalizada");
-            }
-
-           return Task.CompletedTask;
-        }
-
+        
         public Task<bool> RequiereVerificarDisponibilidad(Reserva reserva, ActualizarReservaRequest request)
         {
             bool fechaCambio = reserva.FechaEntrada != request.FechaEntrada || reserva.FechaSalida != request.FechaSalida;
@@ -92,8 +82,6 @@ namespace SGHR.Application.Validations
                     break;
                 default:
                     throw new InvalidOperationException($"El estado {nuevoEstado} no es válido para aplicar cambios.");
-
-
             }
             return Task.CompletedTask;
         }
