@@ -1,6 +1,4 @@
-﻿using Xunit;
-using Moq;
-using FluentAssertions;
+﻿using Moq;
 using AutoMapper;
 using SGHR.Application.DTOs.Reservas;
 using SGHR.Application.Services.Reservas;
@@ -8,10 +6,8 @@ using SGHR.Persistence.Interfaces.Repositories.Reservas;
 using SGHR.Persistence.Interfaces.Repositories.Clientes;
 using SGHR.Persistence.Interfaces.Repositories.Habitaciones;
 using SGHR.Application.Interfaces.Reservas;
-using SGHR.Domain.Entities.Users;
 using SGHR.Domain.Entities.Reservas;
 using SGHR.Domain.Interfaces;
-using SGHR.Domain.Entities.Habitaciones;
 using SGHR.Domain.Enums;
 
 namespace SGHR.Application.Test.Reservas
