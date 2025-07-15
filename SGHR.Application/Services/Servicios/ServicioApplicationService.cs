@@ -8,29 +8,21 @@ using AutoMapper;
 
 namespace SGHR.Application.Services.Servicios
 {
-    public class ServicioApplicationService : IServicioApplicationService
+    public class ServicioApplicationService(
+        IServicioRepository serviciosRepository,
+        IServicioCategoriaRepository servicioCategoriaRepository,
+        ICategoriaHabitacionRepository categoriaHabitacionRepository,
+        IMapper mapper,
+        IUnitOfWork unitOfWork,
+        IServicioRules servicioRules) : IServicioApplicationService
     {
-        private readonly IServicioRepository _serviciosRepository;
-        private readonly IServicioCategoriaRepository _servicioCategoriaRepository;
-        private readonly ICategoriaHabitacionRepository _categoriaHabitacionRepository;
-        private readonly IMapper _mapper;
-        private readonly IUnitOfWork _unitOfWork;  
-        private readonly IServicioRules _servicioRules;
-        public ServicioApplicationService(
-            IServicioRepository serviciosRepository,
-            IServicioCategoriaRepository servicioCategoriaRepository,
-            ICategoriaHabitacionRepository categoriaHabitacionRepository,
-            IMapper mapper,
-            IUnitOfWork unitOfWork,
-            IServicioRules servicioRules)
-        {
-            _serviciosRepository = serviciosRepository;
-            _servicioCategoriaRepository = servicioCategoriaRepository;
-            _categoriaHabitacionRepository = categoriaHabitacionRepository;
-            _mapper = mapper;
-            _unitOfWork = unitOfWork;
-            _servicioRules = servicioRules;
-        }
+        private readonly IServicioRepository _serviciosRepository = serviciosRepository;
+        private readonly IServicioCategoriaRepository _servicioCategoriaRepository = servicioCategoriaRepository;
+        private readonly ICategoriaHabitacionRepository _categoriaHabitacionRepository = categoriaHabitacionRepository;
+        private readonly IMapper _mapper = mapper;
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;  
+        private readonly IServicioRules _servicioRules = servicioRules;
+
         public async Task<ServicioDto> AgregarServicioAsync(AgregarServicioRequest request)
         {
             await _servicioRules.ValidarDatosBasicosAsync(request.Nombre, request.Descripcion);
@@ -45,7 +37,7 @@ namespace SGHR.Application.Services.Servicios
             var servicio = await _serviciosRepository.ObtenerPorIdAsync(request.IdServicio);
             await _servicioRules.ValidarDatosBasicosAsync(request.Nombre, request.Descripcion);
 
-            servicio.Actualizar(request.Nombre, request.Descripcion);
+            servicio.Actualizar(request.Nombre, request.Descripcion);   
             if (request.Activo) servicio.Activar(); else servicio.Desactivar();
 
             await _serviciosRepository.ActualizarServicioAsync(servicio);
@@ -72,6 +64,7 @@ namespace SGHR.Application.Services.Servicios
         {
             await _servicioRules.ValidarExistenciaSerivicioAsync(idServicio);
             var servicio = await _serviciosRepository.ObtenerPorIdAsync(idServicio);
+           
             servicio.Desactivar();
             await _serviciosRepository.ActualizarServicioAsync(servicio);
             await _unitOfWork.CommitAsync();
@@ -79,6 +72,7 @@ namespace SGHR.Application.Services.Servicios
         }
         public async Task<ServicioDto?> ObtenerServicioPorIdAsync(int idServicio)
         {
+            await _servicioRules.ValidarExistenciaSerivicioAsync(idServicio);
             var servicio = await _serviciosRepository.ObtenerPorIdAsync(idServicio);
             return _mapper.Map<ServicioDto>(servicio);
         }
@@ -90,10 +84,11 @@ namespace SGHR.Application.Services.Servicios
         public async Task AsignarPrecioServicioCategoriaAsync(AsignarPrecioServicioCategoriaRequest request)
         {
             _servicioRules.ValidarPrecioServicio(request.Precio);
-            _ = await _serviciosRepository.ObtenerPorIdAsync(request.IdServicio);
+            await _serviciosRepository.ObtenerPorIdAsync(request.IdServicio);
             await _servicioRules.ValidarExistenciaSerivicioAsync(request.IdServicio);
             var categoriaExiste = await _categoriaHabitacionRepository.ObtenerPorIdAsync(request.IdCategoriaHabitacion) != null;
-            if (!categoriaExiste) throw new KeyNotFoundException($"Categoría de habitación con ID {request.IdCategoriaHabitacion} no encontrada."); // Se puede implementar una base para las validaciones
+            
+            if (!categoriaExiste) throw new KeyNotFoundException($"Categoría de habitación con ID {request.IdCategoriaHabitacion} no encontrada."); 
             await _servicioCategoriaRepository.AgregarPrecioServicioCategoriaAsync( 
                 request.IdServicio,
                 request.IdCategoriaHabitacion,
@@ -104,14 +99,14 @@ namespace SGHR.Application.Services.Servicios
         {
             await _servicioRules.ValidarExistenciaSerivicioAsync(servicioId);
             _ = await _categoriaHabitacionRepository.ObtenerPorIdAsync(categoriaId) 
-                ?? throw new KeyNotFoundException($"Categoría de habitación con ID {categoriaId} no encontrada."); // aqui tambien se puede implementar una base para las validaciones
+                ?? throw new KeyNotFoundException($"Categoría de habitación con ID {categoriaId} no encontrada."); 
             await _servicioCategoriaRepository.EliminarPrecioServicioCategoriaAsync(servicioId, categoriaId); 
           
         }
         public async Task<List<ServicioCategoriaDto>> ObtenerPreciosServicioPorCategoriaAsync(int categoriaId)
         {
             _ = await _categoriaHabitacionRepository.ObtenerPorIdAsync(categoriaId)
-                            ?? throw new KeyNotFoundException($"Categoría de habitación con el ID {categoriaId} no encontrada."); // aqui tambien se puede implementar una base para las validaciones
+                            ?? throw new KeyNotFoundException($"Categoría de habitación con el ID {categoriaId} no encontrada."); 
 
             var precios = await _servicioCategoriaRepository.ObtenerPreciosPorCategoriaAsync(categoriaId); 
             return _mapper.Map<List<ServicioCategoriaDto>>(precios);
@@ -125,7 +120,7 @@ namespace SGHR.Application.Services.Servicios
         public async Task<ServicioCategoriaDto?> ObtenerPrecioServicioCategoriaEspecificoAsync(int servicioId, int categoriaId)
         {
             _ = await _categoriaHabitacionRepository.ObtenerPorIdAsync(categoriaId) 
-                ?? throw new KeyNotFoundException($"Categoría de habitación con el ID {categoriaId} no encontrada."); // aqui tambien se puede implementar una base para las validaciones
+                    ?? throw new KeyNotFoundException($"Categoría de habitación con el ID {categoriaId} no encontrada."); 
             var precio = await _servicioCategoriaRepository.ObtenerPrecioServicioCategoriaEspecificoAsync(servicioId, categoriaId); 
             return _mapper.Map<ServicioCategoriaDto>(precio);
         }
