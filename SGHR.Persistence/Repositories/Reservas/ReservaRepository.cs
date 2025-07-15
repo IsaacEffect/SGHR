@@ -53,7 +53,7 @@ namespace SGHR.Persistence.Repositories.Reservas
             return parameters.Get<bool>("@EstaDisponible");
         }
 
-        public async Task CrearAsync(Reserva reserva)
+        public async Task CrearReservaAsync(Reserva reserva)
         {
             await _dbSet.AddAsync(reserva);
         }

@@ -13,7 +13,7 @@ namespace SGHR.Persistence.Interfaces.Repositories.Reservas
         Task<List<Reserva>> ObtenerPorClienteIdAsync(int idCliente);
         Task<List<Reserva>> ObtenerReservasEnRangoAsync(DateTime desde, DateTime hasta);
         Task<bool> HayDisponibilidadAsync(int habitacionId, DateTime fechaEntrada, DateTime fechaSalida, int? idReservaActual = null);
-        Task CrearAsync(Reserva reserva); 
+        Task CrearReservaAsync(Reserva reserva); 
         Task ActualizarAsync(Reserva reserva);         
         Task CancelarReservaAsync(int idReserva);
     }

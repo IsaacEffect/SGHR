@@ -71,7 +71,7 @@ namespace SGHR.Application.Services.Reservas
                 nuevaReserva.Activar();
 
 
-                await _reservaRepository.CrearAsync(nuevaReserva);
+                await _reservaRepository.CrearReservaAsync(nuevaReserva);
                 await _unitOfWork.CommitAsync();
                 var dto = _mapper.Map<ReservaDto>(nuevaReserva);
 
