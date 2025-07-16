@@ -3,7 +3,6 @@ using Moq;
 using SGHR.Application.DTOs.Servicios;
 using SGHR.Application.Interfaces.Servicios;
 using SGHR.Application.Services.Servicios;
-using SGHR.Domain.Entities.Habitaciones;
 using SGHR.Domain.Interfaces;
 using SGHR.Persistence.Interfaces.Repositories.Habitaciones;
 using SGHR.Persistence.Interfaces.Repositories.Servicios;
@@ -14,18 +13,17 @@ namespace SGHR.Application.Test.Servicios
     public class ServicioApplicationServiceTest 
     {
         private readonly Mock<IServicioRepository> _servicioRepMock = new();
-        private readonly Mock<IServicioCategoriaRepository> _servicioCategoriaRepMock = new();
         private readonly Mock<ICategoriaHabitacionRepository> _catHabitacionRepMock = new();
         private readonly Mock<IServicioRules> _servicioRulesMock = new();
         private readonly Mock<IMapper> _mapperMock = new();
         private readonly Mock<IUnitOfWork> _unit0fWorkMock = new();
 
-        private readonly IServicioApplicationService _service;
+        private readonly ServicioApplicationService _service; 
+
         public ServicioApplicationServiceTest()
         {
             _service = new ServicioApplicationService(
                 _servicioRepMock.Object,
-                _servicioCategoriaRepMock.Object,
                 _catHabitacionRepMock.Object,
                 _mapperMock.Object,
                 _unit0fWorkMock.Object,
@@ -190,42 +188,7 @@ namespace SGHR.Application.Test.Servicios
             await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.DesactivarServicioAsync(idServicio));
         }
 
-        [Fact]
-        public async Task AsignarPrecioServicioCategoriaAsync_DebeAsignarPrecioCorrectamente()
-        {
-  
-            var request = new AsignarPrecioServicioCategoriaRequest
-            {
-                IdServicio = 1,
-                IdCategoriaHabitacion = 1,
-                Precio = 200.00m
-            };
-            var servicioEntity = new ServiciosE("Servicio de Lavandería", "Lavado y planchado de ropa");
-            var categoriaHabitacionEntity = new CategoriaHabitacion();
-
-            _catHabitacionRepMock.Setup(r => r.ObtenerPorIdAsync(request.IdCategoriaHabitacion)).ReturnsAsync(categoriaHabitacionEntity);
-            _servicioRulesMock.Setup(r => r.ValidarExistenciaSerivicioAsync(request.IdServicio)).Returns(Task.CompletedTask);
-            _servicioRepMock.Setup(r => r.ObtenerPorIdAsync(request.IdServicio)).ReturnsAsync(servicioEntity);
-    
-            _servicioCategoriaRepMock.Setup(r => r.AgregarPrecioServicioCategoriaAsync(request.IdServicio, request.IdCategoriaHabitacion, request.Precio)).Returns(Task.CompletedTask);
-
-            await _service.AsignarPrecioServicioCategoriaAsync(request);
-        }
-
-        [Fact]
-        public async Task AsignarPrecioServicioCategoriaAsync_LanzaExcepcion_SiDatosInvalidos()
-        {
-            var request = new AsignarPrecioServicioCategoriaRequest
-            {
-                IdServicio = 1,
-                IdCategoriaHabitacion = 1,
-                Precio = -100.00m 
-            };
-            _servicioRulesMock.Setup(r => r.ValidarPrecioServicio(request.Precio))
-                .Throws(new ArgumentException("El precio del servicio no puede ser negativo."));
-            await Assert.ThrowsAsync<ArgumentException>(() => _service.AsignarPrecioServicioCategoriaAsync(request));
-        }
-
+        
         [Fact]
         public async Task ObtenerServicioPorId_Async_DebeRetornarServicioCorrectamente()
         {
