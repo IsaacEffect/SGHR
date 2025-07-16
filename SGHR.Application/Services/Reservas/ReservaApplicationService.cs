@@ -34,9 +34,9 @@ namespace SGHR.Application.Services.Reservas
             var dto = _mapper.Map<ReservaDto?>(reserva);
             return dto;
         }
-        public async Task<List<ReservaDto>> ObtenerTodasReservasAsync()
+        public async Task<List<ReservaDto>> ObtenerTodasReservasAsync(bool incluirRelaciones = false)
         {
-            var reservas = await _reservaRepository.ObtenerTodasAsync();
+            var reservas = await _reservaRepository.ObtenerTodasAsync(incluirRelaciones);
             var dto = _mapper.Map<List<ReservaDto>>(reservas);
             return dto;
         }

@@ -22,7 +22,7 @@ namespace SGHR.Domain.Entities.Reservas
         public CategoriaHabitacion? CategoriaHabitacion { get; private set; }
 
         protected Reserva() { }
-        public Reserva(int clienteId, int idCategoriaHabitacion, DateTime fechaEntrada, DateTime fechaSalida, int numeroHuespedes )
+        public Reserva(int clienteId, int idCategoriaHabitacion, DateTime fechaEntrada, DateTime fechaSalida, int numeroHuespedes)
         {
             if (clienteId <= 0)
             {
@@ -73,7 +73,7 @@ namespace SGHR.Domain.Entities.Reservas
             FechaCancelacion = DateTime.Now;
         }
 
-        public void ActualizarDetalles(int clienteId, int idCategoriaHabitacion, DateTime fechaEntrada, DateTime fechaSalida, sbyte numeroHuespedes)
+        public void ActualizarDetalles(int clienteId, int idCategoriaHabitacion, DateTime fechaEntrada, DateTime fechaSalida, int numeroHuespedes)
         {
             if (clienteId <= 0)
             {

@@ -1,5 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SGHR.Persistence.Base;
 using SGHR.Persistence.Context;
 using SGHR.Persistence.Interfaces;
@@ -32,16 +31,6 @@ namespace SGHR.Persistence.Repositories.Servicios
             var servicio = await base.ObtenerPorId(id) ?? throw new KeyNotFoundException($"Servicio con ID {id} no encontrado.");
             _dbSet.Remove(servicio);
         }
-
-        public Task ActivarServicioAsync(int id, bool activo)
-        {
-            return _context.Database.ExecuteSqlRawAsync(
-                "EXEC ActivarServicio @IdServicio = {0}, @Estado = {1}",
-                new SqlParameter("@IdServicio", id),
-                new SqlParameter("@Estado", activo)
-            );
-        }
-
         public Task<List<ServiciosEntity>> ObtenerServiciosActivosAsync()
         {
             return _dbSet

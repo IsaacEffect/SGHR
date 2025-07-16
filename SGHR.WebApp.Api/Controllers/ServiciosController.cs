@@ -7,13 +7,9 @@ namespace SGHR.WebApp.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ServiciosController : ControllerBase
+    public class ServiciosController(IServicioApplicationService servicioApplicationService) : ControllerBase
     {
-        private readonly IServicioApplicationService _servicioApplicationService;
-        public ServiciosController(IServicioApplicationService servicioApplicationService)
-        {
-            _servicioApplicationService = servicioApplicationService;
-        }
+        private readonly IServicioApplicationService _servicioApplicationService = servicioApplicationService;
 
         /// <summary>
         /// Agregar un nuevo servicio
@@ -31,17 +27,13 @@ namespace SGHR.WebApp.Api.Controllers
         /// <summary>
         /// Actualizar un servicio existente
         /// </summary>
-        [HttpPut("{id}")]
+        [HttpPut("ActualizarServicio")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> ActualizarServicio(int id, [FromBody] ActualizarServicioRequest request)
+        public async Task<IActionResult> ActualizarServicio([FromBody] ActualizarServicioRequest request)
         {
-            if (id != request.IdServicio)
-            {
-                return BadRequest("El ID del servicio no coincide con el ID proporcionado en la solicitud.");
-            }
             await _servicioApplicationService.ActualizarServicioAsync(request);
             return Ok("El servicio se actualizo correctamente");
         }
@@ -73,6 +65,18 @@ namespace SGHR.WebApp.Api.Controllers
         }
 
         /// <summary>
+        /// Obtener todos los servicios activos
+        /// </summary>
+        [HttpGet("ObtenerServiciosActivos")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ObtenerServiciosActivos()
+        {
+            var servicios = await _servicioApplicationService.ObtenerServiciosActivosAsync();
+            return Ok(servicios);
+        }
+
+        /// <summary>
         /// Obtener todos los servicios
         /// </summary>
         [HttpGet("ObtenerTodosLosServicios")]
@@ -83,6 +87,7 @@ namespace SGHR.WebApp.Api.Controllers
             var servicios = await _servicioApplicationService.ObtenerTodosLosServiciosAsync();
             return Ok(servicios);
         }
+
         /// <summary>
         /// Activar un servicio
         /// </summary>
@@ -94,6 +99,7 @@ namespace SGHR.WebApp.Api.Controllers
             await _servicioApplicationService.ActivarServicioAsync(id);
             return Ok("Servicio Activado con exito.");
         }
+
         /// <summary>
         ///  Desactivar un servicio
         /// </summary>
@@ -106,67 +112,5 @@ namespace SGHR.WebApp.Api.Controllers
             return Ok("Servicio Desactivado con exito.");
         }
 
-        /// <summary>
-        /// Asignar un precio a un servicio por categoría
-        /// </summary> 
-        [HttpPost("AsignarPrecio")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> AsignarPrecioServicioCategoria([FromBody] AsignarPrecioServicioCategoriaRequest request)
-        {
-            if (request.IdServicio <= 0 || request.IdCategoriaHabitacion <= 0)
-            {
-                return BadRequest("Los IDs de servicio y categoria deben ser numeros positivos");
-            }
-            await _servicioApplicationService.AsignarPrecioServicioCategoriaAsync(request);
-            return Ok("Precio asignado correctamente");
-        }
-        /// <summary>
-        /// Eliminar un precio asignado a un servicio por categoría
-        /// </summary> 
-        [HttpDelete("EliminarPrecio/{idServicio}/{idCategoriaHabitacion}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> EliminarPrecioServicioCategoria(int idServicio, int idCategoriaHabitacion)
-        {
-            await _servicioApplicationService.EliminarPrecioServicioCategoriaAsync(idServicio, idCategoriaHabitacion);
-            return Ok("Se ha eliminado el precio correctamente");
-        }
-
-        /// <summary>
-        /// Obtener los precios de un servicio por categoría
-        /// </summary>
-        [HttpGet("ObtenerPreciosServicioPorCategoria/{idCategoriaHabitacion}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ObtenerPreciosServicioPorCategoria(int idCategoriaHabitacion)
-        {
-            var precios = await _servicioApplicationService.ObtenerPreciosServicioPorCategoriaAsync(idCategoriaHabitacion);
-            return Ok(precios);
-        }
-
-        /// <summary>
-        /// Obtener precios por servcio
-        /// </summary>
-        [HttpGet("ObtenerPreciosCategoriaPorServicio/{idServicio}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ObtenerPreciosCategoriaPorServicio(int idServicio)
-        {
-            var precios = await _servicioApplicationService.ObtenerPreciosCategoriaPorServicioAsync(idServicio);
-            return Ok(precios);
-        }
-        /// <summary>
-        /// Obtener un precio específico de un servicio por categoría
-        /// </summary>
-        [HttpGet("ObtenerPrecioServicioCategoriaEspecifico")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ObtenerPrecioServicioCategoriaEspecifico([FromQuery]int idServicio, [FromQuery]int idCategoriaHabitacion)
-        {
-            var precio = await _servicioApplicationService.ObtenerPrecioServicioCategoriaEspecificoAsync(idServicio, idCategoriaHabitacion);
-            return precio is null ? NotFound() : Ok(precio);
-        }
     }
 }

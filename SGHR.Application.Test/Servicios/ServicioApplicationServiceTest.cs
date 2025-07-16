@@ -11,7 +11,7 @@ using ServiciosE = SGHR.Domain.Entities.Servicios.Servicios;
 
 namespace SGHR.Application.Test.Servicios
 {
-    public class ServicioApplicationServiceTest
+    public class ServicioApplicationServiceTest 
     {
         private readonly Mock<IServicioRepository> _servicioRepMock = new();
         private readonly Mock<IServicioCategoriaRepository> _servicioCategoriaRepMock = new();

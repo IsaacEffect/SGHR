@@ -24,6 +24,7 @@ namespace SGHR.IOC
             // Application Services 
             services.AddScoped<IReservaApplicationService, ReservaApplicationService>();
             services.AddScoped<IServicioApplicationService, ServicioApplicationService>();
+            services.AddScoped<IServicioCategoriaApplicationService, ServicioCategoriaApplicationService>();
 
             // Repositories
             services.AddScoped<IReservaRepository, ReservaRepository>();

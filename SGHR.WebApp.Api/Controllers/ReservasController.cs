@@ -7,14 +7,9 @@ namespace SGHR.WebApp.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ReservasController : ControllerBase
+    public class ReservasController(IReservaApplicationService reservaApplicationService) : ControllerBase
     {
-        private readonly IReservaApplicationService _reservaApplicationService;
-
-        public ReservasController(IReservaApplicationService reservaApplicationService)
-        {
-            _reservaApplicationService = reservaApplicationService;
-        }
+        private readonly IReservaApplicationService _reservaApplicationService = reservaApplicationService;
 
         /// <summary>
         /// Crea una nueva reserva
@@ -47,6 +42,7 @@ namespace SGHR.WebApp.Api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error interno del servidor: {ex.Message}");
             }
         }
+
         /// <summary>
         ///  Actualiza una reserva existente
         /// </summary>
@@ -163,15 +159,16 @@ namespace SGHR.WebApp.Api.Controllers
             }
             return Ok(reservas);
         }
+
         /// <summary>
         /// Obtiene todas las reservas
         /// </summary>
         [HttpGet("todas")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ObtenerTodasReservas()
+        public async Task<IActionResult> ObtenerTodasReservas([FromQuery] bool incluirRelaciones = false)
         {
-            var reservas = await _reservaApplicationService.ObtenerTodasReservasAsync();
+            var reservas = await _reservaApplicationService.ObtenerTodasReservasAsync(incluirRelaciones);
             if (reservas == null || !reservas.Any())
             {
                 return NotFound("No se encontraron reservas.");

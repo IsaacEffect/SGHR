@@ -10,14 +10,12 @@ namespace SGHR.Application.Services.Servicios
 {
     public class ServicioApplicationService(
         IServicioRepository serviciosRepository,
-        IServicioCategoriaRepository servicioCategoriaRepository,
         ICategoriaHabitacionRepository categoriaHabitacionRepository,
         IMapper mapper,
         IUnitOfWork unitOfWork,
         IServicioRules servicioRules) : IServicioApplicationService
     {
         private readonly IServicioRepository _serviciosRepository = serviciosRepository;
-        private readonly IServicioCategoriaRepository _servicioCategoriaRepository = servicioCategoriaRepository;
         private readonly ICategoriaHabitacionRepository _categoriaHabitacionRepository = categoriaHabitacionRepository;
         private readonly IMapper _mapper = mapper;
         private readonly IUnitOfWork _unitOfWork = unitOfWork;  
@@ -37,7 +35,6 @@ namespace SGHR.Application.Services.Servicios
             var servicio = await _serviciosRepository.ObtenerPorIdAsync(request.IdServicio);
             await _servicioRules.ValidarDatosBasicosAsync(request.Nombre, request.Descripcion);
 
-            servicio.Actualizar(request.Nombre, request.Descripcion);   
             if (request.Activo) servicio.Activar(); else servicio.Desactivar();
 
             await _serviciosRepository.ActualizarServicioAsync(servicio);
@@ -80,59 +77,18 @@ namespace SGHR.Application.Services.Servicios
             var servicio = await _serviciosRepository.ObtenerPorIdAsync(idServicio);
             return _mapper.Map<ServicioDto>(servicio);
         }
+        // Hacer los unit tests de estas funciones 
+        public async Task<List<ServicioDto>> ObtenerServiciosActivosAsync()
+        {
+            var servicios = await _serviciosRepository.ObtenerServiciosActivosAsync();
+            return _mapper.Map<List<ServicioDto>>(servicios);
+        }
         public async Task<List<ServicioDto>> ObtenerTodosLosServiciosAsync()
         {
 
             var servicios = await _serviciosRepository.ObtenerTodosLosServiciosAsync();
             return _mapper.Map<List<ServicioDto>>(servicios);
         }
-        public async Task AsignarPrecioServicioCategoriaAsync(AsignarPrecioServicioCategoriaRequest request)
-        {
-            _servicioRules.ValidarPrecioServicio(request.Precio);
-            await _serviciosRepository.ObtenerPorIdAsync(request.IdServicio);
-            await _servicioRules.ValidarExistenciaSerivicioAsync(request.IdServicio);
-            var categoriaExiste = await _categoriaHabitacionRepository.ObtenerPorIdAsync(request.IdCategoriaHabitacion) != null;
-            
-            if (!categoriaExiste) throw new KeyNotFoundException($"Categoría de habitación con ID {request.IdCategoriaHabitacion} no encontrada."); 
-            await _servicioCategoriaRepository.AgregarPrecioServicioCategoriaAsync( 
-                request.IdServicio,
-                request.IdCategoriaHabitacion,
-                request.Precio
-            );
-        }
-        public async Task EliminarPrecioServicioCategoriaAsync(int servicioId, int categoriaId)
-        {
-            await _servicioRules.ValidarExistenciaSerivicioAsync(servicioId);
-            _ = await _categoriaHabitacionRepository.ObtenerPorIdAsync(categoriaId) 
-                ?? throw new KeyNotFoundException($"Categoría de habitación con ID {categoriaId} no encontrada."); 
-            await _servicioCategoriaRepository.EliminarPrecioServicioCategoriaAsync(servicioId, categoriaId); 
-          
-        }
-        public async Task<List<ServicioCategoriaDto>> ObtenerPreciosServicioPorCategoriaAsync(int categoriaId)
-        {
-            _servicioRules.ValidarIdPositivo(categoriaId);
-            _ = await _categoriaHabitacionRepository.ObtenerPorIdAsync(categoriaId)
-                            ?? throw new KeyNotFoundException($"Categoría de habitación con el ID {categoriaId} no encontrada."); 
-
-            var precios = await _servicioCategoriaRepository.ObtenerPreciosPorCategoriaAsync(categoriaId); 
-            return _mapper.Map<List<ServicioCategoriaDto>>(precios);
-        }
-        public async Task<List<ServicioCategoriaDto>> ObtenerPreciosCategoriaPorServicioAsync(int servicioId)
-        {
-            _servicioRules.ValidarIdPositivo(servicioId);
-            await _servicioRules.ValidarExistenciaSerivicioAsync(servicioId);
-            var precios = await _servicioCategoriaRepository.ObtenerPreciosPorServicioAsync(servicioId); 
-            return _mapper.Map<List<ServicioCategoriaDto>>(precios);
-        }
-        public async Task<ServicioCategoriaDto?> ObtenerPrecioServicioCategoriaEspecificoAsync(int servicioId, int categoriaId)
-        {
-            _servicioRules.ValidarIdPositivo(servicioId);
-            _servicioRules.ValidarIdPositivo(categoriaId);
-            await _servicioRules.ValidarExistenciaSerivicioAsync(servicioId);
-            _ = await _categoriaHabitacionRepository.ObtenerPorIdAsync(categoriaId) 
-                    ?? throw new KeyNotFoundException($"Categoría de habitación con el ID {categoriaId} no encontrada."); 
-            var precio = await _servicioCategoriaRepository.ObtenerPrecioServicioCategoriaEspecificoAsync(servicioId, categoriaId); 
-            return _mapper.Map<ServicioCategoriaDto>(precio);
-        }
+       
     }
 }

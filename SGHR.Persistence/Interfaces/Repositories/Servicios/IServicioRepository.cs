@@ -11,7 +11,6 @@ namespace SGHR.Persistence.Interfaces.Repositories.Servicios
         Task<ServiciosEntity?> ObtenerPorIdAsync(int id);
         Task<List<ServiciosEntity>> ObtenerServiciosActivosAsync();
         Task<List<ServiciosEntity>> ObtenerTodosLosServiciosAsync();
-        Task ActivarServicioAsync(int id, bool activo);
 
     }
 }
