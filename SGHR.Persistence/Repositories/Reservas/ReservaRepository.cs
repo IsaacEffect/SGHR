@@ -28,6 +28,13 @@ namespace SGHR.Persistence.Repositories.Reservas
                 .Where(r => r.ClienteId == idCliente)
                 .ToListAsync();
         }
+        public async Task<List<Reserva>> ObtenerTodasAsync()
+        {
+            return await _dbSet
+                .Include(r => r.Cliente)
+                .Include(r => r.CategoriaHabitacion)
+                .ToListAsync();
+        }
 
         public async Task<List<Reserva>> ObtenerReservasEnRangoAsync(DateTime desde, DateTime hasta)
         {

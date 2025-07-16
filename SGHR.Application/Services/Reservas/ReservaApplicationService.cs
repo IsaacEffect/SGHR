@@ -34,6 +34,12 @@ namespace SGHR.Application.Services.Reservas
             var dto = _mapper.Map<ReservaDto?>(reserva);
             return dto;
         }
+        public async Task<List<ReservaDto>> ObtenerTodasReservasAsync()
+        {
+            var reservas = await _reservaRepository.ObtenerTodasAsync();
+            var dto = _mapper.Map<List<ReservaDto>>(reservas);
+            return dto;
+        }
         public async Task<List<ReservaDto>> ObtenerReservasPorClienteIdAsync(int idCliente)
         {
             await _reservaRules.ValidarExistenciaClienteAsync(idCliente);

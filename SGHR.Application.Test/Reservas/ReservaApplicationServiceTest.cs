@@ -45,8 +45,6 @@ namespace SGHR.Application.Test.Reservas
                 FechaSalida = DateTime.Today.AddDays(2),
                 NumeroHuespedes = 2
             };
-           
-
             var clienteMock = new Cliente(
                 nombre: "Test Cliente",
                 hashedPassword: "hashed",
@@ -65,10 +63,8 @@ namespace SGHR.Application.Test.Reservas
                 ));
             _clienteRepMock.Setup(c => c.ObtenerPorId(request.ClienteId))
                            .ReturnsAsync(clienteMock);
-
             _reservaRulesMock.Setup(r => r.ValidarExistenciaClienteAsync(request.ClienteId)).Returns(Task.CompletedTask);
             _reservaRulesMock.Setup(r => r.ValidarFechaEntradaMayorSalida(request.FechaEntrada, request.FechaSalida)).Returns(Task.CompletedTask);
-
             _categoriaHabitacionRepMock.Setup(c =>c.HayDisponibilidadAsync(
                     request.IdCategoriaHabitacion,
                     request.FechaEntrada,
@@ -77,8 +73,6 @@ namespace SGHR.Application.Test.Reservas
             )).ReturnsAsync(true);
             
             _reservaRulesMock.Setup(r => r.ValidarExistenciaCategoriaAsync(request.IdCategoriaHabitacion, true)).Returns(Task.CompletedTask);
-
-           
             _mapperMock.Setup(m => m.Map<ReservaDto>(It.IsAny<Reserva>()))
                 .Returns(new ReservaDto
                 {
@@ -90,7 +84,6 @@ namespace SGHR.Application.Test.Reservas
                     Estado = EstadoReserva.Pendiente,
                     NumeroHuespedes = request.NumeroHuespedes
                 });
-
             _reservaRepMock.Setup(r => r.CrearReservaAsync(It.IsAny<Reserva>()))
                 .Returns(Task.FromResult(request));
             var resultado = await _service.CrearReservaAsync(request);

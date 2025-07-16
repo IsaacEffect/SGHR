@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
-using Microsoft.Identity.Client;
 using Moq;
 using SGHR.Application.DTOs.Servicios;
 using SGHR.Application.Interfaces.Servicios;
 using SGHR.Application.Services.Servicios;
 using SGHR.Domain.Entities.Habitaciones;
-using SGHR.Domain.Enums;
 using SGHR.Domain.Interfaces;
 using SGHR.Persistence.Interfaces.Repositories.Habitaciones;
 using SGHR.Persistence.Interfaces.Repositories.Servicios;

@@ -163,7 +163,21 @@ namespace SGHR.WebApp.Api.Controllers
             }
             return Ok(reservas);
         }
-
+        /// <summary>
+        /// Obtiene todas las reservas
+        /// </summary>
+        [HttpGet("todas")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ObtenerTodasReservas()
+        {
+            var reservas = await _reservaApplicationService.ObtenerTodasReservasAsync();
+            if (reservas == null || !reservas.Any())
+            {
+                return NotFound("No se encontraron reservas.");
+            }
+            return Ok(reservas);
+        }
 
     }
 }
