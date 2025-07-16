@@ -59,7 +59,7 @@ namespace SGHR.Persistence.Context
             modelBuilder.Entity<ServicioCategoria>(entity =>
             {
                 entity.ToTable("ServicioCategoria");
-                entity.HasKey(sc => new { sc.ServicioId, sc.CategoriaHabitacionId });
+                entity.HasKey(sc => new { sc.IdServicio, sc.IdCategoriaHabitacion });
                 entity.Property(sc => sc.Precio).HasColumnName("PrecioServicio").HasColumnType("decimal(10,2)");
                 
                 entity.Property(sc => sc.FechaCreacion).HasColumnName("FechaCreacion");
@@ -102,12 +102,12 @@ namespace SGHR.Persistence.Context
                 modelBuilder.Entity<ServicioCategoria>()
                      .HasOne(sc => sc.Servicios)
                      .WithMany(s => s.ServicioCategorias)
-                     .HasForeignKey(sc => sc.ServicioId);
+                     .HasForeignKey(sc => sc.IdServicio);
 
                 modelBuilder.Entity<ServicioCategoria>()
                        .HasOne(sc => sc.CategoriaHabitacion)
                        .WithMany(ch => ch.ServicioCategorias)
-                       .HasForeignKey(sc => sc.CategoriaHabitacionId);
+                       .HasForeignKey(sc => sc.IdCategoriaHabitacion);
 
                 base.OnModelCreating(modelBuilder);
             

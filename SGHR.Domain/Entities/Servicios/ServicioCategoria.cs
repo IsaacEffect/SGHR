@@ -4,8 +4,8 @@ namespace SGHR.Domain.Entities.Servicios
 {
     public class ServicioCategoria : AuditableEntity
     {
-        public int ServicioId { get; private set; }
-        public int CategoriaHabitacionId { get; private set; }
+        public int IdServicio { get; private set; }
+        public int IdCategoriaHabitacion { get; private set; }
         public decimal Precio { get; private set; }
         public Servicios? Servicios { get; private set; }
         public CategoriaHabitacion? CategoriaHabitacion { get; private set; }
@@ -22,8 +22,8 @@ namespace SGHR.Domain.Entities.Servicios
             if (precio < 0)
                 throw new ArgumentException("El precio no puede ser negativo.", nameof(precio));
             
-            ServicioId = servicioId;
-            CategoriaHabitacionId = categoriaHabitacionId;
+            IdServicio = servicioId;
+            IdCategoriaHabitacion = categoriaHabitacionId;
             Precio = precio;
 
         }

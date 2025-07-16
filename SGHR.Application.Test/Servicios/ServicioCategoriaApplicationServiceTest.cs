@@ -1,13 +1,17 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using Moq;
-using SGHR.Application.Interfaces.Servicios;
+using Moq.Language.Flow;
 using SGHR.Application.DTOs.Servicios;
+using SGHR.Application.Interfaces.Servicios;
 using SGHR.Application.Services.Servicios;
 using SGHR.Domain.Entities.Habitaciones;
+using SGHR.Domain.Enums;
 using SGHR.Domain.Interfaces;
-using ServicioE = SGHR.Domain.Entities.Servicios.Servicios;
 using SGHR.Persistence.Interfaces.Repositories.Habitaciones;
 using SGHR.Persistence.Interfaces.Repositories.Servicios;
+using ServicioCatE = SGHR.Domain.Entities.Servicios.ServicioCategoria;
+using ServicioE = SGHR.Domain.Entities.Servicios.Servicios;
 
 namespace SGHR.Application.Test.Servicios
 {
@@ -44,7 +48,7 @@ namespace SGHR.Application.Test.Servicios
                 Precio = 200.00m
             };
             var servicioEntity = new ServicioE("Servicio de Lavandería", "Lavado y planchado de ropa");
-            var categoriaHabitacionEntity = new CategoriaHabitacion();
+            var categoriaHabitacionEntity = new CategoriaHabitacion(request.IdCategoriaHabitacion, "suite", "descripcion", 1000.00m, "caracteristicas");
 
             _catHabitacionRepMock.Setup(r => r.ObtenerPorIdAsync(request.IdCategoriaHabitacion)).ReturnsAsync(categoriaHabitacionEntity);
             _servicioRulesMock.Setup(r => r.ValidarExistenciaSerivicioAsync(request.IdServicio)).Returns(Task.CompletedTask);
@@ -96,7 +100,7 @@ namespace SGHR.Application.Test.Servicios
                 Precio = 250.00m
             };
             var servicioEntity = new ServicioE("Servicio de Lavandería", "Lavado y planchado de ropa");
-            var categoriaHabitacionEntity = new CategoriaHabitacion();
+            var categoriaHabitacionEntity = new CategoriaHabitacion(request.IdCategoriaHabitacion, "suite", "descripcion", 1000.00m, "caracteristicas");
             _catHabitacionRepMock.Setup(r => r.ObtenerPorIdAsync(request.IdCategoriaHabitacion)).ReturnsAsync(categoriaHabitacionEntity);
             _servicioRulesMock.Setup(r => r.ValidarExistenciaSerivicioAsync(request.IdServicio)).Returns(Task.CompletedTask);
             _servicioRepMock.Setup(r => r.ObtenerPorIdAsync(request.IdServicio)).ReturnsAsync(servicioEntity);
@@ -135,7 +139,7 @@ namespace SGHR.Application.Test.Servicios
             _servicioRulesMock.Setup(r => r.ValidarIdPositivo(request.IdCategoriaHabitacion));
             _servicioCategoriaRepMock.Setup(r => r.EliminarPrecioServicioCategoriaAsync(request.IdServicio, request.IdCategoriaHabitacion)).Returns(Task.CompletedTask);
             _catHabitacionRepMock.Setup(r => r.ObtenerPorIdAsync(request.IdCategoriaHabitacion))
-            .ReturnsAsync(new CategoriaHabitacion());
+            .ReturnsAsync(new CategoriaHabitacion(request.IdCategoriaHabitacion, "suite","descripcion",1000.00m,"caracteristicas"));
 
             // Act
             await _service.EliminarPrecioServicioCategoriaAsync(request.IdServicio, request.IdCategoriaHabitacion);
@@ -155,7 +159,50 @@ namespace SGHR.Application.Test.Servicios
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() => _service.EliminarPrecioServicioCategoriaAsync(servicioId, categoriaId));
         }
-        
+        [Fact]
+        public async Task ObtenerPreciosServicioPorCategoriaAsync_DebeRetornarPreciosCorrectamente()
+        {
+            // Arrange
+            var categoriaId = 1;
+            var precios = new List<ServicioCatE>
+            {
+                new ( 1, categoriaId, 100.00m ),
+                new (2, categoriaId, 150.00m )
+            };
+            _catHabitacionRepMock.Setup(r => r.ObtenerPorIdAsync(categoriaId))
+                .ReturnsAsync(new CategoriaHabitacion(
+                    categoriaId,
+                    "Suite",
+                    "Suite con vista al mar",
+                    4000m,
+                    "caracteristicas"
+                ));
+            _servicioCategoriaRepMock.Setup(r => r.ObtenerPreciosPorCategoriaAsync(categoriaId)).ReturnsAsync(precios);
+            _mapperMock.Setup(m => m.Map<List<ServicioCategoriaDto>>(precios))
+                .Returns(precios.Select(p => new ServicioCategoriaDto
+                {
+                    IdServicio = p.IdServicio,
+                    IdCategoriaHabitacion = p.IdCategoriaHabitacion,
+                    Precio = p.Precio
+                }).ToList());
+            // Act
+            var result = await _service.ObtenerPreciosServicioPorCategoriaAsync(categoriaId);
+            // Assert
+            Assert.Equal(2, result.Count);
+            Assert.Equal(100.00m, result[0].Precio);
+            Assert.Equal(150.00m, result[1].Precio);
+        }
+        [Fact]
+        public async Task ObtenerPreciosServicioPorCategoriaAsync_LanzaExcepcion_SiCategoriaNoExiste()
+        {
+            // Arrange
+            int categoriaId = 999;
+
+            _servicioCategoriaRepMock.Setup(r => r.ObtenerPreciosPorCategoriaAsync(categoriaId)).ReturnsAsync((List<ServicioCatE>)null);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.ObtenerPreciosServicioPorCategoriaAsync(categoriaId));
+        }
 
     }
 }
