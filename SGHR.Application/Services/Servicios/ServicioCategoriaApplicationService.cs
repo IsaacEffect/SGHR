@@ -38,19 +38,21 @@ namespace SGHR.Application.Services.Servicios
                 request.IdCategoriaHabitacion,
                 request.Precio
             );
+            await _unitOfWork.CommitAsync();
         }
-        public Task ActualizarPrecioServicioCategoriaAsync(int servicioId, int categoriaId, decimal precio)
+        public async Task ActualizarPrecioServicioCategoriaAsync(ActualizarPrecioServicioCategoriaRequest request)
         {
-            _servicioRules.ValidarIdPositivo(servicioId);
-            _servicioRules.ValidarIdPositivo(categoriaId);
-            _servicioRules.ValidarPrecioServicio(precio);
+            _servicioRules.ValidarIdPositivo(request.IdServicio);
+            _servicioRules.ValidarIdPositivo(request.IdCategoriaHabitacion);
+            _servicioRules.ValidarPrecioServicio(request.Precio);
             
-            _ = _serviciosRepository.ObtenerPorIdAsync(servicioId)
-                ?? throw new KeyNotFoundException($"Servicio con ID {servicioId} no encontrado.");
-            _ = _categoriaHabitacionRepository.ObtenerPorIdAsync(categoriaId)
-                ?? throw new KeyNotFoundException($"Categoría de habitación con ID {categoriaId} no encontrada.");
+            _ = _serviciosRepository.ObtenerPorIdAsync(request.IdServicio)
+                ?? throw new KeyNotFoundException($"Servicio con ID {request.IdServicio} no encontrado.");
+            _ = _categoriaHabitacionRepository.ObtenerPorIdAsync(request.IdCategoriaHabitacion)
+                ?? throw new KeyNotFoundException($"Categoría de habitación con ID {request.IdCategoriaHabitacion} no encontrada.");
 
-            return _servicioCategoriaRepository.ActualizarPrecioServicioCategoriaAsync(servicioId, categoriaId, precio);
+            await _servicioCategoriaRepository.ActualizarPrecioServicioCategoriaAsync(request.IdServicio, request.IdCategoriaHabitacion, request.Precio);
+            await _unitOfWork.CommitAsync();
         }
         public async Task EliminarPrecioServicioCategoriaAsync(int servicioId, int categoriaId)
         {
@@ -61,7 +63,7 @@ namespace SGHR.Application.Services.Servicios
                 ?? throw new KeyNotFoundException($"Categoría de habitación con ID {categoriaId} no encontrada.");
 
             await _servicioCategoriaRepository.EliminarPrecioServicioCategoriaAsync(servicioId, categoriaId);
-
+            await _unitOfWork.CommitAsync();
         }
         public async Task<List<ServicioCategoriaDto>> ObtenerPreciosServicioPorCategoriaAsync(int categoriaId)
         {

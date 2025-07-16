@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SGHR.Application.DTOs.Servicios;
 using SGHR.Application.Interfaces.Servicios;
 namespace SGHR.WebApp.Api.Controllers
@@ -27,6 +26,22 @@ namespace SGHR.WebApp.Api.Controllers
             }
             await _servicioCategoriaApplicationService.AsignarPrecioServicioCategoriaAsync(request);
             return Ok("Precio asignado correctamente");
+        }
+        ///<sumary>
+        /// Actualizar un precio asignado a un servicio por categoría
+        ///</sumary>
+        [HttpPut("ActualizarPrecio/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ActualizarPrecioServicioCategoria( [FromBody] ActualizarPrecioServicioCategoriaRequest request)
+        {
+            if (request.IdServicio <= 0 || request.IdCategoriaHabitacion <= 0)
+            {
+                return BadRequest("Los IDs de servicio y categoria deben ser numeros positivos");
+            }
+            await _servicioCategoriaApplicationService.ActualizarPrecioServicioCategoriaAsync(request);
+            return Ok("Se ha actualizado el precio correctamente");
         }
         /// <summary>
         /// Eliminar un precio asignado a un servicio por categoría
