@@ -203,6 +203,84 @@ namespace SGHR.Application.Test.Servicios
             // Act & Assert
             await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.ObtenerPreciosServicioPorCategoriaAsync(categoriaId));
         }
+        [Fact]
+        public async Task ObtenerPreciosCategoriaPorServicioAsync_DebeRetornarPreciosCorrectamente()
+        {
+            // Arrange
+            var servicioId = 1;
+            var precios = new List<ServicioCatE>
+            {
+                new (servicioId, 1, 100.00m),
+                new (servicioId, 2, 150.00m)
+            };
+            _servicioRepMock.Setup(r => r.ObtenerPorIdAsync(servicioId))
+                .ReturnsAsync(new ServicioE("Servicio de Lavandería", "Lavado y planchado de ropa"));
+            _servicioCategoriaRepMock.Setup(r => r.ObtenerPreciosPorServicioAsync(servicioId)).ReturnsAsync(precios);
+            _mapperMock.Setup(m => m.Map<List<ServicioCategoriaDto>>(precios))
+                .Returns(precios.Select(p => new ServicioCategoriaDto
+                {
+                    IdServicio = p.IdServicio,
+                    IdCategoriaHabitacion = p.IdCategoriaHabitacion,
+                    Precio = p.Precio
+                }).ToList());
+            // Act
+            var result = await _service.ObtenerPreciosCategoriaPorServicioAsync(servicioId);
+            // Assert
+            Assert.Equal(2, result.Count);
+            Assert.Equal(100.00m, result[0].Precio);
+            Assert.Equal(150.00m, result[1].Precio);
+        }
+        [Fact]
+        public async Task ObtenerPreciosCategoriaPorServicioAsync_LanzaExcepcion_SiServicioNoExiste()
+        {
+            // Arrange
+            int servicioId = 999;
+            _servicioRulesMock.Setup(r => r.ValidarExistenciaSerivicioAsync(servicioId))
+                .Throws(new KeyNotFoundException($"El servicio con el {servicioId} no existe"));
+            _servicioRepMock.Setup(r => r.ObtenerPorIdAsync(servicioId)).ReturnsAsync((ServicioE)null);
+            // Act & Assert
+            await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.ObtenerPreciosCategoriaPorServicioAsync(servicioId));
+        }
+        [Fact]
+        public async Task ObtenerPrecioServicioCategoriaEspecificoAsync_DebeRetornarPrecioCorrectamente()
+        {
+            // Arrange
+            int servicioId = 1;
+            int categoriaId = 1;
+            var precio = new ServicioCatE(servicioId, categoriaId, 200.00m);
+
+            _catHabitacionRepMock.Setup(r => r.ObtenerPorIdAsync(categoriaId))
+                .ReturnsAsync(new CategoriaHabitacion(categoriaId, "Suite", "Suite con vista al mar", 4000m, "caracteristicas"));
+
+            _servicioCategoriaRepMock.Setup(r => r.ObtenerPrecioServicioCategoriaEspecificoAsync(servicioId, categoriaId)).ReturnsAsync(precio);
+            _mapperMock.Setup(m => m.Map<ServicioCategoriaDto>(precio))
+                .Returns(new ServicioCategoriaDto
+                {
+                    IdServicio = precio.IdServicio,
+                    IdCategoriaHabitacion = precio.IdCategoriaHabitacion,
+                    Precio = precio.Precio
+                });
+            // Act
+            var result = await _service.ObtenerPrecioServicioCategoriaEspecificoAsync(servicioId, categoriaId);
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(servicioId, result.IdServicio);
+            Assert.Equal(categoriaId, result.IdCategoriaHabitacion);
+            Assert.Equal(200.00m, result.Precio);
+        }
+        [Fact]
+        public async Task ObtenerPrecioServicioCategoriaEspecificoAsync_LanzaExcepcion_SiDatosInvalidos()
+        {
+            // Arrange
+            int servicioId = -1;
+            int categoriaId = -1;
+            _servicioRulesMock.Setup(r => r.ValidarIdPositivo(servicioId))
+                .Throws(new ArgumentException("El ID del servicio debe ser positivo."));
+            _servicioRulesMock.Setup(r => r.ValidarIdPositivo(categoriaId))
+                .Throws(new ArgumentException("El ID de la categoría de habitación debe ser positivo."));
+            // Act & Assert
+            await Assert.ThrowsAsync<ArgumentException>(() => _service.ObtenerPrecioServicioCategoriaEspecificoAsync(servicioId, categoriaId));
+        }
 
     }
 }

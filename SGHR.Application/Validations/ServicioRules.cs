@@ -6,11 +6,6 @@ namespace SGHR.Application.Validations
     {
         private readonly IServicioRepository _servicioRepository = servicioRepository;
 
-        public void ValidarEntidadNula(object? entidad, string mensaje)
-        {
-            if (entidad is null)
-                throw new ArgumentNullException(mensaje);
-        }
         public async Task ValidarDatosBasicosAsync(string nombre, string descripcion)
         {
             if (string.IsNullOrWhiteSpace(nombre))

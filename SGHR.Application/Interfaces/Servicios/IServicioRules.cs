@@ -6,6 +6,5 @@
         Task ValidarDatosBasicosAsync(string nombre, string descripcion);
         void ValidarPrecioServicio(decimal precio);
         void ValidarIdPositivo(int idServicio);
-        void ValidarEntidadNula(object? entidad, string mensaje);
     }
 }
