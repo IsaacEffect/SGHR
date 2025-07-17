@@ -4,7 +4,7 @@ namespace SGHR.Application.Interfaces.Servicios
 {
     public interface IServicioApplicationService
     {
-        // Operaciones CRUD para servicios
+        
         Task<ServicioDto> AgregarServicioAsync(AgregarServicioRequest request);
         Task ActualizarServicioAsync(ActualizarServicioRequest request);
         Task EliminarServicioAsync(int id);

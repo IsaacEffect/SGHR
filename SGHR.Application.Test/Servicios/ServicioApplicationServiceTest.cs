@@ -35,6 +35,7 @@ namespace SGHR.Application.Test.Servicios
         [Fact]
         public async Task AgregarServicioAsync_DebeCrearServicioCorrectamente()
         {
+            // Arrange
             var request = new AgregarServicioRequest
             {
                 Nombre = "Servicio de Limpieza",
@@ -56,8 +57,9 @@ namespace SGHR.Application.Test.Servicios
                     Descripcion = servicioEntity.Descripcion,
                     Activo = servicioEntity.Activo
                 });
-
+            // Act
             var resultado = await _service.AgregarServicioAsync(request);
+            // Assert
             Assert.NotNull(resultado);
             Assert.Equal("Servicio de Limpieza", resultado.Nombre);
             Assert.True(resultado.Activo);
@@ -66,6 +68,7 @@ namespace SGHR.Application.Test.Servicios
         [Fact]
         public async Task AgregarServicioAsync_LanzaExcepcion_SiDatosInvalidos()
         {
+            // Arrange
             var request = new AgregarServicioRequest
             {
                 Nombre = "",
@@ -74,11 +77,13 @@ namespace SGHR.Application.Test.Servicios
             };
             _servicioRulesMock.Setup(r => r.ValidarDatosBasicosAsync(request.Nombre, request.Descripcion))
                 .ThrowsAsync(new ArgumentException("El nombre del servicio no puede estar vacío."));
+            // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() => _service.AgregarServicioAsync(request));
         }
         [Fact]
         public async Task ActualizarServicioAsync_DebeActualizarServicioCorrectamente()
         {
+            // Arrange
             var request = new ActualizarServicioRequest
             {
                 IdServicio = 1,
@@ -96,8 +101,9 @@ namespace SGHR.Application.Test.Servicios
             _mapperMock.Setup(m => m.Map<ServiciosE>(request)).Returns(servicioEntity);
             _servicioRepMock.Setup(r => r.ActualizarServicioAsync(servicioEntity)).Returns(Task.CompletedTask);
             _unit0fWorkMock.Setup(u => u.CommitAsync()).ReturnsAsync(1);
-
+            // Act
             await _service.ActualizarServicioAsync(request);
+            // Assert
             Assert.Equal("Servicio de Lavandería", servicioEntity.Nombre);
             Assert.Equal("Lavado y planchado de ropa", servicioEntity.Descripcion);
             Assert.True(servicioEntity.Activo);
@@ -105,6 +111,7 @@ namespace SGHR.Application.Test.Servicios
         [Fact]
         public async Task ActualizarServicioAsync_LanzaExcepcion_SiServicioNoExiste()
         {
+            // Arrange
             var request = new ActualizarServicioRequest
             {
                 IdServicio = 1,
@@ -114,34 +121,38 @@ namespace SGHR.Application.Test.Servicios
             };
             _servicioRulesMock.Setup(r => r.ValidarExistenciaSerivicioAsync(request.IdServicio))
                 .ThrowsAsync(new KeyNotFoundException($"El servicio con ID {request.IdServicio} no fue encontrado"));
-
+            // Act & Assert
             await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.ActualizarServicioAsync(request));
         }
         [Fact]
         public async Task EliminarServicioAsync_DebeEliminarServicioCorrectamente()
         {
+            // Arrange
             int idServicio = 1;
             _servicioRulesMock.Setup(r => r.ValidarExistenciaSerivicioAsync(idServicio)).Returns(Task.CompletedTask);
             _servicioRepMock.Setup(r => r.ObtenerPorIdAsync(idServicio)).ReturnsAsync(new ServiciosE("Servicio de Lavandería", "Lavado y planchado de ropa"));
             _servicioRepMock.Setup(r => r.EliminarServicioAsync(idServicio)).Returns(Task.CompletedTask);
             _unit0fWorkMock.Setup(u => u.CommitAsync()).ReturnsAsync(1);
-
+            // Act
             await _service.EliminarServicioAsync(idServicio);
+            // Assert
             _servicioRepMock.Verify(r => r.EliminarServicioAsync(idServicio), Times.Once);
         }
         [Fact]
         public async Task EliminarServicioAsync_LanzaExcepcion_SiServicioNoExiste()
         {
+            // Arrange
             int idServicio = 1;
             _servicioRulesMock.Setup(r => r.ValidarExistenciaSerivicioAsync(idServicio))
                 .ThrowsAsync(new KeyNotFoundException($"El servicio con ID {idServicio} no fue encontrado"));
-
+            // Act & Assert
             await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.EliminarServicioAsync(idServicio));
         }
 
         [Fact]
         public async Task ActivarServicioAsync_DebeActivarServicioCorrectamente()
         {
+            // Arrange
             int idServicio = 1;
             var servicioEntity = new ServiciosE("Servicio de Lavandería", "Lavado y planchado de ropa");
             _servicioRulesMock.Setup(r => r.ValidarExistenciaSerivicioAsync(idServicio)).Returns(Task.CompletedTask);
@@ -150,22 +161,25 @@ namespace SGHR.Application.Test.Servicios
             servicioEntity.Activar();
             _servicioRepMock.Setup(r => r.ActualizarServicioAsync(servicioEntity)).Returns(Task.CompletedTask);
             _unit0fWorkMock.Setup(u => u.CommitAsync()).ReturnsAsync(1);
-
+            // Act
             await _service.ActivarServicioAsync(idServicio);
+            // Assert
             Assert.True(servicioEntity.Activo);
         }
         [Fact]
         public async Task ActivarServicioAsync_LanzaExcepcion_SiServicioNoExiste()
         {
+            // Arrange
             int idServicio = 1;
             _servicioRulesMock.Setup(r => r.ValidarExistenciaSerivicioAsync(idServicio))
                 .ThrowsAsync(new KeyNotFoundException($"El servicio con ID {idServicio} no fue encontrado"));
-
+            // Act & Assert
             await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.ActivarServicioAsync(idServicio));
         }
         [Fact]
         public async Task DesactivarServicioAsync_DebeDesactivarServicioCorrectamente()
         {
+            // Arrange
             int idServicio = 1;
             var servicioEntity = new ServiciosE("Servicio de Lavandería", "Lavado y planchado de ropa");
             _servicioRulesMock.Setup(r => r.ValidarExistenciaSerivicioAsync(idServicio)).Returns(Task.CompletedTask);
@@ -174,17 +188,19 @@ namespace SGHR.Application.Test.Servicios
             servicioEntity.Desactivar();
             _servicioRepMock.Setup(r => r.ActualizarServicioAsync(servicioEntity)).Returns(Task.CompletedTask);
             _unit0fWorkMock.Setup(u => u.CommitAsync()).ReturnsAsync(1);
-
+            // Act
             await _service.DesactivarServicioAsync(idServicio);
+            // Assert
             Assert.False(servicioEntity.Activo);
         }
         [Fact]
         public async Task DesactivarServicioAsync_LanzaExcepcion_SiServicioNoExiste()
         {
+            // Arrange
             int idServicio = 1;
             _servicioRulesMock.Setup(r => r.ValidarExistenciaSerivicioAsync(idServicio))
                 .ThrowsAsync(new KeyNotFoundException($"El servicio con ID {idServicio} no fue encontrado"));
-
+            // Act & Assert
             await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.DesactivarServicioAsync(idServicio));
         }
 
@@ -192,6 +208,7 @@ namespace SGHR.Application.Test.Servicios
         [Fact]
         public async Task ObtenerServicioPorId_Async_DebeRetornarServicioCorrectamente()
         {
+            // Arrange
             int idServicio = 1;
             var servicioEntity = new ServiciosE("Servicio de Lavandería", "Lavado y planchado de ropa");
             _mapperMock.Setup(m => m.Map<ServicioDto>(servicioEntity))
@@ -203,18 +220,65 @@ namespace SGHR.Application.Test.Servicios
                 });
             _servicioRulesMock.Setup(r => r.ValidarExistenciaSerivicioAsync(idServicio)).Returns(Task.CompletedTask);
             _servicioRepMock.Setup(r => r.ObtenerPorIdAsync(idServicio)).ReturnsAsync(servicioEntity);
-
+            // Act
             var resultado = await _service.ObtenerServicioPorIdAsync(idServicio);
+            // Assert
             Assert.NotNull(resultado);
             Assert.Equal("Servicio de Lavandería", resultado.Nombre);
         }
         [Fact]
         public async Task ObtenerServicioPorId_Async_LanzaExcepcion_SiServicioNoExiste()
         {
+            // Arrange
             int idServicio = 1;
             _servicioRulesMock.Setup(r => r.ValidarExistenciaSerivicioAsync(idServicio))
                 .ThrowsAsync(new KeyNotFoundException($"El servicio con ID {idServicio} no fue encontrado"));
+            // Act & Assert
             await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.ObtenerServicioPorIdAsync(idServicio));
+        }
+        [Fact]
+        public async Task ObtenerServiciosActivosAsync_DebeRetornarListaDeServiciosActivos()
+        {
+            // Arrange
+            var serviciosEntity = new List<ServiciosE>
+            {
+                new ServiciosE("Servicio de Lavandería", "Lavado y planchado de ropa"),
+                new ServiciosE("Servicio de Limpieza", "Limpieza diaria de habitaciones")
+            };
+            _servicioRepMock.Setup(r => r.ObtenerServiciosActivosAsync()).ReturnsAsync(serviciosEntity);
+            _mapperMock.Setup(m => m.Map<List<ServicioDto>>(serviciosEntity))
+                .Returns(new List<ServicioDto>
+                {
+                    new ServicioDto { Nombre = "Servicio de Lavandería", Descripcion = "Lavado y planchado de ropa", Activo = true },
+                    new ServicioDto { Nombre = "Servicio de Limpieza", Descripcion = "Limpieza diaria de habitaciones", Activo = true }
+                });
+            // Act
+            var resultado = await _service.ObtenerServiciosActivosAsync();
+            // Assert
+            Assert.NotNull(resultado);
+            Assert.Equal(2, resultado.Count);
+        }
+        [Fact]
+        public async Task ObtenerTodosLosServiciosAsync_DebeRetornarListaDeTodosLosServicios()
+        {
+            // Arrange
+            var serviciosEntity = new List<ServiciosE>
+            {
+                new ServiciosE("Servicio de Lavandería", "Lavado y planchado de ropa"),
+                new ServiciosE("Servicio de Limpieza", "Limpieza diaria de habitaciones")
+            };
+            _servicioRepMock.Setup(r => r.ObtenerTodosLosServiciosAsync()).ReturnsAsync(serviciosEntity);
+            _mapperMock.Setup(m => m.Map<List<ServicioDto>>(serviciosEntity))
+                .Returns(new List<ServicioDto>
+                {
+                    new ServicioDto { Nombre = "Servicio de Lavandería", Descripcion = "Lavado y planchado de ropa", Activo = true },
+                    new ServicioDto { Nombre = "Servicio de Limpieza", Descripcion = "Limpieza diaria de habitaciones", Activo = false }
+                });
+            // Act
+            var resultado = await _service.ObtenerTodosLosServiciosAsync();
+            // Assert
+            Assert.NotNull(resultado);
+            Assert.Equal(2, resultado.Count);
         }
     }
 }
