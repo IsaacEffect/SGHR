@@ -1,15 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SGHR.Persistence.Base;
 using SGHR.Persistence.Context;
-using SGHR.Persistence.Interfaces;
 using SGHR.Persistence.Interfaces.Repositories.Servicios;
 using ServiciosEntity = SGHR.Domain.Entities.Servicios.Servicios;
 
 namespace SGHR.Persistence.Repositories.Servicios
 {
-    public class ServicioRepository(SGHRDbContext context, ISqlConnectionFactory sqlConnectionFactory) : BaseRepository<ServiciosEntity>(context), IServicioRepository
+    public class ServicioRepository(SGHRDbContext context) : BaseRepository<ServiciosEntity>(context), IServicioRepository
     {
-        private readonly ISqlConnectionFactory _sqlConnectionFactory = sqlConnectionFactory;
 
         public async Task<ServiciosEntity?> ObtenerPorIdAsync(int id)
         {

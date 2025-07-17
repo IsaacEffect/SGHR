@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using ServiciosEntity = SGHR.Domain.Entities.Servicios.Servicios;
+﻿using ServiciosEntity = SGHR.Domain.Entities.Servicios.Servicios;
 
 namespace SGHR.Persistence.Interfaces.Repositories.Servicios
 {

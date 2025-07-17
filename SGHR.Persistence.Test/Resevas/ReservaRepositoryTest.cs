@@ -14,8 +14,8 @@ namespace SGHR.Persistence.Test.Resevas
             // Act
             await ReservaRepository.CrearReservaAsync(nuevaReserva);
             await Context.SaveChangesAsync();
-            // Assert
             var reservaGuardada = await Context.Reservas.FindAsync(nuevaReserva.Id);
+            // Assert
             Assert.NotNull(reservaGuardada);
             Assert.Equal(nuevaReserva.FechaCreacion, reservaGuardada.FechaCreacion);
             Assert.Equal(nuevaReserva.ClienteId, reservaGuardada.ClienteId);
