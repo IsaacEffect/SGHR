@@ -15,24 +15,30 @@ public class ClienteRepository : IClienteRepository
     public async Task<Cliente> GetByIdAsync(int id)
     {
         return await _context.Clientes
-        .Where(c => c.Id == id && c.Estado && c.Rol == "Cliente")
-        .FirstOrDefaultAsync();
+            .Where(c => c.Id == id && c.Estado && string.Equals(c.Rol, "Cliente", StringComparison.OrdinalIgnoreCase))
+            .FirstOrDefaultAsync();
     }
 
     public async Task<IEnumerable<Cliente>> GetAllAsync()
     {
         return await _context.Clientes
-        .Where(c => c.Estado && c.Rol == "Cliente")
-        .ToListAsync();
+            .Where(c => c.Estado && string.Equals(c.Rol, "Cliente", StringComparison.OrdinalIgnoreCase))
+            .ToListAsync();
     }
 
     public async Task AddAsync(Cliente cliente)
     {
-        await _context.Clientes.AddAsync(cliente);
+        if (cliente == null) throw new ArgumentNullException(nameof(cliente));
+
+        if (string.IsNullOrWhiteSpace(cliente.Nombre))
+            throw new ArgumentException("El nombre es requerido", nameof(cliente.Nombre));
+
+        await _context.Clientes.AddAsync(cliente); ;
     }
 
     public async Task UpdateAsync(Cliente cliente)
     {
+        if (cliente == null) throw new ArgumentNullException(nameof(cliente));
         _context.Clientes.Update(cliente);
         await Task.CompletedTask;
     }
@@ -49,7 +55,11 @@ public class ClienteRepository : IClienteRepository
 
     public async Task<Cliente> GetByEmailAsync(string email)
     {
+        if (string.IsNullOrWhiteSpace(email))
+            return null;
+
         return await _context.Clientes
-            .FirstOrDefaultAsync(c => c.Correo.ToLower() == email.ToLower());
+            .Where(c => c.Estado && c.Correo != null && c.Correo.ToLower() == email.ToLower())
+            .FirstOrDefaultAsync();
     }
 }

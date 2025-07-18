@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using SGHR.Domain.Base;
 using SGHR.Domain.Entities.Historial;
 using SGHR.Domain.Interfaces.Repository;
 using SGHR.Persistence.Base;
@@ -10,11 +11,14 @@ namespace SGHR.Persistence.Repositories
     {
         private readonly string _connectionString;
         private readonly ILogger<HistorialReservaRepository> _logger;
+        private readonly ISqlHelper _sqlHelper;
 
-        public HistorialReservaRepository(IConfiguration configuration, ILogger<HistorialReservaRepository> logger)
+
+        public HistorialReservaRepository(IConfiguration configuration, ILogger<HistorialReservaRepository> logger, ISqlHelper sqlHelper)
         {
             _connectionString = configuration.GetConnectionString("HotelDBConnection");
             _logger = logger;
+            _sqlHelper = sqlHelper;
         }
 
         public async Task<IEnumerable<HistorialReserva>> GetHistorialByClienteAsync(
@@ -37,7 +41,7 @@ namespace SGHR.Persistence.Repositories
                     { "@TipoHabitacion", tipoHabitacion }
                 };
 
-                var historial = await SqlHelper.ExecuteReaderAsync(
+                var historial = await _sqlHelper.ExecuteReaderAsync(
                     _connectionString,
                     "dbo.ObtenerHistorialClienteFiltrado",
                     parameters,
@@ -65,7 +69,7 @@ namespace SGHR.Persistence.Repositories
                     { "@ClienteId", clienteId }
                 };
 
-                var resultados = await SqlHelper.ExecuteReaderAsync(
+                var resultados = await _sqlHelper.ExecuteReaderAsync(
                     _connectionString,
                     "dbo.ObtenerDetalleReservaCliente",
                     parameters,

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using SGHR.Domain.Base;
 using SGHR.Domain.Interfaces;
 using SGHR.Domain.Interfaces.Repository;
 using SGHR.Persistence.Context;
@@ -18,13 +19,15 @@ namespace SGHR.Persistence
         public UnitOfWork(
             HotelReservaDBContext context,
             IConfiguration configuration,
-            ILogger<HistorialReservaRepository> historialLogger)
+            ILogger<HistorialReservaRepository> historialLogger,
+            ISqlHelper sqlHelper)
         {
             _context = context;
             _configuration = configuration;
             Clients = new ClienteRepository(_context);
-            HistorialReservas = new HistorialReservaRepository(_configuration, historialLogger);
+            HistorialReservas = new HistorialReservaRepository(_configuration, historialLogger, sqlHelper);
         }
+
 
         public async Task<int> SaveChangesAsync()
         {

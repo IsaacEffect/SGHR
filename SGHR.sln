@@ -36,6 +36,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGHR.Persistence.Test", "SGHR.Persistence.Test\SGHR.Persistence.Test.csproj", "{BC3F0EB1-3F33-4F51-BC1A-311445AE5F4D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGHR.Application.Test", "SGHR.Application.Test\SGHR.Application.Test.csproj", "{8A41B10A-3313-4B22-8C2D-9229DAEEE1C4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A3A10976-1AE3-4D3D-A382-BC221217A202} = {A3A10976-1AE3-4D3D-A382-BC221217A202}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
