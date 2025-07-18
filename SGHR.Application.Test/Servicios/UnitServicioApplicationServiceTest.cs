@@ -10,7 +10,7 @@ using ServiciosE = SGHR.Domain.Entities.Servicios.Servicios;
 
 namespace SGHR.Application.Test.Servicios
 {
-    public class ServicioApplicationServiceTest 
+    public class UnitServicioApplicationServiceTest 
     {
         private readonly Mock<IServicioRepository> _servicioRepMock = new();
         private readonly Mock<ICategoriaHabitacionRepository> _catHabitacionRepMock = new();
@@ -20,7 +20,7 @@ namespace SGHR.Application.Test.Servicios
 
         private readonly ServicioApplicationService _service; 
 
-        public ServicioApplicationServiceTest()
+        public UnitServicioApplicationServiceTest()
         {
             _service = new ServicioApplicationService(
                 _servicioRepMock.Object,

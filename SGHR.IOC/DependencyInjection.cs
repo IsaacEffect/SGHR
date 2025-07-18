@@ -5,6 +5,7 @@ using SGHR.Application.Services.Reservas;
 using SGHR.Application.Services.Servicios;
 using SGHR.Application.Validations;
 using SGHR.Domain.Interfaces;
+using SGHR.Persistence.Context;
 using SGHR.Persistence.Interfaces.Repositories.Clientes;
 using SGHR.Persistence.Interfaces.Repositories.Habitaciones;
 using SGHR.Persistence.Interfaces.Repositories.Reservas;
@@ -14,12 +15,14 @@ using SGHR.Persistence.Repositories.Habitaciones;
 using SGHR.Persistence.Repositories.Reservas;
 using SGHR.Persistence.Repositories.Servicios;
 using SGHR.Persistence.UnitOfWork;
-
+using Microsoft.EntityFrameworkCore;
+using SGHR.Persistence.Interfaces;
+using Microsoft.Extensions.Configuration;
 namespace SGHR.IOC
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddAplicationServices(this IServiceCollection services)
+        public static IServiceCollection AddAplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
             // Application Services 
             services.AddScoped<IReservaApplicationService, ReservaApplicationService>();
@@ -43,9 +46,12 @@ namespace SGHR.IOC
             services.AddScoped<IReservaRules, ReservaRules>();
             services.AddScoped<IServicioRules, ServicioRules>();
 
+            // SQL Connection Factory 
+            services.AddDbContext<SGHRDbContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("SGHR")));
+            services.AddScoped<ISqlConnectionFactory, SqlConnectionFactory>();
 
             return services;
         }
-
     }
 }

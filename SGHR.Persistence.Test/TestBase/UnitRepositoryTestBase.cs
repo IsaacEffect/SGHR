@@ -3,16 +3,16 @@ using SGHR.Persistence.Repositories.Reservas;
 using SGHR.Persistence.Repositories.Servicios;
 namespace SGHR.Persistence.Test.TestBase
 {
-    public class RepositoryTestBase : IDisposable
+    public class UnitRepositoryTestBase : IDisposable
     {
         protected readonly SGHRDbContext Context;
         protected readonly ReservaRepository ReservaRepository;
         protected readonly ServicioRepository ServicioRepository;
         protected readonly ServicioCategoriaRepository ServicioCategoriaRepository;
 
-        protected RepositoryTestBase()
+        protected UnitRepositoryTestBase()
         {
-            Context = SGHRDbContextFactory.CreateInMemoryDbContext();
+            Context = SGHRDbContextFactoryTest.CreateInMemoryDbContext();
             ReservaRepository = new ReservaRepository(Context, new FakeSqlConnectionFactory());
             ServicioRepository = new ServicioRepository(Context);
             ServicioCategoriaRepository = new ServicioCategoriaRepository(new FakeSqlConnectionFactory());

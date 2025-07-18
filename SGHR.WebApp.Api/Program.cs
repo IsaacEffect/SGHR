@@ -1,6 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using SGHR.Persistence.Context;
-using SGHR.Persistence.Interfaces;
 using SGHR.IOC;
 
 namespace SGHR.WebApp.Api
@@ -12,25 +9,11 @@ namespace SGHR.WebApp.Api
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.  
-            builder.Services.AddDbContext<SGHRDbContext>(options =>
-               options.UseSqlServer(builder.Configuration.GetConnectionString("SGHR")));
-
-
-            // Dependency Injection
-            builder.Services.AddAplicationServices();
-
-
-
+            builder.Services.AddAplicationServices(builder.Configuration);
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
-           
-
-            builder.Services.AddScoped<ISqlConnectionFactory, SqlConnectionFactory>();
-
-            
-
+            // Add CORS policy
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.  

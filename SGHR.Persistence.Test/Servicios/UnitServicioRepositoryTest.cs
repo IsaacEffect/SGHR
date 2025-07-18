@@ -4,7 +4,7 @@ using SGHR.Persistence.Repositories.Servicios;
 
 namespace SGHR.Persistence.Test.Servicios
 {
-    public class ServicioRepositoryTest : RepositoryTestBase
+    public class UnitServicioRepositoryTest : UnitRepositoryTestBase
     {
         [Fact]
         public async Task AgregarServicio_DeberiaGuardarCorrectamente()

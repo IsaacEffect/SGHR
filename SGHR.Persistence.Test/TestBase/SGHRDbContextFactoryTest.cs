@@ -2,7 +2,7 @@
 using SGHR.Persistence.Context;
 namespace SGHR.Persistence.Test.TestBase
 {
-    public class SGHRDbContextFactory
+    public class SGHRDbContextFactoryTest
     {
         public static SGHRDbContext CreateInMemoryDbContext()
         {

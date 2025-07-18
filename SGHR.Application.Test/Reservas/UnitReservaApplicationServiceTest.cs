@@ -13,7 +13,7 @@ using SGHR.Domain.Enums;
 
 namespace SGHR.Application.Test.Reservas
 {
-    public class ReservaApplicationServiceTest
+    public class UnitReservaApplicationServiceTest
     {
 
         private readonly Mock<ICategoriaHabitacionRepository> _categoriaHabitacionRepMock = new();
@@ -24,7 +24,7 @@ namespace SGHR.Application.Test.Reservas
         private readonly Mock<IReservaRules> _reservaRulesMock = new();
 
         private readonly ReservaApplicationService _service;
-        public ReservaApplicationServiceTest()
+        public UnitReservaApplicationServiceTest()
         {
             _service = new ReservaApplicationService(
                 _reservaRepMock.Object,

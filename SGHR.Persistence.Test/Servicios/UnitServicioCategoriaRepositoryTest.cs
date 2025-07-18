@@ -2,7 +2,7 @@
 using SGHR.Persistence.Test.TestBase;
 namespace SGHR.Persistence.Test.Servicios
 {
-    public class ServicioCategoriaRepositoryTest : RepositoryTestBase
+    public class UnitServicioCategoriaRepositoryTest : UnitRepositoryTestBase
     {
         // "Funciona" solo que para pruebas unitarias no se puede usar SQL Server, o por lo menos me tira el excepction 
         [Fact]

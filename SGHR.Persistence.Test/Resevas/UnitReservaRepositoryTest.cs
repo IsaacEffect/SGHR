@@ -4,7 +4,7 @@ using SGHR.Persistence.Repositories.Reservas;
 using SGHR.Domain.Enums;
 namespace SGHR.Persistence.Test.Resevas
 {
-    public class ReservaRepositoryTest : RepositoryTestBase
+    public class UnitReservaRepositoryTest : UnitRepositoryTestBase
     {
         [Fact]
         public async Task AgregarReserva_DeberiaGuardarCorrectamente()
