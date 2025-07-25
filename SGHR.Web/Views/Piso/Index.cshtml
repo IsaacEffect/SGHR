@@ -1,0 +1,30 @@
+﻿@model IEnumerable<SGHR.Application.Dtos.PisoDto>
+
+<h2>Lista de Pisos</h2>
+
+<a asp-action="Create" class="btn btn-primary">Crear nuevo piso</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Número Piso</th>
+            <th>Descripción</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var piso in Model)
+        {
+            <tr>
+                <td>@piso.Id</td>
+                <td>@piso.NumeroPiso</td>
+                <td>@piso.Descripcion</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@piso.Id">Editar</a> |
+                    <a asp-action="Delete" asp-route-id="@piso.Id">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

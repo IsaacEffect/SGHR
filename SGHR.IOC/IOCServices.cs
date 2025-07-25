@@ -8,7 +8,9 @@ namespace SGHR.IOC
 {
     public static class IOCServices
     {
-        public static void Register(IServiceCollection services)
+        public static void RegisterServices(this IServiceCollection services)
+
+
         {
             // Servicios de aplicación
             services.AddScoped<IPisoService, PisoService>();

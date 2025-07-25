@@ -21,17 +21,18 @@ using SGHR.Persistence.Repositories;
         // Registrar el repositoro
         builder.Services.AddScoped<IPisoRepository, PisoRepository>();
 
-        // Add services to the container.
+        
 
         builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            IOCServices.Register(builder.Services);
+            builder.Services.RegisterServices(); 
+
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -45,7 +46,7 @@ using SGHR.Persistence.Repositories;
             using (var scope = app.Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<SGHRContext>();
-                context.Database.EnsureCreated(); // o context.Database.Migrate();
+                context.Database.EnsureCreated(); 
             }
 
 

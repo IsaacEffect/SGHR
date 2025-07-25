@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SGHR.Persistence.Domain
 {
-    [Table("Piso")] // 
+    [Table("Piso")] 
     public class Piso
     {
         [Key]
