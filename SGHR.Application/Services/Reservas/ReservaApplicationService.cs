@@ -4,7 +4,6 @@ using SGHR.Application.Interfaces.Reservas;
 using SGHR.Domain.Entities.Reservas; 
 using SGHR.Domain.Enums;
 using SGHR.Domain.Interfaces;
-using SGHR.Persistence.Interfaces.Repositories.Clientes;
 using SGHR.Persistence.Interfaces.Repositories.Habitaciones; 
 using SGHR.Persistence.Interfaces.Repositories.Reservas;
 
@@ -14,14 +13,12 @@ namespace SGHR.Application.Services.Reservas
     public class ReservaApplicationService(
         IReservaRepository reservaRepository,
         ICategoriaHabitacionRepository categoriaHabitacionRepository,
-        IClienteRepository clienteRepository,
         IMapper mapper,
         IUnitOfWork unitOfWork,
         IReservaRules reservaRules ) : IReservaApplicationService
     {
         private readonly IReservaRepository _reservaRepository = reservaRepository;
         private readonly ICategoriaHabitacionRepository _categoriaHabitacionRepository = categoriaHabitacionRepository;
-        private readonly IClienteRepository _clienteRepository = clienteRepository;
         private readonly IMapper _mapper = mapper;
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IReservaRules _reservaRules = reservaRules;
@@ -132,20 +129,20 @@ namespace SGHR.Application.Services.Reservas
             return true;
             
         }
-        public async Task<bool> CancelarReservaAsync(int id)
+        public async Task<bool> CancelarReservaAsync(CancelarReservaDto request)
         {
-            var reservaExistente = await _reservaRepository.ObtenerPorId(id)
-                  ?? throw new KeyNotFoundException($"Reserva con ID {id} no encontrada.");
+            var reservaExistente = await _reservaRepository.ObtenerPorId(request.IdReserva)
+                  ?? throw new KeyNotFoundException($"Reserva con ID {request.IdReserva} no encontrada.");
 
             if (reservaExistente.Estado == EstadoReserva.Finalizada)
                 throw new InvalidOperationException("No se puede cancelar una reserva que ya esta finalizada.");
             try
             {
                 await _reservaRules.ValidarTransicionEstadoAsync(reservaExistente.Estado, EstadoReserva.Cancelada);
-                await _reservaRules.ValidarReservaExistenteAsync(id);
+                await _reservaRules.ValidarReservaExistenteAsync(request.IdReserva);
+                await _reservaRules.ValidarMotivoCancelacion(request.MotivoCancelacion);
 
-                
-                await _reservaRepository.CancelarReservaAsync(id);
+                await _reservaRepository.CancelarReservaAsync(request.IdReserva, request.MotivoCancelacion);
                 await _unitOfWork.CommitAsync();
                 return true;
             }

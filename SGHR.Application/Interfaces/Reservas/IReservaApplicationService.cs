@@ -10,7 +10,7 @@ namespace SGHR.Application.Interfaces.Reservas
         Task<List<ReservaDto>> ObtenerTodasReservasAsync(bool incluirRelaciones = false);
         Task<ReservaDto> CrearReservaAsync(CrearReservaRequest request);
         Task<bool> ActualizarReservaAsync(int id, ActualizarReservaRequest request);
-        Task<bool> CancelarReservaAsync(int id);
+        Task<bool> CancelarReservaAsync(CancelarReservaDto request);
         Task<bool> VerificarDisponibilidadAsync(VerificarDisponibilidadRequest request);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SGHR.Application.DTOs.Reservas;
 using SGHR.Application.Interfaces.Reservas;
-
+using SGHR.Application.DTOs.Common;
 
 namespace SGHR.WebApp.Api.Controllers
 {
@@ -18,29 +18,23 @@ namespace SGHR.WebApp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CrearReservaAsync([FromBody] CrearReservaRequest request)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                return BadRequest(new ApiResponse<ReservaDto> { IsSuccess = false, Message = "Errores de validación: " + string.Join("; ", errors) });
             }
-            try
+
+            var reservaDto = await _reservaApplicationService.CrearReservaAsync(request); 
+            var apiResponse = new ApiResponse<ReservaDto>
             {
-                var reservaDto = await _reservaApplicationService.CrearReservaAsync(request);
-                return CreatedAtAction(nameof(ObtenerReservaPorId), new { id = reservaDto.Id }, reservaDto);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(ex.Message);
-            }
-            catch(ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch(Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error interno del servidor: {ex.Message}");
-            }
+                IsSuccess = true,
+                Message = "Reserva creada exitosamente.",
+                Data = reservaDto
+            };
+            return CreatedAtAction(nameof(ObtenerReservaPorId), new { id = reservaDto.Id }, apiResponse);
         }
 
         /// <summary>
@@ -83,15 +77,15 @@ namespace SGHR.WebApp.Api.Controllers
         /// <summary>
         /// Cancela una reserva.
         /// </summary>
-        [HttpPut("{id}/cancelar")]
+        [HttpPatch("{id}/cancelar")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CancelarReserva(int id)
+        public async Task<IActionResult> CancelarReserva([FromBody] CancelarReservaDto request)
         {
             try
             {
-                var reservaCancelada = await _reservaApplicationService.CancelarReservaAsync(id); // modificar para poner el motivo de cancelacion luego (no tengo tiempo ahora xd)
+                var reservaCancelada = await _reservaApplicationService.CancelarReservaAsync(request); 
                 return Ok(reservaCancelada);
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("no encontrada"))
@@ -173,7 +167,12 @@ namespace SGHR.WebApp.Api.Controllers
             {
                 return NotFound("No se encontraron reservas.");
             }
-            return Ok(reservas);
+            return Ok(new ApiResponse<List<ReservaDto>>
+            {
+                IsSuccess = true,
+                Message = "Reservas obtenidas",
+                Data = reservas
+            });
         }
 
     }

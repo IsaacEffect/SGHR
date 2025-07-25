@@ -3,7 +3,6 @@ using AutoMapper;
 using SGHR.Application.DTOs.Reservas;
 using SGHR.Application.Services.Reservas;
 using SGHR.Persistence.Interfaces.Repositories.Reservas;
-using SGHR.Persistence.Interfaces.Repositories.Clientes;
 using SGHR.Persistence.Interfaces.Repositories.Habitaciones;
 using SGHR.Application.Interfaces.Reservas;
 using SGHR.Domain.Entities.Users;
@@ -17,7 +16,6 @@ namespace SGHR.Application.Test.Reservas
     {
 
         private readonly Mock<ICategoriaHabitacionRepository> _categoriaHabitacionRepMock = new();
-        private readonly Mock<IClienteRepository> _clienteRepMock = new();
         private readonly Mock<IReservaRepository> _reservaRepMock = new();
         private readonly Mock<IMapper> _mapperMock = new();
         private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
@@ -29,7 +27,6 @@ namespace SGHR.Application.Test.Reservas
             _service = new ReservaApplicationService(
                 _reservaRepMock.Object,
                 _categoriaHabitacionRepMock.Object,
-                _clienteRepMock.Object,
                 _mapperMock.Object,
                 _unitOfWorkMock.Object,
                 _reservaRulesMock.Object);
@@ -62,8 +59,6 @@ namespace SGHR.Application.Test.Reservas
                     request.FechaSalida,
                     request.NumeroHuespedes
                 ));
-            _clienteRepMock.Setup(c => c.ObtenerPorId(request.ClienteId))
-                           .ReturnsAsync(clienteMock);
             _reservaRulesMock.Setup(r => r.ValidarExistenciaClienteAsync(request.ClienteId)).Returns(Task.CompletedTask);
             _reservaRulesMock.Setup(r => r.ValidarFechaEntradaMayorSalida(request.FechaEntrada, request.FechaSalida)).Returns(Task.CompletedTask);
             _categoriaHabitacionRepMock.Setup(c =>c.HayDisponibilidadAsync(

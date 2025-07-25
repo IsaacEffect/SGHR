@@ -17,7 +17,6 @@ namespace SGHR.Domain.Entities.Reservas
         public string NumeroReservaUnico { get; private set; } 
         public DateTime? FechaCancelacion { get; private set; }
         public string? MotivoCancelacion { get; private set; }
-
         public Cliente? Cliente { get; private set; }
         public CategoriaHabitacion? CategoriaHabitacion { get; private set; }
 
@@ -58,21 +57,7 @@ namespace SGHR.Domain.Entities.Reservas
         {
             return $"RSV-{Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper()}";
         }
-        public void ActualizarEstado(EstadoReserva nuevoEstado)
-        {
-            Estado = nuevoEstado;
-        }
-        
-        public void ActualizarMotivoCancelacion(string motivo)
-        {
-            if (string.IsNullOrWhiteSpace(motivo))
-            {
-                throw new ArgumentException("El motivo de cancelación no puede estar vacío.", nameof(motivo));
-            }
-            MotivoCancelacion = motivo;
-            FechaCancelacion = DateTime.Now;
-        }
-
+       
         public void ActualizarDetalles(int clienteId, int idCategoriaHabitacion, DateTime fechaEntrada, DateTime fechaSalida, int numeroHuespedes)
         {
             if (clienteId <= 0)
@@ -129,5 +114,3 @@ namespace SGHR.Domain.Entities.Reservas
         }
     }
 }
-
-

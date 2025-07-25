@@ -1,0 +1,118 @@
+﻿@model IEnumerable<SGHR.Web.ViewModel.Reservas.ReservasViewModel>
+@{
+    ViewData["Title"] = "Reservas";
+}
+
+<h1>Reservas</h1>
+<p>
+    <a asp-action="Create" class="btn btn-primary">Crear nueva Reserva</a>
+</p>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger" role="alert">
+        <ul>
+            @foreach (var modelStateEntry in ViewData.ModelState.Values)
+            {
+                foreach (var error in modelStateEntry.Errors)
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            }
+        </ul>
+    </div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdCliente)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdCategoriaHabitacion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NumeroHuespedes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FechaEntrada)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FechaSalida)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Estado)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FechaCreacion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Activo)
+            </th>
+            <th></th> 
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Id) 
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IdCliente)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IdCategoriaHabitacion)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.NumeroHuespedes)
+                    </td>
+                    <td>
+                        @item.FechaEntrada.ToString("dd/MM/yyyy")
+                    </td>
+                    <td>
+                        @item.FechaSalida.ToString("dd/MM/yyyy")
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EstadoDisplay)
+                        
+                    </td>
+
+                     <td>
+                        @item.FechaCreacion.ToString("dd/MM/yyyy hh:mm tt") 
+                    </td>
+                    <td>
+                        @Html.DisplayFor(ModelItem => item.Activo)
+                        
+                            <button asp-action ="Delete" type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </button>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="10">No se encontraron reservas.</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -72,13 +72,13 @@ namespace SGHR.Persistence.Repositories.Reservas
             return Task.CompletedTask;
         }
 
-        public async Task CancelarReservaAsync(int idReserva)
+        public async Task CancelarReservaAsync(int idReserva, string motivo)
         {
             using var connection = _sqlConnectionFactory.CreateConnection();
             var parameters = new DynamicParameters();
             parameters.Add("@IdReserva", idReserva, DbType.Int32);
             parameters.Add("@FechaCancelacion", DateTime.Now, DbType.DateTime);
-            parameters.Add("@MotivosCancelacion", "Cancelada desde la aplicacion", DbType.String);
+            parameters.Add("@MotivoCancelacion", motivo, DbType.String); 
 
             await connection.ExecuteAsync(
                 "CancelarReserva",
@@ -86,13 +86,6 @@ namespace SGHR.Persistence.Repositories.Reservas
                 commandType: CommandType.StoredProcedure
             );
 
-            var reserva = await _dbSet.FindAsync(idReserva);
-            if (reserva != null)
-            {
-                reserva.ActualizarEstado(EstadoReserva.Cancelada);
-                reserva.ActualizarMotivoCancelacion("Cancelada desde la aplicacion");
-                _context.Update(reserva);
-            }
         }
     }
 }

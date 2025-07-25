@@ -10,6 +10,6 @@ namespace SGHR.Persistence.Interfaces.Repositories.Reservas
         Task<bool> HayDisponibilidadAsync(int habitacionId, DateTime fechaEntrada, DateTime fechaSalida, int? idReservaActual = null);
         Task CrearReservaAsync(Reserva reserva); 
         Task ActualizarReservaAsync(Reserva reserva);         
-        Task CancelarReservaAsync(int idReserva);
+        Task CancelarReservaAsync(int idReserva, string motivo);
     }
 }

@@ -12,5 +12,6 @@ namespace SGHR.Application.Interfaces.Reservas
         Task ValidarTransicionEstadoAsync(EstadoReserva actual, EstadoReserva nuevo);
         Task<bool> RequiereVerificarDisponibilidad(Reserva reserva, ActualizarReservaRequest request);
         Task AplicarCambiosDeEstado(Reserva reserva, EstadoReserva nuevoEstado);
+        Task ValidarMotivoCancelacion(string motivoCancelacion);
     }
 }

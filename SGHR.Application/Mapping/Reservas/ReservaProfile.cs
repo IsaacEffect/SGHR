@@ -22,7 +22,6 @@ namespace SGHR.Application.Mapping.Reservas
                 .ForMember(dest => dest.FechaCancelacion, opt => opt.Ignore())
                 .ForMember(dest => dest.MotivoCancelacion, opt => opt.Ignore());
 
-
             CreateMap<Reserva, ReservaDto>()
                 .ForMember(dest => dest.IdCliente, opt => opt.MapFrom(src => src.ClienteId))
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
@@ -37,6 +36,9 @@ namespace SGHR.Application.Mapping.Reservas
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.Estado, opt => opt.Ignore());
 
+            CreateMap<CancelarReservaDto, Reserva>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.MotivoCancelacion, opt => opt.Ignore());
         }
 
     }

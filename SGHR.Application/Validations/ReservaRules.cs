@@ -1,4 +1,5 @@
-﻿using SGHR.Application.DTOs.Reservas;
+﻿using Microsoft.IdentityModel.Tokens;
+using SGHR.Application.DTOs.Reservas;
 using SGHR.Application.Interfaces.Reservas;
 using SGHR.Domain.Entities.Reservas;
 using SGHR.Domain.Enums;
@@ -84,6 +85,17 @@ namespace SGHR.Application.Validations
                     throw new InvalidOperationException($"El estado {nuevoEstado} no es válido para aplicar cambios.");
             }
             return Task.CompletedTask;
+        }
+        public Task ValidarMotivoCancelacion(string motivoCancelacion)
+        {
+            if (motivoCancelacion.IsNullOrEmpty())
+            {
+                throw new InvalidOperationException("El motivo no puede ir vacio");
+            }
+            else
+            {
+                return Task.CompletedTask;
+            }
         }
     }
 }
