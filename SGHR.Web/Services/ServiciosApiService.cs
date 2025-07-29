@@ -243,7 +243,6 @@ namespace SGHR.Web.Services
             }
             catch (HttpRequestException httpEx)
             {
-            {
                 return new ApiResponse<bool> { IsSuccess = false, Message = $"Error de red al eliminar servicio: {httpEx.Message}" };
             }
             catch (Exception ex)
