@@ -1,0 +1,38 @@
+﻿@model CategoriaHabitacion
+
+<h2>Editar Categoría</h2>
+
+<form asp-action="Editar" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="Nombre"></label>
+        <input asp-for="Nombre" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Descripcion"></label>
+        <textarea asp-for="Descripcion" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Caracteristicas"></label>
+        <textarea asp-for="Caracteristicas" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="TarifaBase"></label>
+        <input asp-for="TarifaBase" class="form-control" type="number" step="0.01" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Estado"></label>
+        <select asp-for="Estado" class="form-control">
+            <option value="true">Activa</option>
+            <option value="false">Inactiva</option>
+        </select>
+    </div>
+
+    <button method="post" asp-controller="CategoriasHabitacion" asp-action="EditarCategoria"type="submit" class="btn btn-primary">Guardar cambios</button>
+    <a asp-action="GetAllCategoriasHabitacion" class="btn btn-secondary">Cancelar</a>
+</form>

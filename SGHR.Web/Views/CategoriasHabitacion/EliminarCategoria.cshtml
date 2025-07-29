@@ -1,0 +1,9 @@
+﻿@model CategoriaHabitacion
+
+<h3>¿Quieres eliminar la categoría "@Model.Nombre"?</h3>
+
+<form asp-action="EliminarConfirmado" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="GetAllCategoriasHabitacion" class="btn btn-secondary">Cancelar</a>
+</form>

@@ -1,8 +1,7 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿<form asp-controller="CategoriasHabitacion" asp-action="GetAllCategoriasHabitacion" method="get">
+    <button type="submit">Cargar Categorías</button>
+</form>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<form asp-controller="CategoriasHabitacion" asp-action="CrearCategoriaHabitacion" method="post">
+    <button type="submit">Crear Categorias</button>
+</form>

@@ -1,3 +1,5 @@
+using SGHR.Web.Controllers;
+
 namespace SGHR.Web
 {
     public class Program
@@ -8,6 +10,9 @@ namespace SGHR.Web
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddHttpClient<CategoriasHabitacionController>();
+
 
             var app = builder.Build();
 

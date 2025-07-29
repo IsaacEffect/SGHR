@@ -1,0 +1,26 @@
+﻿@model CategoriaHabitacion
+
+<h2 class="mb-4">Crear Categoría de Habitación</h2>
+
+<form asp-controller="CategoriasHabitacion" asp-action="CrearCategoriaHabitacion" method="post" class="needs-validation" novalidate>
+    <div class="mb-3">
+        <label asp-for="Nombre" class="form-label"></label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Descripcion" class="form-label"></label>
+        <input asp-for="Descripcion" class="form-control" />
+        <span asp-validation-for="Descripcion" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Caracteristicas" class="form-label"></label>
+        <input asp-for="Caracteristicas" class="form-control" />
+        <span asp-validation-for="Caracteristicas" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>
+

@@ -18,10 +18,13 @@ namespace SGHR.WebApp.Api.Controllers
         }
 
         // POST api/<TarifaController>
-        [HttpPost("DefinirTarifaBase")]
+        [HttpPost("DefinirTarifaBase/{id}")]
         public async Task<IActionResult> DefinirTarifaBase(int id, [FromBody] DefinirTarifaBaseDto dto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid) 
+            { 
+                return BadRequest(ModelState);
+            }
 
             await _service.DefinirTarifaAsync(id, dto);
             return Ok("Tarifa base definida correctamente.");

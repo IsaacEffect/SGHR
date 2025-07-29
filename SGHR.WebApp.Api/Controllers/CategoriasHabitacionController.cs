@@ -16,7 +16,7 @@ namespace SGHR.WebApp.Api.Controllers
             _services = categoriasHabitacionesService;
         }
         // GET: api/<ValuesController>
-        [HttpGet("CategoriasHabitacion")]
+        [HttpGet("GetAllCategoriasHabitacion")]
         public async Task<ActionResult<IEnumerable<ObtenerTodoCategoriaDto>>> Get()
         {
             var categoria = await _services.ObtenerTodasCategoriasAsync();

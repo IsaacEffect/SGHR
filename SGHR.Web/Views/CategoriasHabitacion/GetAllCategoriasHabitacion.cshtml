@@ -1,0 +1,42 @@
+﻿@model List<CategoriasHabitacionModel>
+
+@if (Model == null || !Model.Any())
+{
+    <p>No hay categorías para mostrar.</p>
+}
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Caractersitcas</th>
+            <th>Tarifa Base</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var categoria in Model)
+        {
+            <tr>
+                <td>@categoria.Id</td>
+                <td>@categoria.nombre</td>
+                <td>@categoria.descripcion</td>
+                <td>@categoria.caracteristicas</td>
+                <td>@categoria.tarifaBase</td>
+                <td>@categoria.EstadoTexto</td>
+                <td></td>
+                <td>
+                    <a method="get" asp-controller="CategoriasHabitacion" asp-action="EditarCategoria" asp-route-id="@categoria.Id" class="btn btn-warning">Editar</a>
+
+                    <form asp-controller="CategoriasHabitacion" asp-action="ConfirmadoEliminarCategoria" asp-route-id="@categoria.Id" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta categoría?')">Eliminar</button>
+                    </form>
+
+                    <a method="get" asp-controller="Tarifas" asp-action="DefinirTarifaBase" asp-route-id="@categoria.Id" class="btn btn-primary">Definir Tarifa Base</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
