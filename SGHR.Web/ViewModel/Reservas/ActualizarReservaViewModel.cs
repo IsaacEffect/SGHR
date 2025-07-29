@@ -4,13 +4,15 @@ namespace SGHR.Web.ViewModel.Reservas
 {
     public class ActualizarReservaViewModel
     {
+        public int Id { get; set; }
+
         [Required(ErrorMessage = "El Id de la reserva es requerido")]
         [Range(1, int.MaxValue, ErrorMessage = "El Id de la reserva debe ser un número positivo")]
-        public string IdCliente { get; set; } = string.Empty;
+        public int IdCliente { get; set; } 
 
         [Required(ErrorMessage = "El Id de la categoría de habitación es requerido")]
         [Range(1, int.MaxValue, ErrorMessage = "El Id de la categoría de habitación debe ser un número positivo")]
-        public string IdCategoriaHabitacion { get; set; } = string.Empty;
+        public int IdCategoriaHabitacion { get; set; } 
 
         [Required(ErrorMessage ="El numero de huéspedes es requerido")]
         [Range(1, 255, ErrorMessage = "El número de huéspedes debe ser al menos 1 y no exceder 255")]
@@ -29,10 +31,6 @@ namespace SGHR.Web.ViewModel.Reservas
         [Required(ErrorMessage = "El estado es requerido")]
         [EnumDataType(typeof(EstadoReserva), ErrorMessage = "El estado debe ser un valor válido de EstadoReserva.")]
         public EstadoReserva Estado { get; set; }
-
-        public int Activo { get; set; }
-
-
-
+        public bool Activo { get; set; }
     }
 }

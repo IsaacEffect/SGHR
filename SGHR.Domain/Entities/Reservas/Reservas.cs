@@ -31,20 +31,13 @@ namespace SGHR.Domain.Entities.Reservas
             {
                 throw new ArgumentException("El ID de la categoría de habitación debe ser un número positivo.", nameof(idCategoriaHabitacion));
             }
-            if (fechaEntrada > fechaSalida)
-            {
-                throw new ArgumentException("La fecha de entrada no puede ser posterior a la fecha de salida.");
-            }
-            if (numeroHuespedes <= 0)
-            {
-                throw new ArgumentException("El número de huéspedes debe ser mayor que cero.");
-            }
+            
 
             ClienteId = clienteId;
             IdCategoriaHabitacion = idCategoriaHabitacion;
             FechaEntrada = fechaEntrada;
             FechaSalida = fechaSalida;
-            NumeroHuespedes = numeroHuespedes; 
+            ValidarHuespedes(numeroHuespedes); 
             Estado = EstadoReserva.Pendiente;
 
             NumeroReservaUnico = GenerarNumeroReservaUnico();
@@ -52,38 +45,36 @@ namespace SGHR.Domain.Entities.Reservas
 
 
         }
-
         public string GenerarNumeroReservaUnico()
         {
             return $"RSV-{Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper()}";
         }
        
-        public void ActualizarDetalles(int clienteId, int idCategoriaHabitacion, DateTime fechaEntrada, DateTime fechaSalida, int numeroHuespedes)
+        public void ActualizarDetalles(int clienteId, int idCategoriaHabitacion, DateTime fechaEntrada, DateTime fechaSalida, int numeroHuespedes, EstadoReserva nuevoEstado)
         {
             if (clienteId <= 0)
             {
                 throw new ArgumentException("El ID del cliente debe ser un número positivo.", nameof(clienteId));
             }
-            if (idCategoriaHabitacion <= 0)
-            {
-                throw new ArgumentException("El ID de la categoría de habitación debe ser un número positivo.", nameof(idCategoriaHabitacion));
-            }
-            if (fechaEntrada > fechaSalida)
-            {
-                throw new ArgumentException("La fecha de entrada no puede ser posterior a la fecha de salida.", nameof(fechaEntrada));
-            }
-            if (numeroHuespedes <= 0)
-            {
-                throw new ArgumentException("El número de huéspedes debe ser mayor que cero.", nameof(numeroHuespedes));
-            }
-            
             ClienteId = clienteId;
             IdCategoriaHabitacion = idCategoriaHabitacion;
             FechaEntrada = fechaEntrada;
             FechaSalida = fechaSalida;
-
+            ValidarHuespedes(numeroHuespedes);
+            ValidarYActualizarEstado(nuevoEstado);
 
             SetFechaUltimaModificacion();
+        }
+ 
+        private void ValidarHuespedes(int nuevoNumeroHuespedes)
+        {
+            if (nuevoNumeroHuespedes == NumeroHuespedes) return;
+            if (nuevoNumeroHuespedes <= 0)
+            {
+                throw new ArgumentException("El número de huéspedes debe ser mayor que cero.", nameof(nuevoNumeroHuespedes));
+            }
+
+            NumeroHuespedes = nuevoNumeroHuespedes;
         }
         public void Confirmar()
         {
@@ -93,8 +84,6 @@ namespace SGHR.Domain.Entities.Reservas
 
             SetFechaUltimaModificacion();
         }
-
-
         public void Cancelar()
         {
             if (Estado != EstadoReserva.Confirmada)
@@ -112,5 +101,33 @@ namespace SGHR.Domain.Entities.Reservas
             SetFechaUltimaModificacion();
 
         }
+        public bool RequiereVerificarDisponibilidad(DateTime nuevaEntrada, DateTime nuevaSalida, int nuevaCategoriaId)
+        {
+            return FechaEntrada != nuevaEntrada ||
+                   FechaSalida != nuevaSalida ||
+                   IdCategoriaHabitacion != nuevaCategoriaId;
+        }
+        private bool EsTransicionValida(EstadoReserva actual, EstadoReserva nuevo)
+        {
+            return actual switch
+            {
+                EstadoReserva.Pendiente => nuevo == EstadoReserva.Confirmada || nuevo == EstadoReserva.Cancelada,
+                EstadoReserva.Confirmada => nuevo == EstadoReserva.Cancelada,
+                EstadoReserva.Cancelada => false,
+                _ => false
+            };
+        }
+        private void ValidarYActualizarEstado(EstadoReserva nuevoEstado)
+        {
+            if (nuevoEstado == Estado) return;
+
+            if (!EsTransicionValida(Estado, nuevoEstado))
+            {
+                throw new InvalidOperationException(
+                    $"Transición de estado inválida: {Estado} → {nuevoEstado}");
+            }
+            Estado = nuevoEstado;
+        }
+
     }
 }

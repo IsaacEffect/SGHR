@@ -39,6 +39,7 @@ namespace SGHR.Application.Services.Reservas
         }
         public async Task<List<ReservaDto>> ObtenerReservasPorClienteIdAsync(int idCliente)
         {
+           
             await _reservaRules.ValidarExistenciaClienteAsync(idCliente);
             var reservas = await _reservaRepository.ObtenerPorClienteIdAsync(idCliente);
             var dto = _mapper.Map<List<ReservaDto>>(reservas);
@@ -46,7 +47,7 @@ namespace SGHR.Application.Services.Reservas
         }
         public async Task<List<ReservaDto>> ObtenerReservasEnRangoAsync(DateTime desde, DateTime hasta)
         {
-            await _reservaRules.ValidarFechaEntradaMayorSalida(desde, hasta);
+            _ = new RangoFechas(desde, hasta);
             var reservas = await _reservaRepository.ObtenerReservasEnRangoAsync(desde, hasta);
             var dto = _mapper.Map<List<ReservaDto>>(reservas);
             return dto;
@@ -61,19 +62,16 @@ namespace SGHR.Application.Services.Reservas
                    null
                );
 
-            await _reservaRules.ValidarFechaEntradaMayorSalida(request.FechaEntrada, request.FechaSalida);
             try
             {
 
                 await _reservaRules.ValidarExistenciaClienteAsync(request.ClienteId);
                 await _reservaRules.ValidarExistenciaCategoriaAsync(request.IdCategoriaHabitacion, estaDisponible);
                 var nuevaReserva = _mapper.Map<Reserva>(request);
+                _ = new RangoFechas(request.FechaEntrada, request.FechaSalida);
                 nuevaReserva.GenerarNumeroReservaUnico();
                 nuevaReserva.SetFechaUltimaModificacion();
-
                 nuevaReserva.Activar();
-
-
                 await _reservaRepository.CrearReservaAsync(nuevaReserva);
                 await _unitOfWork.CommitAsync();
                 var dto = _mapper.Map<ReservaDto>(nuevaReserva);
@@ -88,19 +86,14 @@ namespace SGHR.Application.Services.Reservas
             {
                 throw new InvalidOperationException($"Error al crear la reserva: {ex.Message}");
             }
-
         }
         public async Task<bool> ActualizarReservaAsync(int id, ActualizarReservaRequest request)
         {
-
             await _reservaRules.ValidarReservaExistenteAsync(id);
             var reservaExistente = await _reservaRepository.ObtenerPorId(id)
                     ?? throw new KeyNotFoundException($"Reserva con ID {id} no encontrada.");
-
-            await _reservaRules.ValidarFechaEntradaMayorSalida(request.FechaEntrada, request.FechaSalida);
             await _reservaRules.ValidarExistenciaClienteAsync(request.IdCliente);
-
-            if (await _reservaRules.RequiereVerificarDisponibilidad(reservaExistente, request))
+            if (reservaExistente.RequiereVerificarDisponibilidad(request.FechaEntrada, request.FechaSalida, request.IdCategoriaHabitacion))
             {
                 var estaDisponible = await _categoriaHabitacionRepository.HayDisponibilidadAsync
                     (
@@ -111,38 +104,32 @@ namespace SGHR.Application.Services.Reservas
                      );
                 await _reservaRules.ValidarExistenciaCategoriaAsync(request.IdCategoriaHabitacion, estaDisponible);
             }
-            
             reservaExistente.ActualizarDetalles(
                 request.IdCliente,
                 request.IdCategoriaHabitacion,
                 request.FechaEntrada,
                 request.FechaSalida,
-                request.NumeroHuespedes
+                request.NumeroHuespedes,
+                request.Estado
             );
-
-            await _reservaRules.ValidarTransicionEstadoAsync(reservaExistente.Estado, request.Estado);
-            await _reservaRules.AplicarCambiosDeEstado(reservaExistente, request.Estado);
-
             await _reservaRepository.ActualizarReservaAsync(reservaExistente);
             await _unitOfWork.CommitAsync();
-
             return true;
-            
         }
-        public async Task<bool> CancelarReservaAsync(CancelarReservaDto request)
+
+        public async Task<bool> CancelarReservaAsync(int id, CancelarReservaDto request)
         {
-            var reservaExistente = await _reservaRepository.ObtenerPorId(request.IdReserva)
-                  ?? throw new KeyNotFoundException($"Reserva con ID {request.IdReserva} no encontrada.");
+            var reservaExistente = await _reservaRepository.ObtenerPorId(id)
+                  ?? throw new KeyNotFoundException($"Reserva con ID {id} no encontrada.");
 
             if (reservaExistente.Estado == EstadoReserva.Finalizada)
                 throw new InvalidOperationException("No se puede cancelar una reserva que ya esta finalizada.");
             try
-            {
-                await _reservaRules.ValidarTransicionEstadoAsync(reservaExistente.Estado, EstadoReserva.Cancelada);
-                await _reservaRules.ValidarReservaExistenteAsync(request.IdReserva);
+            { 
+                await _reservaRules.ValidarReservaExistenteAsync(id);
                 await _reservaRules.ValidarMotivoCancelacion(request.MotivoCancelacion);
 
-                await _reservaRepository.CancelarReservaAsync(request.IdReserva, request.MotivoCancelacion);
+                await _reservaRepository.CancelarReservaAsync(id, request.MotivoCancelacion);
                 await _unitOfWork.CommitAsync();
                 return true;
             }
@@ -151,18 +138,5 @@ namespace SGHR.Application.Services.Reservas
                 throw new InvalidOperationException($"Error al cancelar la reserva: {ex.Message}");
             }
         }
-        public async Task<bool> VerificarDisponibilidadAsync(VerificarDisponibilidadRequest request)
-        {
-
-            await _reservaRules.ValidarFechaEntradaMayorSalida(request.FechaEntrada, request.FechaSalida);
-            await _reservaRules.ValidarExistenciaCategoriaAsync(request.IdCategoriaHabitacion, true);
-            return await _reservaRepository.HayDisponibilidadAsync(
-                request.IdCategoriaHabitacion,
-                request.FechaEntrada,
-                request.FechaSalida
-            );
-        }
-
-        
     }
 }

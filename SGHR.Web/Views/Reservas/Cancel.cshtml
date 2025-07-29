@@ -1,0 +1,36 @@
+﻿@model SGHR.Web.ViewModel.Reservas.CancelarReservaViewModel
+
+@{
+    ViewData["Title"] = "Cancelar Reserva";
+}
+
+<h2>Cancelar Reserva</h2>
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger" role="alert">
+        <ul>
+            @foreach (var modelStateEntry in ViewData.ModelState.Values)
+            {
+                foreach (var error in modelStateEntry.Errors)
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            }
+        </ul>
+    </div>
+}
+<form asp-action="Cancel" asp-controller="Reservas" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id"/>
+
+    <div class="mb-3">
+        <label asp-for="MotivoCancelacion" class="form-label"></label>
+        <textarea asp-for="MotivoCancelacion" class="form-control"></textarea>
+        <span asp-validation-for="MotivoCancelacion" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas cancelar esta reserva?');">
+        Confirmar Cancelación
+    </button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

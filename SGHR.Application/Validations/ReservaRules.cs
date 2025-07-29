@@ -30,7 +30,6 @@ namespace SGHR.Application.Validations
                 _ = await _categoriaHabitacionRepository.ObtenerPorId(categoriaId)
                     ?? throw new ArgumentException($"La categoria con ID {categoriaId} no existe.");
         }
-
         public async Task ValidarReservaExistenteAsync(int idReserva)
         {
             _ = await _reservaRepository.ObtenerPorId(idReserva)
@@ -38,54 +37,7 @@ namespace SGHR.Application.Validations
 
         }
 
-        public Task ValidarFechaEntradaMayorSalida(DateTime entrada, DateTime salida)
-        {
-            if (entrada > salida)
-            {
-                throw new ArgumentException("La fecha de entrada no puede ser posterior a la fecha de salida.");
-            }
-            return Task.CompletedTask;
-        }
-
-        public Task ValidarTransicionEstadoAsync(EstadoReserva actual, EstadoReserva nuevo)
-        {
-            if (nuevo == EstadoReserva.Confirmada && actual == EstadoReserva.Pendiente) return Task.CompletedTask;
-            if (nuevo == EstadoReserva.Finalizada && actual == EstadoReserva.Confirmada) return Task.CompletedTask;
-            if (nuevo == EstadoReserva.Cancelada && actual == EstadoReserva.Confirmada) return Task.CompletedTask;
-            if (nuevo != actual)
-                throw new InvalidOperationException($"El estado de la reserva no puede ser cambiado a {nuevo} desde el estado actual {actual}.");
-
-            return Task.CompletedTask;
-        }
-
-
-        
-        public Task<bool> RequiereVerificarDisponibilidad(Reserva reserva, ActualizarReservaRequest request)
-        {
-            bool fechaCambio = reserva.FechaEntrada != request.FechaEntrada || reserva.FechaSalida != request.FechaSalida;
-            bool habitacionCambio = reserva.IdCategoriaHabitacion != request.IdCategoriaHabitacion;
-
-            return Task.FromResult(fechaCambio || habitacionCambio);
-        }
-
-        public Task AplicarCambiosDeEstado(Reserva reserva, EstadoReserva nuevoEstado)
-        {
-            switch (nuevoEstado)
-            {
-                case EstadoReserva.Confirmada:
-                    reserva.Activar();
-                    break;
-                case EstadoReserva.Cancelada:
-                    reserva.Cancelar();
-                    break;
-                case EstadoReserva.Finalizada:
-                    reserva.Finalizar();
-                    break;
-                default:
-                    throw new InvalidOperationException($"El estado {nuevoEstado} no es válido para aplicar cambios.");
-            }
-            return Task.CompletedTask;
-        }
+        // MOVER
         public Task ValidarMotivoCancelacion(string motivoCancelacion)
         {
             if (motivoCancelacion.IsNullOrEmpty())

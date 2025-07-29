@@ -1,68 +1,101 @@
 ﻿@model SGHR.Web.ViewModel.Reservas.CrearReservaViewModel;
 @using SGHR.Domain.Enums;
-
 @{
     ViewData["Title"] = "Crear Nueva Reserva";
 }
-
 <h1>Crear Nueva Reserva</h1>
-
 <h4>Detalles de la Reserva</h4>
-
 <hr />
-@using (Html.BeginForm())
+@if (TempData["ErrorMessage"] != null)
 {
-    <div class="row">
-        <div class="col-md-4">
-            <form asp-action="Create" method="post">
-                <div class="mb-3">
-                    <label asp-for="IdCliente" class="form-label"></label>
-                    <input asp-for="IdCliente" class="form-control" />
-                    <span asp-validation-for="IdCliente" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="IdCategoriaHabitacion" class="form-label"></label>
-                    <input asp-for="IdCategoriaHabitacion" class="form-control" />
-                    <span asp-validation-for="IdCategoriaHabitacion" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="NumeroHuespedes" class="form-label"></label>
-                    <input asp-for="NumeroHuespedes" class="form-control" />
-                    <span asp-validation-for="NumeroHuespedes" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="FechaEntrada" class="form-label"></label>
-                    <input asp-for="FechaEntrada" class="form-control" type="date" />
-                    <span asp-validation-for="FechaEntrada" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="FechaSalida" class="form-label"></label>
-                    <input asp-for="FechaSalida" class="form-control" type="date" />
-                    <span asp-validation-for="FechaSalida" class="text-danger"></span>
-                </div>
-                <div>
-                    <label asp-for="EstadoReserva" class="form-label"></label>
-                    <select asp-for="EstadoReserva" class="form-select" asp-items="Html.GetEnumSelectList<EstadoReserva>()">
-                        <option value="">Seleccione un Estado</option>
-                    </select>
-                    <span asp-validation-for="EstadoReserva" class="text-danger"></span>
-                </div>
-
-                <button type="submit" class="btn btn-primary">Guardar</button>
-            </form>
-        </div>
+    <div class="alert alert-danger" role="alert">
+        @TempData["ErrorMessage"]
     </div>
 }
-<div class="mt-3">
-    <a asp-action="Index">Volver a la Lista</a>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" method="post">
+            <div class="mb-3">
+                <label asp-for="IdCliente" class="form-label"></label>
+                <input asp-for="IdCliente" class="form-control" />
+                <span asp-validation-for="IdCliente" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="IdCategoriaHabitacion" class="form-label"></label>
+                <input asp-for="IdCategoriaHabitacion" class="form-control" />
+                <span asp-validation-for="IdCategoriaHabitacion" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="NumeroHuespedes" class="form-label"></label>
+                <input asp-for="NumeroHuespedes" class="form-control" />
+                <span asp-validation-for="NumeroHuespedes" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="FechaEntrada" class="form-label"></label>
+                <input asp-for="FechaEntrada" class="form-control fecha-input" type="text"
+                       placeholder="dd/mm/yy" maxlength="8" />
+                <span asp-validation-for="FechaEntrada" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="FechaSalida" class="form-label"></label>
+                <input asp-for="FechaSalida" class="form-control fecha-input" type="text"
+                       placeholder="dd/mm/yy" maxlength="8" />
+                <span asp-validation-for="FechaSalida" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="EstadoReserva" class="form-label"></label>
+                <select asp-for="EstadoReserva" class="form-select" asp-items="Html.GetEnumSelectList<EstadoReserva>()">
+                    <option value="">Seleccione un Estado</option>
+                </select>
+                <span asp-validation-for="EstadoReserva" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
 </div>
+
+
+
+
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        document.querySelectorAll('.fecha-input').forEach(function(input) {
+            input.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, ''); 
+
+                if (value.length >= 2) {
+                    value = value.substring(0,2) + '/' + value.substring(2);
+                }
+                if (value.length >= 5) {
+                    value = value.substring(0,5) + '/' + value.substring(5,7);
+                }
+
+                e.target.value = value;
+            });
+
+            // Validación básica al salir del campo
+            input.addEventListener('blur', function(e) {
+                let value = e.target.value;
+                if (value && value.length === 8) {
+                    let parts = value.split('/');
+                    let day = parseInt(parts[0]);
+                    let month = parseInt(parts[1]);
+                    let year = parseInt(parts[2]);
+
+                    if (day > 31 || month > 12 || day < 1 || month < 1) {
+                        e.target.classList.add('is-invalid');
+                    } else {
+                        e.target.classList.remove('is-invalid');
+                    }
+                }
+            });
+        });
+    </script>
 }

@@ -38,6 +38,7 @@ namespace SGHR.Web.ViewModel.Reservas
 
         [JsonPropertyName("estado")]
         public EstadoReserva EstadoReserva { get; set; }
+    
 
     }
 }

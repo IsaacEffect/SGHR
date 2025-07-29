@@ -1,6 +1,7 @@
-﻿using SGHR.Web.ViewModel;
+﻿using Newtonsoft.Json;
+using SGHR.Web.ViewModel;
 using SGHR.Web.ViewModel.Reservas;
-using SGHR.Application.DTOs;
+using System.Text;
 namespace SGHR.Web.Services
 {
     public class ReservasApiService(HttpClient httpClient)
@@ -18,9 +19,7 @@ namespace SGHR.Web.Services
                 var response = await _httpClient.GetAsync(url);
                 if (response.IsSuccessStatusCode)
                 {
-                    var content = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine("Leyendo el contenido como string");
-                    Console.WriteLine(content);
+
                     var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<List<ReservasViewModel>>>();
                     
                     return apiResponse ?? new ApiResponse<List<ReservasViewModel>> { IsSuccess = false, Data = new List<ReservasViewModel>()};
@@ -48,34 +47,43 @@ namespace SGHR.Web.Services
         /// <summary>
         /// Obtiene una reserva especifica por su ID
         /// </summary>
-        public async Task<ApiResponse<ReservasViewModel>> ObtenerReservaPorIdAsync(int id)
+        public async Task<ApiResponse<ActualizarReservaViewModel>> ObtenerReservaPorIdAsync(int id)
         {
             try
             {
                 var url = $"/api/Reservas/{id}";
                 var response = await _httpClient.GetAsync(url);
+
                 if (response.IsSuccessStatusCode)
                 {
-                    var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<ReservasViewModel>>();
-                    return apiResponse ?? new ApiResponse<ReservasViewModel> { IsSuccess = true };
+                    var reserva = await response.Content.ReadFromJsonAsync<ActualizarReservaViewModel>();
+
+                    if (reserva != null)
+                    {
+                        return new ApiResponse<ActualizarReservaViewModel>
+                        {
+                            IsSuccess = true,
+                            Data = reserva
+                        };
+                    }
+                    else
+                    {
+                        return new ApiResponse<ActualizarReservaViewModel> { IsSuccess = false, Message = "La respuesta del API fue nula o inválida." };
+                    }
                 }
                 else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
-                    return new ApiResponse<ReservasViewModel> {IsSuccess = false, Message = "Reserva no encontrada"};
+                    return new ApiResponse<ActualizarReservaViewModel> { IsSuccess = false, Message = "Reserva no encontrada" };
                 }
                 else
                 {
                     var errorMessage = await response.Content.ReadAsStringAsync();
-                    return new ApiResponse<ReservasViewModel> { IsSuccess = false, Message = $"Error al obtener la reserva: {response.ReasonPhrase} - {errorMessage}" };
+                    return new ApiResponse<ActualizarReservaViewModel> { IsSuccess = false, Message = $"Error al obtener la reserva: {response.ReasonPhrase} - {errorMessage}" };
                 }
             }
-            catch (HttpRequestException httpEx)
+            catch (Exception ex)
             {
-                return new ApiResponse<ReservasViewModel> { IsSuccess = false, Message = $"Error de red al obtener reserva: {httpEx.Message}" };
-            }
-            catch(Exception ex)
-            {
-                return new ApiResponse<ReservasViewModel> { IsSuccess = false, Message = $"Error de red al obtener reserva: {ex.Message}" };
+                return new ApiResponse<ActualizarReservaViewModel> { IsSuccess = false, Message = $"Error de red al obtener reserva: {ex.Message}" };
             }
         }
 
@@ -159,39 +167,55 @@ namespace SGHR.Web.Services
         ///<summary>
         /// Actualizar una reserva a traves de la API
         /// </summary>
-        public async Task<ApiResponse<ReservasViewModel>> ActualizarReservasAsync(int id,ActualizarReservaViewModel actualizarReservaViewModel)
+        public async Task<ApiResponse<object>> ActualizarReservasAsync(int id, ActualizarReservaViewModel Model)
         {
             try
             {
                 var url = $"/api/Reservas/{id}";
-                var response = await _httpClient.PutAsJsonAsync(url, actualizarReservaViewModel);
+                var response = await _httpClient.PutAsJsonAsync(url, Model);// tira ok, pero en una validacion mas adelande tira null en La data del apiResponse por alguna razon que desconosco, lo peor es que si actualiza los datos en la db xd
 
-                if(response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
-                    var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<ReservasViewModel>>();
-                    return apiResponse ?? new ApiResponse<ReservasViewModel> { IsSuccess = true };
+                    return new ApiResponse<object>
+                    {
+                        IsSuccess = true,
+                        Data = true,
+                        Message = "Reserva actualizada correctamente"
+                    };
                 }
                 else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
-                    return new ApiResponse<ReservasViewModel> { IsSuccess = false, Message = "Reserva no encontrada" };
+                    return new ApiResponse<object>
+                    {
+                        IsSuccess = false,
+                        Message = "Reserva no encontrada"
+                    };
                 }
                 else
                 {
                     var errorMessage = await response.Content.ReadAsStringAsync();
-                    return new ApiResponse<ReservasViewModel> 
-                    { 
-                        IsSuccess = false, 
+                    return new ApiResponse<object>
+                    {
+                        IsSuccess = false,
                         Message = $"Error al actualizar la reserva: {response.ReasonPhrase} - {errorMessage}"
                     };
                 }
             }
             catch (HttpRequestException httpEx)
             {
-                return new ApiResponse<ReservasViewModel> { IsSuccess = false, Message = $"Error de red al crear reserva: {httpEx.Message}" };
+                return new ApiResponse<object>
+                {
+                    IsSuccess = false,
+                    Message = $"Error de red al actualizar reserva: {httpEx.Message}"
+                };
             }
             catch (Exception ex)
             {
-                return new ApiResponse<ReservasViewModel> { IsSuccess = false, Message = $"Error al crear reserva: {ex.Message}" };
+                return new ApiResponse<object>
+                {
+                    IsSuccess = false,
+                    Message = $"Error inesperado al actualizar reserva: {ex.Message}"
+                };
             }
         }
 
@@ -202,8 +226,18 @@ namespace SGHR.Web.Services
         {
             try
             {
-                var url = $"/api/Reservas/{model.Id}/cancelar";
-                var response = await _httpClient.PutAsync(url, null);
+                var url = $"api/Reservas/cancelar/{model.Id}";
+                var payload = new { motivoCancelacion = model.MotivoCancelacion };
+                var json = new StringContent(
+                    JsonConvert.SerializeObject(payload),
+                    Encoding.UTF8,
+                    "application/json"
+                );
+
+                var contentjson = json;
+                var response = await _httpClient.PutAsync(url, json);
+                var content = await response.Content.ReadAsStringAsync();
+
                 if (response.IsSuccessStatusCode)
                 {
                     return new ApiResponse<bool> { IsSuccess = true, Data = true };
@@ -227,5 +261,34 @@ namespace SGHR.Web.Services
                 return new ApiResponse<bool> { IsSuccess = false, Message = $"Error al cancelar reserva: {ex.Message}" };
             }
         }
+
+        ///<summary>
+        /// Obtener reserva por cliente
+        /// </summary>
+        public async Task<ApiResponse<List<ReservasViewModel>>> ObtenerReservasPorCliente(int id)
+        {
+            try
+            {
+                var url = $"/api/Reservas/cliente/{id}";
+                var response = await _httpClient.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var reservas = await response.Content.ReadFromJsonAsync<List<ReservasViewModel>>();
+                    return new ApiResponse<List<ReservasViewModel>> { IsSuccess = true, Data = reservas};
+                }
+
+                return new ApiResponse<List<ReservasViewModel>> { IsSuccess = false, Message = $"No se encontraron reservas del cliente: {id}." };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<List<ReservasViewModel>>
+                {
+                    IsSuccess = false,
+                    Message = $"Error al buscar la reserva: {ex.Message}"
+                };
+            }
+        }
+
+
     }
 }

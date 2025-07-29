@@ -6,8 +6,6 @@ using SGHR.Persistence.Context;
 using SGHR.Persistence.Interfaces; 
 using SGHR.Persistence.Interfaces.Repositories.Reservas;
 using System.Data;
-using SGHR.Domain.Enums;
-
 namespace SGHR.Persistence.Repositories.Reservas
 {
     

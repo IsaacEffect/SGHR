@@ -7,6 +7,7 @@ namespace SGHR.Web.ViewModel.Reservas
        public int Id { get; set; }
 
        [Required(ErrorMessage = "Debe ingresar un motivo")]
-       public string? MotivoCancelacion { get; set; }      
+       [StringLength(500, ErrorMessage = "El motivo no puede exceder los 500 caracteres.")]
+       public string MotivoCancelacion { get; set; } = string.Empty;      
     }
 }

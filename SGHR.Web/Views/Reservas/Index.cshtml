@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<SGHR.Web.ViewModel.Reservas.ReservasViewModel>
+@using SGHR.Domain.Enums;
 @{
     ViewData["Title"] = "Reservas";
 }
@@ -13,7 +14,7 @@
         @TempData["SuccessMessage"]
     </div>
 }
-@if (TempData["ErrorMessage"] != null)
+@if (TempData["ErrorMessage"] != null)  
 {
     <div class="alert alert-danger" role="alert">
         @TempData["ErrorMessage"]
@@ -37,34 +38,17 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdCliente)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdCategoriaHabitacion)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NumeroHuespedes)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FechaEntrada)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FechaSalida)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Estado)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FechaCreacion)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Activo)
-            </th>
-            <th></th> 
+            <th>@Html.DisplayNameFor(model => model.Id)</th>
+            <th>@Html.DisplayNameFor(model => model.IdCliente)</th>
+            <th>@Html.DisplayNameFor(model => model.IdCategoriaHabitacion)</th>
+            <th>@Html.DisplayNameFor(model => model.NumeroHuespedes)</th>
+            <th>@Html.DisplayNameFor(model => model.FechaEntrada)</th>
+            <th>@Html.DisplayNameFor(model => model.FechaSalida)</th>
+            <th>@Html.DisplayNameFor(model => model.Estado)</th>
+            <th>@Html.DisplayNameFor(model => model.FechaCreacion)</th>
+            <th>@Html.DisplayNameFor(Model => Model.FechaModificacion)</th>
+            <th>@Html.DisplayNameFor(model => model.Activo)</th>
+            <th class="text-center">Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -73,37 +57,33 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Id) 
-                    <td>
-                        @Html.DisplayFor(modelItem => item.IdCliente)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.IdCategoriaHabitacion)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.NumeroHuespedes)
-                    </td>
-                    <td>
-                        @item.FechaEntrada.ToString("dd/MM/yyyy")
-                    </td>
-                    <td>
-                        @item.FechaSalida.ToString("dd/MM/yyyy")
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.EstadoDisplay)
-                        
-                    </td>
-
-                     <td>
-                        @item.FechaCreacion.ToString("dd/MM/yyyy hh:mm tt") 
-                    </td>
-                    <td>
-                        @Html.DisplayFor(ModelItem => item.Activo)
-                        
-                            <button asp-action ="Delete" type="submit" class="btn btn-sm btn-outline-danger">
-                                <i class="bi bi-x-circle"></i> Cancelar
-                            </button>
+                    <td>@Html.DisplayFor(modelItem => item.Id)</td>
+                    <td>@Html.DisplayFor(modelItem => item.IdCliente)</td>
+                    <td>@Html.DisplayFor(modelItem => item.IdCategoriaHabitacion)</td>
+                    <td>@Html.DisplayFor(modelItem => item.NumeroHuespedes)</td>
+                    <td>@item.FechaEntrada.ToString("dd/MM/yyyy")</td>
+                    <td>@item.FechaSalida.ToString("dd/MM/yyyy")</td>
+                    <td>@Html.DisplayFor(modelItem => item.EstadoDisplay)</td>
+                    <td>@item.FechaCreacion.ToString("dd/MM/yyyy hh:mm tt")</td>
+                    <td>@item.FechaModificacion.ToString("dd/MM/yyyy hh:mm tt")</td>
+                    <td>@Html.DisplayFor(modelItem => item.Activo)</td>
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-2">
+                            @if (item.Estado == EstadoReserva.Pendiente || item.Estado == EstadoReserva.Confirmada)
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+                            }
+                            @if (item.Estado == EstadoReserva.Confirmada)
+                            {
+                                <form asp-action="Cancel" asp-controller="Reservas" method="get" asp-route-id="@item.Id" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-x-circle"></i> Cancelar
+                                    </button>
+                                </form>
+                            }
+                        </div>
                     </td>
                 </tr>
             }

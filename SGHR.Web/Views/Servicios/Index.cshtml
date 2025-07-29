@@ -1,0 +1,68 @@
+﻿@model IEnumerable<SGHR.Web.ViewModel.Servicios.ServiciosViewModel>
+@using SGHR.Domain.Enums;
+@{
+    ViewData["Title"] = "Reservas";
+}
+
+<h1>Reservas</h1>
+<p>
+    <a asp-action="Create" class="btn btn-primary">Crear nuevo Servicio</a>
+</p>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger" role="alert">
+        <ul>
+            @foreach (var modelStateEntry in ViewData.ModelState.Values)
+            {
+                foreach (var error in modelStateEntry.Errors)
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            }
+        </ul>
+    </div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.IdServicio)</th>
+            <th>@Html.DisplayNameFor(model => model.Nombre)</th>
+            <th>@Html.DisplayNameFor(model => model.Descripcion)</th>
+            <th>@Html.DisplayNameFor(model => model.Activo)</th>
+            <th class="text-center">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.IdServicio)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Nombre)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Descripcion)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Activo)</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="10">No se encontraron Servicios.</td>
+            </tr>
+        }
+    </tbody>
+</table>

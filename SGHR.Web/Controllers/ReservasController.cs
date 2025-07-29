@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SGHR.Web.Services;
 using SGHR.Web.ViewModel.Reservas;
+using System.Threading.Tasks;
 namespace SGHR.Web.Controllers
 {
     public class ReservasController(ReservasApiService reservasApiService) : Controller
@@ -45,7 +46,7 @@ namespace SGHR.Web.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CrearReservaViewModel model)
-        {
+            {
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -59,50 +60,35 @@ namespace SGHR.Web.Controllers
             }
             else
             {
-                ModelState.AddModelError(string.Empty, apiResponse.Message ?? "Error al crear la reserva");
+                TempData["ErrorMessage"] = $"Error al crear Reserva: {apiResponse.Message}";
                 return View(model);
             }
         }
 
-        // GET: /Reservas/Edit/5
+        // GET: /Reservas/Edit/{id}
         /// <summary>
         ///  Muestar el formulario para editar una reserva existente
         /// </summary>
         public async Task<IActionResult> Edit(int id)
-        {
+            {
             var apiResponse = await _reservasApiService.ObtenerReservaPorIdAsync(id);
-            if(apiResponse.IsSuccess && apiResponse.Data != null)
+
+            if (!apiResponse.IsSuccess || apiResponse.Data == null)
             {
-                var model = new ActualizarReservaViewModel
-                {
-                    IdCliente = apiResponse.Data.IdCliente.ToString(),
-                    IdCategoriaHabitacion = apiResponse.Data.IdCategoriaHabitacion.ToString(),
-                    FechaEntrada = apiResponse.Data.FechaEntrada,
-                    FechaSalida = apiResponse.Data.FechaSalida,
-                    Estado = apiResponse.Data.Estado,
-                    NumeroHuespedes = apiResponse.Data.NumeroHuespedes
-                };
-                return View(model);
+                TempData["ErrorMessage"] = apiResponse.Message ?? "No se pudo cargar la reserva para edición";
+                return RedirectToAction(nameof(Index)); // Redirige al listado
             }
-            else if(!apiResponse.IsSuccess && apiResponse.Message.Contains("no encontrada"))
-            {
-                TempData["ErrorMessage"] = "Reserva no encontrada";
-                return RedirectToAction(nameof(Index));
-            }
-            else
-            {
-                TempData["ErrorMessage"] = apiResponse.Message ?? "Error al cargar la reserva para edicion";
-                return RedirectToAction(nameof(Index));
-            }
+
+            return View(apiResponse.Data); // Solo muestra la vista si los datos están bien
         }
 
-        // POST: /Reservas/Edit/5
+        // POST: /Reservas/Edit/
         /// <summary>
         ///  Procesa la edicion de una reserva existente enviada desde el formulario
         /// </summary>
         /// <param name="id">Id de la reserva a actualizar</param>
         /// <param name="model">Los datos actualizados</param>
-       
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, ActualizarReservaViewModel model)
@@ -129,40 +115,58 @@ namespace SGHR.Web.Controllers
             }
             else
             {
-                ModelState.AddModelError(string.Empty, apiResponse.Message ?? "Error al actualizar la reserva");
+                TempData["ErrorMessage"] = "Error al actualizar la reserva";
                 return View(model);
             }
         }
 
        
-        // GET: Reserva/Delete/5
+        // GET: Reserva/Cancel/{id}
+        /// <summary>
+        /// Muestra el Fromulario para cancelar una reserva existente
+        /// </summary>
         [HttpGet]
-        [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id)
+        public IActionResult Cancel(int id)
         {
-            
-            return View(new CancelarReservaViewModel());
+            return View(new CancelarReservaViewModel { Id = id});
         }
         
-        // POST: Reserva/Delete/5
+        // POST: Reserva/Cancel/
         /// <summary>
         /// Cancela una reserva existente
         /// </summary>
         /// <param name="id">El Id de la reserva a cancelar</param>
         /// <returns></returns>
-        [HttpPut, ActionName("Cancel")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(CancelarReservaViewModel model)
+        public async Task<IActionResult> Cancel(CancelarReservaViewModel model)
         {
-            if(!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
+            if(!ModelState.IsValid) return View(model);
             var response = await _reservasApiService.CancelarReservaAsync(model);
+            if (response.IsSuccess)
+            {
+                TempData["SuccessMessage"] = "Reserva cancelada correctamente.";
+                return RedirectToAction("Index");
+            }
+            ModelState.AddModelError("", response.Message ?? "Error al cancelar la reserva");
+            return View(model);
+        }
 
-            return View(response);
-
+        // GET: Reserva/cliente/{id}
+        /// <summary>
+        /// Obtiene una reserva por el id del cliente
+        /// </summary>
+        /// <param name="id">Id del Cliente</param>
+        /// <returns>Una reserva del cliente</returns>
+        [HttpGet]
+        public async Task<IActionResult> GetByClientId(int id) 
+        {
+            var result = await _reservasApiService.ObtenerReservasPorCliente(id);
+            if (!result.IsSuccess || result.Data == null)
+            {
+                return NotFound("No se encontro la reserva.");
+            }
+            return View("ListaPorCliente", result.Data);
         }
     }
 }

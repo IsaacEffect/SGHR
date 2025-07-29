@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SGHR.Application.DTOs.Common;
+using SGHR.Application.DTOs.Reservas;
 using SGHR.Application.DTOs.Servicios;
 using SGHR.Application.Interfaces.Servicios;
-
+using SGHR.Domain.Entities.Reservas;
 
 namespace SGHR.WebApp.Api.Controllers
 {
@@ -85,7 +87,16 @@ namespace SGHR.WebApp.Api.Controllers
         public async Task<IActionResult> ObtenerTodosLosServicios()
         {
             var servicios = await _servicioApplicationService.ObtenerTodosLosServiciosAsync();
-            return Ok(servicios);
+            if (servicios == null || !servicios.Any())
+            {
+                return NotFound("No se encontraron servicios.");
+            }
+            return Ok(new ApiResponse<List<ServicioDto>>
+            {
+                IsSuccess = true,
+                Message = "Reserva creada exitosamente.",
+                Data = servicios
+            });
         }
 
         /// <summary>

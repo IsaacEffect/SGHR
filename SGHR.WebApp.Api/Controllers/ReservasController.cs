@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SGHR.Application.DTOs.Common;
 using SGHR.Application.DTOs.Reservas;
 using SGHR.Application.Interfaces.Reservas;
-using SGHR.Application.DTOs.Common;
+using SGHR.Domain.Entities.Reservas;
+using System.Linq.Expressions;
 
 namespace SGHR.WebApp.Api.Controllers
 {
@@ -27,7 +29,7 @@ namespace SGHR.WebApp.Api.Controllers
                 return BadRequest(new ApiResponse<ReservaDto> { IsSuccess = false, Message = "Errores de validación: " + string.Join("; ", errors) });
             }
 
-            var reservaDto = await _reservaApplicationService.CrearReservaAsync(request); 
+            var reservaDto = await _reservaApplicationService.CrearReservaAsync(request);
             var apiResponse = new ApiResponse<ReservaDto>
             {
                 IsSuccess = true,
@@ -46,59 +48,96 @@ namespace SGHR.WebApp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> ActualizarReserva(int id, [FromBody] ActualizarReservaRequest request)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        { 
             try
             {
                 var reservaActualizada = await _reservaApplicationService.ActualizarReservaAsync(id, request);
-                return Ok(reservaActualizada);
+                return Ok(new ApiResponse<bool>
+                {
+                    IsSuccess = true,
+                    Message = "Reservas obtenidas",
+                    Data = reservaActualizada
+                });
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("no encontrada"))
             {
-                return NotFound(ex.Message);
+                return NotFound(new ApiResponse<bool>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                    Data = false
+                }); ;
             }
             catch (InvalidOperationException ex)
             {
-                return Conflict(ex.Message);
+                return Conflict(new ApiResponse<bool>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                    Data = false
+                }); 
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ApiResponse<bool>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                    Data = false
+                }); 
             }
             catch(Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error interno del servidor: {ex.Message}");
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    IsSuccess = false,
+                    Message = $"Error interno del servidor: {ex.Message}",
+                    Data = null
+                });
             }
         }
 
         /// <summary>
         /// Cancela una reserva.
         /// </summary>
-        [HttpPatch("{id}/cancelar")]
+        [HttpPut("cancelar/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CancelarReserva([FromBody] CancelarReservaDto request)
+        public async Task<IActionResult> CancelarReserva(int id, [FromBody] CancelarReservaDto request)
         {
             try
             {
-                var reservaCancelada = await _reservaApplicationService.CancelarReservaAsync(request); 
+                
+                var reservaCancelada = await _reservaApplicationService.CancelarReservaAsync(id, request); 
                 return Ok(reservaCancelada);
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("no encontrada"))
             {
-                return NotFound(ex.Message);
+                return NotFound(new ApiResponse<object>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                    Data = null
+                });
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ApiResponse<object>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                    Data = null
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error interno del servidor: {ex.Message}");
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                    Data = null
+                }); ;
             }
         }
 
@@ -142,6 +181,7 @@ namespace SGHR.WebApp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ObtenerReservasEnRango([FromQuery] DateTime desde, [FromQuery] DateTime hasta)
         {
+            
             if (desde >= hasta)
             {
                 return BadRequest("La fecha de inicio debe ser anterior a la fecha de fin.");
@@ -151,7 +191,12 @@ namespace SGHR.WebApp.Api.Controllers
             {
                 return NotFound("No se encontraron reservas en el rango de fechas especificado.");
             }
-            return Ok(reservas);
+            return Ok(new ApiResponse<List<ReservaDto>>
+            {
+                IsSuccess = true,
+                Message = "Reservas obtenidas",
+                Data = reservas
+            });
         }
 
         /// <summary>

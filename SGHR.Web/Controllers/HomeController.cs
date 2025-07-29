@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using SGHR.Web.Models;
 using System.Diagnostics;
 
+
 namespace SGHR.Web.Controllers
 {
     public class HomeController : Controller
@@ -19,6 +20,11 @@ namespace SGHR.Web.Controllers
         }
 
         public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        public IActionResult ReservasIndex()
         {
             return View();
         }
