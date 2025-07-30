@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SGHR.Web.Services;
 using SGHR.Web.ViewModel.Reservas;
-using System.Threading.Tasks;
 namespace SGHR.Web.Controllers
 {
     public class ReservasController(ReservasApiService reservasApiService) : Controller
@@ -76,10 +75,10 @@ namespace SGHR.Web.Controllers
             if (!apiResponse.IsSuccess || apiResponse.Data == null)
             {
                 TempData["ErrorMessage"] = apiResponse.Message ?? "No se pudo cargar la reserva para edición";
-                return RedirectToAction(nameof(Index)); // Redirige al listado
+                return RedirectToAction(nameof(Index)); 
             }
 
-            return View(apiResponse.Data); // Solo muestra la vista si los datos están bien
+            return View(apiResponse.Data); 
         }
 
         // POST: /Reservas/Edit/

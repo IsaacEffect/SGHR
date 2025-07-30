@@ -12,7 +12,6 @@ namespace SGHR.Application.DTOs.Reservas
         public EstadoReserva Estado { get; set; }
         public DateTime FechaCreacion { get; set; }
         public DateTime? FechaModificacion { get; set; }
-        
         public bool Activo { get; set; }
     }
 }

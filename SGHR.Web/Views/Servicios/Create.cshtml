@@ -1,0 +1,42 @@
+﻿@model SGHR.Web.ViewModel.Servicios.CrearServiciosViewModel;
+@using SGHR.Domain.Enums;
+@{
+    ViewData["Title"] = "Crear Nueva Reserva";
+}
+<h1>Crear Nuevo Servicio</h1>
+<h4>Detalles del servicio</h4>
+<hr />
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" method="post">
+            <div class="mb-3">
+                <label asp-for="Nombre" class="form-label"></label>
+                <input asp-for="Nombre" class="form-control" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Descripcion" class="form-label"></label>
+                <textarea asp-for="Descripcion" class="form-control"></textarea>
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+            <div>
+                <label asp-for="Activo" class="form-label"></label>
+                <input asp-for="Activo" class="form-check-input"/>
+
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+

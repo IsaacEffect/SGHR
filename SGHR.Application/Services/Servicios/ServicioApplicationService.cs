@@ -29,22 +29,33 @@ namespace SGHR.Application.Services.Servicios
             await _unitOfWork.CommitAsync();
             return _mapper.Map<ServicioDto>(nuevoServicio);
         }
-        public async Task ActualizarServicioAsync(ActualizarServicioRequest request)
+        public async Task<bool> ActualizarServicioAsync(int id, ActualizarServicioRequest request)
         {
-            await _servicioRules.ValidarExistenciaSerivicioAsync(request.IdServicio);
-            var servicio = await _serviciosRepository.ObtenerPorIdAsync(request.IdServicio);
+            await _servicioRules.ValidarExistenciaSerivicioAsync(id);
+            var servicio = await _serviciosRepository.ObtenerPorIdAsync(id);
             await _servicioRules.ValidarDatosBasicosAsync(request.Nombre, request.Descripcion);
 
-            if (request.Activo) servicio.Activar(); else servicio.Desactivar();
-
+            if (request.Activo)
+                servicio.Activar();
+            else
+                servicio.Desactivar();
+            
+            servicio.Actualizar
+                (
+                    request.Nombre,
+                    request.Descripcion
+                );
+            
             await _serviciosRepository.ActualizarServicioAsync(servicio);
             await _unitOfWork.CommitAsync();
+
+
+            return true;
         }
+
         public async Task EliminarServicioAsync(int idServicio)
         {
             _servicioRules.ValidarIdPositivo(idServicio);
-            await _servicioRules.ValidarExistenciaSerivicioAsync(idServicio);
-            await _serviciosRepository.ObtenerPorIdAsync(idServicio);
             await _serviciosRepository.EliminarServicioAsync(idServicio);
             await _unitOfWork.CommitAsync();
 
@@ -88,6 +99,7 @@ namespace SGHR.Application.Services.Servicios
 
             var servicios = await _serviciosRepository.ObtenerTodosLosServiciosAsync();
             return _mapper.Map<List<ServicioDto>>(servicios);
+
         }
        
     }

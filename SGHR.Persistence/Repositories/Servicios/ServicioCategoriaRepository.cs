@@ -14,7 +14,7 @@ namespace SGHR.Persistence.Repositories.Servicios
             _sqlConnectionFactory = sqlConnectionFactory;
         }
 
-        public async Task AgregarPrecioServicioCategoriaAsync(int servicioId, int categoriaId, decimal precio)
+        public async Task AgregarActualizarPrecioServicioCategoriaAsync(int servicioId, int categoriaId, decimal precio)
         {
             using var connection = _sqlConnectionFactory.CreateConnection();
             var parameters = new DynamicParameters();
@@ -29,35 +29,7 @@ namespace SGHR.Persistence.Repositories.Servicios
                 commandType: CommandType.StoredProcedure
             );
         }
-        public async Task ActualizarPrecioServicioCategoriaAsync(int servicioId, int categoriaId, decimal precio)
-        {
-            using var connection = _sqlConnectionFactory.CreateConnection();
-            var parameters = new DynamicParameters();
-
-            parameters.Add("@IdServicio", servicioId, DbType.Int32);
-            parameters.Add("@IdCategoriaHabitacion", categoriaId, DbType.Int32);
-            parameters.Add("@Precio", precio, DbType.Decimal);
-
-            await connection.ExecuteAsync(
-                "UpsertPrecioServicioCategoria", 
-                parameters,
-                commandType: CommandType.StoredProcedure
-            );
-        }
-        public async Task EliminarPrecioServicioCategoriaAsync(int servicioId, int categoriaId)
-        {
-            using var connection = _sqlConnectionFactory.CreateConnection();
-            var parameters = new DynamicParameters();
-
-            parameters.Add("@IdServicio", servicioId, DbType.Int32);
-            parameters.Add("@IdCategoriaHabitacion", categoriaId, DbType.Int32);
-
-            await connection.ExecuteAsync(
-                "EliminarPrecioServicioCategoria",
-                parameters,
-                commandType: CommandType.StoredProcedure
-            );
-        }
+     
         public async Task<List<ServicioCategoria>> ObtenerPreciosPorServicioAsync(int servicioId)
         {
             using var connection = _sqlConnectionFactory.CreateConnection();

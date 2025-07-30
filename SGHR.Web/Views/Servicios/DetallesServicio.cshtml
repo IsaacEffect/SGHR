@@ -1,0 +1,169 @@
+﻿@using SGHR.Web.ViewModel.ServicioCategoria
+@model ServicioConPreciosViewModel
+
+@{
+    ViewData["Title"] = "Detalles del Servicio";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="bi bi-gear"></i> @Model.NombreServicio</h2>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <strong>ID Servicio:</strong> @Model.IdServicio
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <strong>Fecha de Creación:</strong>
+                            @if (Model.FechaCreacion != default(DateTime))
+                            {
+                                @Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")
+                            }
+                            else
+                            {
+                                <span class="text-muted">No disponible</span>
+                            }
+                        </div>
+                        <div class="mb-2">
+                            <strong>Última Modificación:</strong>
+                            @if (Model.FechaModificacion.HasValue) 
+                            {
+                            @Model.FechaModificacion.Value.ToString("dd/MM/yyyy HH:mm")
+                            }
+                            else
+                            {
+                            <span class="text-muted">Sin modificaciones</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <h4>Precios por Categoría de Habitación</h4>
+
+                @if (Model.PreciosPorCategoria != null && Model.PreciosPorCategoria.Any())
+                {
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID Categoría</th>
+                                <th>Nombre Categoría</th> 
+                                <th>Precio</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var precio in Model.PreciosPorCategoria)
+                            {
+                                <tr>
+                                    <td>@precio.IdCategoriaHabitacion</td>
+                                    <td>@precio.NombreCategoriaHabitacion</td> 
+                                    <td>@precio.PrecioServicio.ToString("C")</td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="EditarPrecioCategoria"
+                                               asp-route-idServicio="@precio.IdServicio"
+                                               asp-route-idCategoria="@precio.IdCategoriaHabitacion"
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-pencil"></i> Editar
+                                            </a>
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deletePrecioModal"
+                                                    data-servicio="@precio.IdServicio"
+                                                    data-categoria="@precio.IdCategoriaHabitacion"
+                                                    data-precio="@precio.PrecioServicio.ToString("C")"
+                                                    data-nombrecategoria="@precio.NombreCategoriaHabitacion">
+                                                <i class="bi bi-trash"></i> Eliminar
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        No hay precios configurados para este servicio en ninguna categoría.
+                    </div>
+                }
+
+                <div class="mt-4">
+                    <a asp-action="AsignarPrecio"
+                       asp-route-idServicio="@Model.IdServicio"
+                       class="btn btn-success">
+                        <i class="bi bi-plus-circle"></i> Asignar Nuevo Precio
+                    </a>
+                    <a asp-action="Edit"
+                       asp-route-id="@Model.IdServicio"
+                       class="btn btn-primary">
+                        <i class="bi bi-pencil-square"></i> Editar Servicio
+                    </a>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver a la Lista
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deletePrecioModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle text-warning"></i>
+                    Confirmar Eliminación de Precio
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    ¿Está seguro que desea eliminar el precio <strong id="precioTexto"></strong>
+                    para la categoría <strong id="categoriaTexto"></strong>?
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="deletePrecioForm" method="post" style="display: inline;">
+                    <input type="hidden" name="idServicio" id="servicioIdInput" />
+                    <input type="hidden" name="idCategoria" id="categoriaIdInput" />
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deletePrecioModal = document.getElementById('deletePrecioModal');
+
+            deletePrecioModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const servicioId = button.getAttribute('data-servicio');
+                const categoriaId = button.getAttribute('data-categoria');
+                const precio = button.getAttribute('data-precio');
+                const nombreCategoria = button.getAttribute('data-nombrecategoria'); // Obtener el nombre de la categoría
+
+                document.getElementById('precioTexto').textContent = precio;
+                document.getElementById('categoriaTexto').textContent = nombreCategoria; // Mostrar el nombre de la categoría
+                document.getElementById('servicioIdInput').value = servicioId;
+                document.getElementById('categoriaIdInput').value = categoriaId;
+
+                // Configurar la acción del formulario
+                document.getElementById('deletePrecioForm').action = '@Url.Action("EliminarPrecio", "Servicios")';
+            });
+        });
+    </script>
+}

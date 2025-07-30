@@ -27,7 +27,8 @@ namespace SGHR.Persistence.Repositories.Servicios
         public async Task EliminarServicioAsync(int id)
         {
             var servicio = await base.ObtenerPorId(id) ?? throw new KeyNotFoundException($"Servicio con ID {id} no encontrado.");
-            _dbSet.Remove(servicio);
+            servicio.Eliminar();
+            _dbSet.Update(servicio);
         }
         public Task<List<ServiciosEntity>> ObtenerServiciosActivosAsync()
         {
@@ -38,7 +39,7 @@ namespace SGHR.Persistence.Repositories.Servicios
 
         public Task<List<ServiciosEntity>> ObtenerTodosLosServiciosAsync()
         {
-            return _dbSet.ToListAsync();    
+            return _dbSet.Where(s => !s.Eliminado).ToListAsync();    
         }
     }
 }

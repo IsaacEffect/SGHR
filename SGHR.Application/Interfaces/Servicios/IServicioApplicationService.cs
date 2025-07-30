@@ -6,7 +6,7 @@ namespace SGHR.Application.Interfaces.Servicios
     {
         
         Task<ServicioDto> AgregarServicioAsync(AgregarServicioRequest request);
-        Task ActualizarServicioAsync(ActualizarServicioRequest request);
+        Task<bool> ActualizarServicioAsync(int id, ActualizarServicioRequest request);
         Task EliminarServicioAsync(int id);
         Task <List<ServicioDto>> ObtenerServiciosActivosAsync();
         Task<ServicioDto?> ObtenerServicioPorIdAsync(int id);

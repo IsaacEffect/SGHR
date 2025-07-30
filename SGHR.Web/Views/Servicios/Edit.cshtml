@@ -1,0 +1,121 @@
+﻿@model SGHR.Web.ViewModel.Servicios.ActualizarServiciosViewModel
+@{
+    ViewData["Title"] = "Editar Servicio";
+}
+
+<h1>Editar Servicio</h1>
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            @* Campo oculto para el ID *@
+            <input asp-for="IdServicio" type="hidden" />
+
+            <div class="form-group mb-3">
+                <label asp-for="Nombre" class="control-label"></label>
+                <input asp-for="Nombre" class="form-control" placeholder="Ingrese el nombre del servicio" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Descripcion" class="control-label"></label>
+                <textarea asp-for="Descripcion" class="form-control" rows="4" placeholder="Ingrese la descripción del servicio"></textarea>
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+
+            @* <div class="form-group mb-3">
+                <label asp-for="Precio" class="control-label"></label>
+                <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input asp-for="Precio" class="form-control" type="number" step="0.01" min="0" placeholder="0.00" />
+                </div>
+                <span asp-validation-for="Precio" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Duracion" class="control-label"></label>
+                <div class="input-group">
+                    <input asp-for="Duracion" class="form-control" type="number" min="1" placeholder="Duración en minutos" />
+                    <span class="input-group-text">minutos</span>
+                </div>
+                <span asp-validation-for="Duracion" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Capacidad" class="control-label"></label>
+                <input asp-for="Capacidad" class="form-control" type="number" min="1" placeholder="Número máximo de personas" />
+                <span asp-validation-for="Capacidad" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="IdCategoriaServicio" class="control-label">Categoría del Servicio</label>
+                <select asp-for="IdCategoriaServicio" class="form-select">
+                    <option value="">-- Seleccione una categoría --</option>
+                    @* Aquí deberías cargar las categorías desde el controller *@
+                    @* Por ahora pongo ejemplos estáticos *@
+                    @*
+                    <option value="1">Spa</option>
+                    <option value="2">Restaurante</option>
+                    <option value="3">Entretenimiento</option>
+                    <option value="4">Transporte</option>
+                </select>
+                <span asp-validation-for="IdCategoriaServicio" class="text-danger"></span>
+            </div>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" asp-for="Activo" type="checkbox" />
+                <label class="form-check-label" asp-for="Activo">
+                    Servicio Activo
+                </label>
+                <span asp-validation-for="Activo" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Observaciones" class="control-label"></label>
+                <textarea asp-for="Observaciones" class="form-control" rows="3" placeholder="Observaciones adicionales (opcional)"></textarea>
+                <span asp-validation-for="Observaciones" class="text-danger"></span>
+            </div> 
+            *@
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle"></i> Actualizar Servicio
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Opcional: Validación adicional del lado del cliente
+        $(document).ready(function() {
+            // Formatear el campo de precio
+            $('#Precio').on('blur', function() {
+                var value = parseFloat($(this).val());
+                if (!isNaN(value)) {
+                    $(this).val(value.toFixed(2));
+                }
+            });
+
+            // Validar que la duración sea positiva
+            $('#Duracion').on('input', function() {
+                var value = parseInt($(this).val());
+                if (value <= 0) {
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+        });
+    </script>
+}

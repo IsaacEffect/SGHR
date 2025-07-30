@@ -60,7 +60,7 @@ namespace SGHR.Persistence.Context
             {
                 entity.ToTable("ServicioCategoria");
                 entity.HasKey(sc => new { sc.IdServicio, sc.IdCategoriaHabitacion });
-                entity.Property(sc => sc.Precio).HasColumnName("PrecioServicio").HasColumnType("decimal(10,2)");
+                entity.Property(sc => sc.PrecioServicio).HasColumnName("PrecioServicio").HasColumnType("decimal(10,2)");
                 
                 entity.Property(sc => sc.FechaCreacion).HasColumnName("FechaCreacion");
                 entity.Property(sc => sc.FechaModificacion).HasColumnName("FechaActualizacion");

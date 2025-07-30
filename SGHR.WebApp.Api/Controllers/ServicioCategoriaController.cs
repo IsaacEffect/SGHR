@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SGHR.Application.DTOs.Servicios;
 using SGHR.Application.Interfaces.Servicios;
+using SGHR.Application.DTOs.Common;
 namespace SGHR.WebApp.Api.Controllers
 {
     [Route("api/[controller]")]
@@ -12,7 +13,7 @@ namespace SGHR.WebApp.Api.Controllers
 
 
         /// <summary>
-        /// Asignar un precio a un servicio por categoría
+        /// Asignar y si existe actualiza un precio a un servicio por categoría
         /// </summary> 
         [HttpPost("AsignarPrecio")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -24,49 +25,15 @@ namespace SGHR.WebApp.Api.Controllers
             {
                 return BadRequest("Los IDs de servicio y categoria deben ser numeros positivos");
             }
-            await _servicioCategoriaApplicationService.AsignarPrecioServicioCategoriaAsync(request);
-            return Ok("Precio asignado correctamente");
-        }
-        ///<sumary>
-        /// Actualizar un precio asignado a un servicio por categoría
-        ///</sumary>
-        [HttpPut("ActualizarPrecio/{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ActualizarPrecioServicioCategoria( [FromBody] ActualizarPrecioServicioCategoriaRequest request)
-        {
-            if (request.IdServicio <= 0 || request.IdCategoriaHabitacion <= 0)
+            await _servicioCategoriaApplicationService.AsignarActualizarPrecioServicioCategoriaAsync(request);
+            return Ok(new ApiResponse<ServicioDto>
             {
-                return BadRequest("Los IDs de servicio y categoria deben ser numeros positivos");
-            }
-            await _servicioCategoriaApplicationService.ActualizarPrecioServicioCategoriaAsync(request);
-            return Ok("Se ha actualizado el precio correctamente");
+                IsSuccess = true,
+                Message = "Precio Asignado exitosamente.",
+
+            });
         }
-        /// <summary>
-        /// Eliminar un precio asignado a un servicio por categoría
-        /// </summary> 
-        [HttpDelete("EliminarPrecio/{idServicio}/{idCategoriaHabitacion}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> EliminarPrecioServicioCategoria(int idServicio, int idCategoriaHabitacion)
-        {
-            await _servicioCategoriaApplicationService.EliminarPrecioServicioCategoriaAsync(idServicio, idCategoriaHabitacion);
-            return Ok("Se ha eliminado el precio correctamente");
-        }
-        // Revisar porque si trae las columnas pero sin los datos, sin embargo en la db si se guardan los datos
-        /// <summary>
-        /// Obtener los precios de un servicio por categoría
-        /// </summary>
-        [HttpGet("ObtenerPreciosServicioPorCategoria/{idCategoriaHabitacion}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ObtenerPreciosServicioPorCategoria(int idCategoriaHabitacion)
-        {
-            var precios = await _servicioCategoriaApplicationService.ObtenerPreciosServicioPorCategoriaAsync(idCategoriaHabitacion);
-            return Ok(precios);
-        }
-        // Revisar 
+
         /// <summary>
         /// Obtener precios por servcio
         /// </summary>
@@ -76,7 +43,12 @@ namespace SGHR.WebApp.Api.Controllers
         public async Task<IActionResult> ObtenerPreciosCategoriaPorServicio(int idServicio)
         {
             var precios = await _servicioCategoriaApplicationService.ObtenerPreciosCategoriaPorServicioAsync(idServicio);
-            return Ok(precios);
+            return Ok(new ApiResponse<List<ServicioCategoriaDto>>
+            {
+                IsSuccess = true,
+                Data = precios,
+                Message = "Precios por servicio obtenidos correctamente"
+            });
         }
 
         /// <summary>

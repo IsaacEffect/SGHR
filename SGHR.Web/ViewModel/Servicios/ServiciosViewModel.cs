@@ -15,5 +15,19 @@ namespace SGHR.Web.ViewModel.Servicios
 
         [JsonPropertyName("activo")]
         public bool Activo { get; set; }
+
+        [JsonPropertyName("fechaCreacion")]
+        public DateTime FechaCreacion { get; set; }
+
+        [JsonPropertyName("fechaModificacion")] 
+        public DateTime? FechaModificacion { get; set; }
+
+        [JsonPropertyName("eliminado")] 
+        public bool Eliminado { get; set; }
+
+        [JsonPropertyName("fechaEliminacion")] 
+        public DateTime? FechaEliminacion { get; set; }
+
+
     }
 }

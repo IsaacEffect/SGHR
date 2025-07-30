@@ -4,10 +4,7 @@ namespace SGHR.Application.Interfaces.Servicios
 {
     public interface IServicioCategoriaApplicationService
     {
-        Task AsignarPrecioServicioCategoriaAsync(AsignarPrecioServicioCategoriaRequest request);
-        Task ActualizarPrecioServicioCategoriaAsync(ActualizarPrecioServicioCategoriaRequest request);
-        Task EliminarPrecioServicioCategoriaAsync(int servicioId, int categoriaId);
-        Task<List<ServicioCategoriaDto>> ObtenerPreciosServicioPorCategoriaAsync(int categoriaId);
+        Task AsignarActualizarPrecioServicioCategoriaAsync(AsignarPrecioServicioCategoriaRequest request);
         Task<List<ServicioCategoriaDto>> ObtenerPreciosCategoriaPorServicioAsync(int servicioId);
         Task<ServicioCategoriaDto?> ObtenerPrecioServicioCategoriaEspecificoAsync(int servicioId, int categoriaId);
     }

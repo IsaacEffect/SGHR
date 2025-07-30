@@ -1,7 +1,5 @@
-﻿using Newtonsoft.Json;
-using SGHR.Web.ViewModel;
+﻿using SGHR.Web.ViewModel;
 using SGHR.Web.ViewModel.Servicios;
-using System.Text;
 
 namespace SGHR.Web.Services
 {
@@ -12,11 +10,11 @@ namespace SGHR.Web.Services
         /// <summary>
         /// Obtiene todos los servicios
         /// </summary>
-        public async Task<ApiResponse<List<ServiciosViewModel>>> ObtenerTodosServiciosAsync(bool incluirRelaciones = false)
+        public async Task<ApiResponse<List<ServiciosViewModel>>> ObtenerTodosServiciosAsync()
         {
             try
             {
-                var url = $"/api/Servicios/todos?incluirRelaciones={incluirRelaciones}";
+                var url = $"/api/Servicios/ObtenerTodosLosServicios";
                 var response = await _httpClient.GetAsync(url);
                 if (response.IsSuccessStatusCode)
                 {
@@ -51,25 +49,21 @@ namespace SGHR.Web.Services
         {
             try
             {
-                var url = $"/api/Servicios/{id}";
+                var url = $"/api/Servicios/ObtenerServicio/{id}";
                 var response = await _httpClient.GetAsync(url);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var servicio = await response.Content.ReadFromJsonAsync<ActualizarServiciosViewModel>();
+                    var servicio = await response.Content.ReadFromJsonAsync<ApiResponse<ActualizarServiciosViewModel>>();
 
                     if (servicio != null)
                     {
-                        return new ApiResponse<ActualizarServiciosViewModel>
-                        {
-                            IsSuccess = true,
-                            Data = servicio
-                        };
+                        return servicio;
                     }
-                    else
-                    {
-                        return new ApiResponse<ActualizarServiciosViewModel> { IsSuccess = false, Message = "La respuesta del API fue nula o inválida." };
-                    }
+                else
+                {
+                    return new ApiResponse<ActualizarServiciosViewModel> { IsSuccess = false, Message = "La respuesta del API fue nula o inválida." };
+                }
                 }
                 else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
@@ -137,7 +131,7 @@ namespace SGHR.Web.Services
         {
             try
             {
-                var url = "/api/Servicios/CrearServicio";
+                var url = "/api/Servicios/AgregarServicio";
                 var response = await _httpClient.PostAsJsonAsync(url, model);
                 var content = await response.Content.ReadAsStringAsync();
                 Console.WriteLine(content);
@@ -169,7 +163,7 @@ namespace SGHR.Web.Services
         {
             try
             {
-                var url = $"/api/Servicios/{id}";
+                var url = $"/api/Servicios/ActualizarServicio/{id}";
                 var response = await _httpClient.PutAsJsonAsync(url, model);
 
                 if (response.IsSuccessStatusCode)
@@ -224,7 +218,7 @@ namespace SGHR.Web.Services
         {
             try
             {
-                var url = $"/api/Servicios/{id}";
+                var url = $"/api/Servicios/EliminarServicio/{id}";
                 var response = await _httpClient.DeleteAsync(url);
 
                 if (response.IsSuccessStatusCode)
@@ -251,48 +245,116 @@ namespace SGHR.Web.Services
             }
         }
 
-        /// <summary>
-        /// Activa o desactiva un servicio por su ID a través de la API
+        /// Activa un servicio por su ID a través de la API
         /// </summary>
-        //public async Task<ApiResponse<bool>> CambiarEstadoServicioAsync(CambiarEstadoServicioViewModel model)
-        //{
-        //    try
-        //    {
-        //        var url = $"api/Servicios/cambiar-estado/{model.Id}";
-        //        var payload = new { activo = model.Activo, motivo = model.Motivo };
-        //        var json = new StringContent(
-        //            JsonConvert.SerializeObject(payload),
-        //            Encoding.UTF8,
-        //            "application/json"
-        //        );
+        public async Task<ApiResponse<object>> ActivarServicioAsync(int id)
+        {
+            try
+            {
+                var url = $"/api/Servicios/ActivarServicio/{id}";
+                var response = await _httpClient.PutAsync(url, null);
 
-        //        var response = await _httpClient.PutAsync(url, json);
-        //        var content = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<ServicioDto>>();
+                    return new ApiResponse<object>
+                    {
+                        IsSuccess = apiResponse?.IsSuccess ?? true,
+                        Message = apiResponse?.Message ?? "Servicio activado correctamente",
+                        Data = apiResponse?.Data
+                    };
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    return new ApiResponse<object>
+                    {
+                        IsSuccess = false,
+                        Message = "Servicio no encontrado"
+                    };
+                }
+                else
+                {
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    return new ApiResponse<object>
+                    {
+                        IsSuccess = false,
+                        Message = $"Error al activar el servicio: {response.ReasonPhrase} - {errorMessage}"
+                    };
+                }
+            }
+            catch (HttpRequestException httpEx)
+            {
+                return new ApiResponse<object>
+                {
+                    IsSuccess = false,
+                    Message = $"Error de red al activar servicio: {httpEx.Message}"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<object>
+                {
+                    IsSuccess = false,
+                    Message = $"Error inesperado al activar servicio: {ex.Message}"
+                };
+            }
+        }
 
-        //        if (response.IsSuccessStatusCode)
-        //        {
-        //            var mensaje = model.Activo ? "Servicio activado correctamente" : "Servicio desactivado correctamente";
-        //            return new ApiResponse<bool> { IsSuccess = true, Data = true, Message = mensaje };
-        //        }
-        //        else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-        //        {
-        //            return new ApiResponse<bool> { IsSuccess = false, Message = "Servicio no encontrado" };
-        //        }
-        //        else
-        //        {
-        //            var errorMessage = await response.Content.ReadAsStringAsync();
-        //            return new ApiResponse<bool> { IsSuccess = false, Message = $"Error al cambiar estado del servicio: {response.ReasonPhrase} - {errorMessage}" };
-        //        }
-        //    }
-        //    catch (HttpRequestException httpEx)
-        //    {
-        //        return new ApiResponse<bool> { IsSuccess = false, Message = $"Error de red al cambiar estado del servicio: {httpEx.Message}" };
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return new ApiResponse<bool> { IsSuccess = false, Message = $"Error al cambiar estado del servicio: {ex.Message}" };
-        //    }
-        //}
+        /// <summary>
+        /// Desactiva un servicio por su ID a través de la API
+        /// </summary>
+        public async Task<ApiResponse<object>> DesactivarServicioAsync(int id)
+        {
+            try
+            {
+                var url = $"/api/Servicios/DesactivarServicio/{id}";
+                var response = await _httpClient.PutAsync(url, null);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<ServicioDto>>();
+                    return new ApiResponse<object>
+                    {
+                        IsSuccess = apiResponse?.IsSuccess ?? true,
+                        Message = apiResponse?.Message ?? "Servicio desactivado correctamente",
+                        Data = apiResponse?.Data
+                    };
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    return new ApiResponse<object>
+                    {
+                        IsSuccess = false,
+                        Message = "Servicio no encontrado"
+                    };
+                }
+                else
+                {
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    return new ApiResponse<object>
+                    {
+                        IsSuccess = false,
+                        Message = $"Error al desactivar el servicio: {response.ReasonPhrase} - {errorMessage}"
+                    };
+                }
+            }
+            catch (HttpRequestException httpEx)
+            {
+                return new ApiResponse<object>
+                {
+                    IsSuccess = false,
+                    Message = $"Error de red al desactivar servicio: {httpEx.Message}"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<object>
+                {
+                    IsSuccess = false,
+                    Message = $"Error inesperado al desactivar servicio: {ex.Message}"
+                };
+            }
+        }
 
         /// <summary>
         /// Obtener servicios activos únicamente
@@ -317,33 +379,6 @@ namespace SGHR.Web.Services
                 {
                     IsSuccess = false,
                     Message = $"Error al buscar servicios activos: {ex.Message}"
-                };
-            }
-        }
-
-        /// <summary>
-        /// Buscar servicios por nombre o descripción
-        /// </summary>
-        public async Task<ApiResponse<List<ServiciosViewModel>>> BuscarServiciosAsync(string termino)
-        {
-            try
-            {
-                var url = $"/api/Servicios/buscar?termino={Uri.EscapeDataString(termino)}";
-                var response = await _httpClient.GetAsync(url);
-                if (response.IsSuccessStatusCode)
-                {
-                    var servicios = await response.Content.ReadFromJsonAsync<List<ServiciosViewModel>>();
-                    return new ApiResponse<List<ServiciosViewModel>> { IsSuccess = true, Data = servicios };
-                }
-
-                return new ApiResponse<List<ServiciosViewModel>> { IsSuccess = false, Message = $"No se encontraron servicios que coincidan con: {termino}." };
-            }
-            catch (Exception ex)
-            {
-                return new ApiResponse<List<ServiciosViewModel>>
-                {
-                    IsSuccess = false,
-                    Message = $"Error al buscar servicios: {ex.Message}"
                 };
             }
         }

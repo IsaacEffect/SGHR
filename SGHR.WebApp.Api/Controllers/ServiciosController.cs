@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SGHR.Application.DTOs.Common;
-using SGHR.Application.DTOs.Reservas;
 using SGHR.Application.DTOs.Servicios;
 using SGHR.Application.Interfaces.Servicios;
-using SGHR.Domain.Entities.Reservas;
+using SGHR.Domain.Entities.Servicios;
 
 namespace SGHR.WebApp.Api.Controllers
 {
@@ -20,30 +19,46 @@ namespace SGHR.WebApp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> AgregarSerivicioAsync([FromBody] AgregarServicioRequest request)
         {
             var servicio = await _servicioApplicationService.AgregarServicioAsync(request) ?? throw new InvalidOperationException("No se pudo agregar el servicio.");
-            return CreatedAtAction(nameof(ObtenerServicioPorId), new { id = servicio.IdServicio }, servicio);
+            return Ok(new ApiResponse<ServicioDto>
+            {
+                IsSuccess = true,
+                Message = "Servicio agregado exitosamente.",
+                Data = servicio
+            });
         }
 
         /// <summary>
         /// Actualizar un servicio existente
         /// </summary>
-        [HttpPut("ActualizarServicio")]
+        [HttpPut("ActualizarServicio/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> ActualizarServicio([FromBody] ActualizarServicioRequest request)
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> ActualizarServicio(int id, [FromBody] ActualizarServicioRequest request)
         {
-            await _servicioApplicationService.ActualizarServicioAsync(request);
-            return Ok("El servicio se actualizo correctamente");
+            var nuevoServicio = await _servicioApplicationService.ActualizarServicioAsync(id, request);
+            return Ok(new ApiResponse<bool>
+            {
+                IsSuccess = true,
+                Message = "Servicio actualizado exitosamente.",
+                Data = nuevoServicio
+            });
         }
 
         /// <summary>
         /// Eliminar un servicio
         /// </summary>
         [HttpDelete("EliminarServicio/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> EliminarServicio(int id)
         {
             if (id <= 0)
@@ -51,20 +66,14 @@ namespace SGHR.WebApp.Api.Controllers
                 return BadRequest("El ID del servicio debe ser un numero positivo");
             }
             await _servicioApplicationService.EliminarServicioAsync(id);
-            return Ok("El servicio se elimino correctamente");
+            return Ok(new ApiResponse<ServicioDto>
+            {
+                IsSuccess = true,
+                Message = "Servicio cancelada exitosamente."
+            });
         }
 
-        /// <summary>
-        /// Obtener un servicio por ID
-        /// </summary>
-        [HttpGet("ObtenerServicio/{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ObtenerServicioPorId(int id)
-        {
-            var servicio = await _servicioApplicationService.ObtenerServicioPorIdAsync(id);
-            return servicio is null ? NotFound() : Ok(servicio);
-        }
+    
 
         /// <summary>
         /// Obtener todos los servicios activos
@@ -72,10 +81,38 @@ namespace SGHR.WebApp.Api.Controllers
         [HttpGet("ObtenerServiciosActivos")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> ObtenerServiciosActivos()
         {
             var servicios = await _servicioApplicationService.ObtenerServiciosActivosAsync();
-            return Ok(servicios);
+            return Ok(new ApiResponse<List<ServicioDto>>
+            {
+                IsSuccess = true,
+                Message = "Servicio obtenido exitosamente.",
+                Data = servicios
+            });
+        }
+
+        ///<summary>
+        /// Obtener servicio Por id
+        /// </summary>
+        [HttpGet("ObtenerServicio/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> ObtenerServicioPorIdAsync(int id)
+        {
+            var servicios = await _servicioApplicationService.ObtenerServicioPorIdAsync(id);
+            if(servicios == null)
+            {
+                return NotFound();
+            }
+            return Ok(new ApiResponse<ServicioDto>
+            {
+                IsSuccess = true,
+                Message = "Servicio obtenido correctamente",
+                Data = servicios
+            });
         }
 
         /// <summary>
@@ -84,6 +121,7 @@ namespace SGHR.WebApp.Api.Controllers
         [HttpGet("ObtenerTodosLosServicios")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> ObtenerTodosLosServicios()
         {
             var servicios = await _servicioApplicationService.ObtenerTodosLosServiciosAsync();
@@ -94,7 +132,7 @@ namespace SGHR.WebApp.Api.Controllers
             return Ok(new ApiResponse<List<ServicioDto>>
             {
                 IsSuccess = true,
-                Message = "Reserva creada exitosamente.",
+                Message = "Servicio obtenido exitosamente.",
                 Data = servicios
             });
         }
@@ -105,10 +143,15 @@ namespace SGHR.WebApp.Api.Controllers
         [HttpPut("ActivarServicio/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> ActivarServicio(int id)
         {
             await _servicioApplicationService.ActivarServicioAsync(id);
-            return Ok("Servicio Activado con exito.");
+            return Ok(new ApiResponse<ServicioDto>
+            {
+                IsSuccess = true,
+                Message = "Servicio Activado exitosamente."
+            });
         }
 
         /// <summary>
@@ -117,10 +160,16 @@ namespace SGHR.WebApp.Api.Controllers
         [HttpPut("DesactivarServicio/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DesactivarServicio(int id)
         {
             await _servicioApplicationService.DesactivarServicioAsync(id);
-            return Ok("Servicio Desactivado con exito.");
+            return Ok(new ApiResponse<ServicioDto>
+            {
+                IsSuccess = true,
+                Message = "Servicio desactivado exitosamente.",
+               
+            });
         }
 
     }

@@ -18,7 +18,7 @@ namespace SGHR.Persistence.Test.Servicios
             // Assert
             var resultado = await ServicioCategoriaRepository.ObtenerPrecioServicioCategoriaEspecificoAsync(servicioId, categoriaId);
             Assert.NotNull(resultado);
-            Assert.Equal(precio, resultado.Precio);
+            Assert.Equal(precio, resultado.PrecioServicio);
         }
         [Fact]
         public async Task ActualizarPrecioServicioCategoriaAsync_DeberiaActualizarCorrectamente()
@@ -32,7 +32,7 @@ namespace SGHR.Persistence.Test.Servicios
             // Assert
             var resultado = await ServicioCategoriaRepository.ObtenerPrecioServicioCategoriaEspecificoAsync(servicioId, categoriaId);
             Assert.NotNull(resultado);
-            Assert.Equal(nuevoPrecio, resultado.Precio);
+            Assert.Equal(nuevoPrecio, resultado.PrecioServicio);
         }
         [Fact]
         public async Task EliminarPrecioServicioCategoriaAsync_DeberiaEliminarCorrectamente()

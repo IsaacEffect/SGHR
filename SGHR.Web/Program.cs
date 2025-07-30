@@ -28,7 +28,15 @@ namespace SGHR.Web
                 }
                 client.BaseAddress = new Uri(baseUrl);
             });
-
+            builder.Services.AddHttpClient<ServicioCategoriaApiService>(client =>
+            {
+                var baseUrl = builder.Configuration["ApiSettings:BaseUrl"];
+                if (string.IsNullOrEmpty(baseUrl))
+                {
+                    throw new InvalidOperationException("La URL base de la API no está configurada. Por favor, añade 'ApiSettings:BaseUrl' en appsettings.json.");
+                }
+                client.BaseAddress = new Uri(baseUrl);
+            });
 
             var app = builder.Build();
 

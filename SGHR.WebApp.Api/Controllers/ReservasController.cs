@@ -2,9 +2,6 @@
 using SGHR.Application.DTOs.Common;
 using SGHR.Application.DTOs.Reservas;
 using SGHR.Application.Interfaces.Reservas;
-using SGHR.Domain.Entities.Reservas;
-using System.Linq.Expressions;
-
 namespace SGHR.WebApp.Api.Controllers
 {
     [Route("api/[controller]")]

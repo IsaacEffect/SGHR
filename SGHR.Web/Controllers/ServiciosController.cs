@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SGHR.Web.Services;
+using SGHR.Web.ViewModel.ServicioCategoria;
 using SGHR.Web.ViewModel.Servicios;
-using System.Threading.Tasks;
 
 namespace SGHR.Web.Controllers
 {
-    public class ServiciosController(ServiciosApiService serviciosApiService) : Controller
+    public class ServiciosController(ServiciosApiService serviciosApiService, ServicioCategoriaApiService servicioCategoriaApiService) : Controller
     {
         private readonly ServiciosApiService _serviciosApiService = serviciosApiService;
+        private readonly ServicioCategoriaApiService _servicioCategoriaApiService = servicioCategoriaApiService;
 
         // GET: /Servicios
         /// <summary>
@@ -16,7 +17,6 @@ namespace SGHR.Web.Controllers
         public async Task<IActionResult> Index()
         {
             var apiResponse = await _serviciosApiService.ObtenerTodosServiciosAsync();
-
             if (apiResponse.IsSuccess && apiResponse.Data != null)
             {
                 return View(apiResponse.Data);
@@ -74,10 +74,10 @@ namespace SGHR.Web.Controllers
             if (!apiResponse.IsSuccess || apiResponse.Data == null)
             {
                 TempData["ErrorMessage"] = apiResponse.Message ?? "No se pudo cargar el servicio para edición";
-                return RedirectToAction(nameof(Index)); // Redirige al listado
+                return RedirectToAction(nameof(Index));
             }
 
-            return View(apiResponse.Data); // Solo muestra la vista si los datos están bien
+            return View(apiResponse.Data);
         }
 
         // POST: /Servicios/Edit/
@@ -100,7 +100,7 @@ namespace SGHR.Web.Controllers
             }
 
             var apiResponse = await _serviciosApiService.ActualizarServicioAsync(id, model);
-            if (apiResponse.IsSuccess && apiResponse.Data != null)
+            if (apiResponse.IsSuccess)
             {
                 TempData["SuccessMessage"] = "Servicio actualizado exitosamente";
                 return RedirectToAction(nameof(Index));
@@ -117,98 +117,97 @@ namespace SGHR.Web.Controllers
             }
         }
 
-        // POST: /Servicios/Delete/{id}
+        // POST: /Servicios/ActivarServicio
         /// <summary>
-        /// Elimina un servicio directamente por su ID
+        /// Activa un servicio existente
         /// </summary>
+        /// <param name="id">El Id del servicio a activar</param>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> ActivarServicio(int id)
         {
             if (id <= 0)
             {
-                TempData["ErrorMessage"] = "ID de servicio inválido";
+                TempData["ErrorMessage"] = "Id de servicio inválido";
                 return RedirectToAction(nameof(Index));
             }
 
-            var apiResponse = await _serviciosApiService.EliminarServicioAsync(id);
-
+            var apiResponse = await _serviciosApiService.ActivarServicioAsync(id);
             if (apiResponse.IsSuccess)
             {
-                TempData["SuccessMessage"] = "Servicio eliminado exitosamente";
+                TempData["SuccessMessage"] = apiResponse.Message ?? "Servicio activado correctamente";
             }
             else
             {
-                TempData["ErrorMessage"] = $"Error al eliminar servicio: {apiResponse.Message}";
+                TempData["ErrorMessage"] = apiResponse.Message ?? "Error al activar el servicio";
             }
 
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: /Servicios/CambiarEstado/{id}
+        // POST: /Servicios/DesactivarServicio
         /// <summary>
-        /// Muestra el formulario para cambiar el estado de un servicio (activar/desactivar)
+        /// Desactiva un servicio existente
         /// </summary>
-        //[HttpGet]
-        //public async Task<IActionResult> CambiarEstado(int id)
-        //{
-        //    var apiResponse = await _serviciosApiService.ObtenerServicioPorIdAsync(id);
-
-        //    if (!apiResponse.IsSuccess || apiResponse.Data == null)
-        //    {
-        //        TempData["ErrorMessage"] = apiResponse.Message ?? "No se pudo cargar el servicio";
-        //        return RedirectToAction(nameof(Index));
-        //    }
-
-        //    var model = new CambiarEstadoServicioViewModel
-        //    {
-        //        Id = id,
-        //        Activo = !apiResponse.Data.Activo // Cambiar al estado opuesto
-        //    };
-
-        //    return View(model);
-        //}
-
-        // POST: /Servicios/CambiarEstado/
-        /// <summary>
-        /// Cambia el estado de un servicio existente (activar/desactivar)
-        /// </summary>
-       // [HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> CambiarEstado(CambiarEstadoServicioViewModel model)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return View(model);
-
-        //    var response = await _serviciosApiService.CambiarEstadoServicioAsync(model);
-        //    if (response.IsSuccess)
-        //    {
-        //        var mensaje = model.Activo ? "Servicio activado correctamente" : "Servicio desactivado correctamente";
-        //        TempData["SuccessMessage"] = mensaje;
-        //        return RedirectToAction("Index");
-        //    }
-
-        //    ModelState.AddModelError("", response.Message ?? "Error al cambiar el estado del servicio");
-        //    return View(model);
-        //}
-
-        // GET: /Servicios/Categoria/{categoriaId}
-        /// <summary>
-        /// Obtiene servicios filtrados por categoría
-        /// </summary>
-        /// <param name="categoriaId">Id de la categoría</param>
-        /// <returns>Lista de servicios de la categoría</returns>
-        [HttpGet]
-        public async Task<IActionResult> PorCategoria(int categoriaId)
+        /// <param name="id">El Id del servicio a desactivar</param>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DesactivarServicio(int id)
         {
-            var result = await _serviciosApiService.ObtenerServiciosPorCategoriaAsync(categoriaId);
-            if (!result.IsSuccess || result.Data == null)
+            if (id <= 0)
             {
-                TempData["ErrorMessage"] = "No se encontraron servicios en esta categoría.";
+                TempData["ErrorMessage"] = "Id de servicio inválido";
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewBag.CategoriaId = categoriaId;
+            var apiResponse = await _serviciosApiService.DesactivarServicioAsync(id);
+            if (apiResponse.IsSuccess)
+            {
+                TempData["SuccessMessage"] = apiResponse.Message ?? "Servicio desactivado correctamente";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = apiResponse.Message ?? "Error al desactivar el servicio";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // POST: /Servicios/Delete
+        /// <summary>
+        /// Elimina un servicio existente
+        /// </summary>
+        /// <param name="id">El Id del servicio a eliminar</param>
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var apiResponse = await _serviciosApiService.EliminarServicioAsync(id);
+            if (apiResponse.IsSuccess)
+            {
+                TempData["SuccessMessage"] = "Servicio eliminado correctamente";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = apiResponse.Message ?? "Error al eliminar el servicio";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: /Servicios/GetByCategoria/{id}
+        /// <summary>
+        /// Obtiene servicios por categoría
+        /// </summary>
+        /// <param name="id">Id de la Categoría</param>
+        [HttpGet]
+        public async Task<IActionResult> GetByCategoria(int id)
+        {
+            var result = await _serviciosApiService.ObtenerServiciosPorCategoriaAsync(id);
+            if (!result.IsSuccess || result.Data == null)
+            {
+                return NotFound("No se encontraron servicios para esta categoría.");
+            }
             return View("ListaPorCategoria", result.Data);
         }
 
@@ -218,65 +217,147 @@ namespace SGHR.Web.Controllers
         /// </summary>
         public async Task<IActionResult> Activos()
         {
-            var result = await _serviciosApiService.ObtenerServiciosActivosAsync();
-            if (!result.IsSuccess || result.Data == null)
+            var apiResponse = await _serviciosApiService.ObtenerServiciosActivosAsync();
+
+            if (apiResponse.IsSuccess && apiResponse.Data != null)
             {
-                TempData["ErrorMessage"] = "No se encontraron servicios activos.";
+                return View("Index", apiResponse.Data);
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, apiResponse.Message ?? "Error al cargar los servicios activos");
                 return View("Index", new List<ServiciosViewModel>());
             }
-
-            ViewBag.SoloActivos = true;
-            return View("Index", result.Data);
         }
-
-        // GET: /Servicios/Buscar
         /// <summary>
-        /// Muestra el formulario de búsqueda de servicios
+        /// Obtiene los precios y las categorias de un servicio especifico
         /// </summary>
-        public IActionResult Buscar()
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> GetPreciosPorServicio(int id)
         {
-            return View();
-        }
+            var servicioResponse = await _serviciosApiService.ObtenerServicioPorIdAsync(id);
+            var preciosResponse = await _servicioCategoriaApiService.ObtenerPreciosCategoriaPorServicioAsync(id);
 
-        // POST: /Servicios/Buscar
-        /// <summary>
-        /// Realiza la búsqueda de servicios por término
-        /// </summary>
-        [HttpPost]
-        public async Task<IActionResult> Buscar(string termino)
-        {
-            if (string.IsNullOrWhiteSpace(termino))
+            if (servicioResponse?.Data == null)
             {
-                ModelState.AddModelError("termino", "Debe ingresar un término de búsqueda");
-                return View();
-            }
-
-            var result = await _serviciosApiService.BuscarServiciosAsync(termino);
-            if (!result.IsSuccess || result.Data == null)
-            {
-                ViewBag.Mensaje = $"No se encontraron servicios que coincidan con '{termino}'";
-                return View("ResultadosBusqueda", new List<ServiciosViewModel>());
-            }
-
-            ViewBag.TerminoBusqueda = termino;
-            return View("ResultadosBusqueda", result.Data);
-        }
-
-        // GET: /Servicios/Details/{id}
-        /// <summary>
-        /// Muestra los detalles de un servicio específico
-        /// </summary>
-        public async Task<IActionResult> Details(int id)
-        {
-            var apiResponse = await _serviciosApiService.ObtenerServicioPorIdAsync(id);
-
-            if (!apiResponse.IsSuccess || apiResponse.Data == null)
-            {
-                TempData["ErrorMessage"] = apiResponse.Message ?? "No se pudo cargar el servicio";
+                TempData["ErrorMessage"] = "Servicio no encontrado";
                 return RedirectToAction(nameof(Index));
             }
 
-            return View(apiResponse.Data);
+            var viewModel = new ServicioConPreciosViewModel
+            {
+                IdServicio = servicioResponse.Data.IdServicio,
+                Nombre = servicioResponse.Data.Nombre, 
+                Descripcion = servicioResponse.Data.Descripcion,
+                Activo = servicioResponse.Data.Activo,
+                FechaCreacion = servicioResponse.Data.FechaCreacion, 
+                FechaModificacion = servicioResponse.Data.FechaModificacion, 
+                Eliminado = servicioResponse.Data.Eliminado,
+                FechaEliminacion = servicioResponse.Data.FechaEliminacion,
+                // PrecioServicio = preciosResponse.Data.PrecioServicio
+
+                PreciosPorCategoria = preciosResponse.IsSuccess && preciosResponse.Data != null
+                                ? preciosResponse.Data
+                                : new List<ServicioCategoriaViewModel>()
+            };
+            return View("DetallesServicio", viewModel); 
         }
+
+        // GET: /Servicios/GetPrecioEspecifico?idServicio=1&idCategoriaHabitacion=2
+        /// <summary>
+        /// Muestra el precio específico de un servicio por categoría
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> GetPrecioEspecifico(int idServicio, int idCategoriaHabitacion)
+        {
+            var response = await _servicioCategoriaApiService.ObtenerPrecioServicioCategoriaEspecificoAsync(idServicio, idCategoriaHabitacion);
+            if (!response.IsSuccess || response.Data == null)
+            {
+                return NotFound(response.Message ?? "Precio no encontrado");
+            }
+
+            return View("DetallePrecioEspecifico", response.Data);
+        }
+        /// <summary>
+        /// Muestra el formulario para asignar un nuevo precio a un servicio específico.
+        /// Solo requiere el ID del servicio. El ID de categoría y precio se ingresan manualmente.
+        /// </summary>
+        /// <param name="idServicio">El ID del servicio al que se asignará el precio.</param>
+        [HttpGet]
+        public async Task<IActionResult> AsignarPrecio(int idServicio)
+        {
+            var servicioResponse = await _serviciosApiService.ObtenerServicioPorIdAsync(idServicio);
+            if (servicioResponse?.Data == null)
+            {
+                TempData["ErrorMessage"] = "Servicio no encontrado para asignar precio.";
+                return RedirectToAction(nameof(Index)); 
+            }
+
+            var viewModel = new AsignarPrecioServicioCategoriaViewModel
+            {
+                IdServicio = idServicio,
+                NombreServicio = servicioResponse?.Data?.Nombre       
+            };
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError("", servicioResponse.Message ?? "Error desconocido al asignar precio.");
+                return View("AsignarPrecio", viewModel); 
+            }
+            else 
+            {
+                return View("AsignarPrecio", viewModel); 
+            }
+        }
+
+        // POST: /Servicios/AsignarPrecio
+        /// <summary>
+        /// Asigna un precio a un servicio por categoría
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AsignarPrecio(AsignarPrecioServicioCategoriaViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("AsignarPrecio", model);
+            }
+
+            var response = await _servicioCategoriaApiService.AsignarPrecioServicioCategoriaAsync(model);
+            if (response.IsSuccess)
+            {
+                TempData["SuccessMessage"] = response.Data ?? "Precio asignado correctamente";
+                return RedirectToAction(nameof(Index));
+            }
+            
+            TempData["ErrorMessage"] = response.Message ?? "Error al asignar precio";
+            return View("AsignarPrecio", model);
+        }
+
+        // POST: /Servicios/ActualizarPrecio
+        /// <summary>
+        /// Actualiza el precio de un servicio por categoría
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditarPrecio(ActualizarPrecioServicioCategoriaViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("EditarPrecio", model);
+            }
+
+            var response = await _servicioCategoriaApiService.ActualizarPrecioServicioCategoriaAsync(model);
+            if (response.IsSuccess)
+            {
+                TempData["SuccessMessage"] = response.Data ?? "Precio actualizado correctamente";
+                return RedirectToAction(nameof(Index));
+            }
+
+            TempData["ErrorMessage"] = response.Message ?? "Error al actualizar precio";
+            return View("ActualizarPrecio", model);
+        }
+
     }
 }

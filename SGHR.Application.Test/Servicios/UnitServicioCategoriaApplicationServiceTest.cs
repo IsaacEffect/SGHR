@@ -54,11 +54,11 @@ namespace SGHR.Application.Test.Servicios
             _servicioRulesMock.Setup(r => r.ValidarExistenciaSerivicioAsync(request.IdServicio)).Returns(Task.CompletedTask);
             _servicioRepMock.Setup(r => r.ObtenerPorIdAsync(request.IdServicio)).ReturnsAsync(servicioEntity);
             
-            _servicioCategoriaRepMock.Setup(r => r.AgregarPrecioServicioCategoriaAsync(request.IdServicio, request.IdCategoriaHabitacion, request.Precio)).Returns(Task.CompletedTask);
+            _servicioCategoriaRepMock.Setup(r => r.AgregarActualizarPrecioServicioCategoriaAsync(request.IdServicio, request.IdCategoriaHabitacion, request.Precio)).Returns(Task.CompletedTask);
             // Act
-            await _service.AsignarPrecioServicioCategoriaAsync(request);
+            await _service.AsignarActualizarPrecioServicioCategoriaAsync(request);
             // Assert
-            _servicioCategoriaRepMock.Verify(r => r.AgregarPrecioServicioCategoriaAsync(request.IdServicio, request.IdCategoriaHabitacion, request.Precio), Times.Once);
+            _servicioCategoriaRepMock.Verify(r => r.AgregarActualizarPrecioServicioCategoriaAsync(request.IdServicio, request.IdCategoriaHabitacion, request.Precio), Times.Once);
         }
         [Fact]
         public async Task AsignarPrecioServicioCategoriaAsync_LanzaExcepcion_SiCategoriaNoExiste()
@@ -72,7 +72,7 @@ namespace SGHR.Application.Test.Servicios
             };
             _catHabitacionRepMock.Setup(r => r.ObtenerPorIdAsync(request.IdCategoriaHabitacion)).ReturnsAsync((CategoriaHabitacion)null);
             // Act & Assert
-            await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.AsignarPrecioServicioCategoriaAsync(request));
+            await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.AsignarActualizarPrecioServicioCategoriaAsync(request));
         }
         [Fact]
         public async Task AsignarPrecioServicioCategoriaAsync_LanzaExcepcion_SiDatosInvalidos()
@@ -87,7 +87,7 @@ namespace SGHR.Application.Test.Servicios
             _servicioRulesMock.Setup(r => r.ValidarPrecioServicio(request.Precio))
                 .Throws(new ArgumentException("El precio del servicio no puede ser negativo."));
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => _service.AsignarPrecioServicioCategoriaAsync(request));
+            await Assert.ThrowsAsync<ArgumentException>(() => _service.AsignarActualizarPrecioServicioCategoriaAsync(request));
         }
         [Fact]
         public async Task ActualizarPrecioServicioCategoriaAsync_DebeActualizarPrecioCorrectamente()
@@ -183,7 +183,7 @@ namespace SGHR.Application.Test.Servicios
                 {
                     IdServicio = p.IdServicio,
                     IdCategoriaHabitacion = p.IdCategoriaHabitacion,
-                    Precio = p.Precio
+                    Precio = p.PrecioServicio
                 }).ToList());
             // Act
             var result = await _service.ObtenerPreciosServicioPorCategoriaAsync(categoriaId);
@@ -221,7 +221,7 @@ namespace SGHR.Application.Test.Servicios
                 {
                     IdServicio = p.IdServicio,
                     IdCategoriaHabitacion = p.IdCategoriaHabitacion,
-                    Precio = p.Precio
+                    Precio = p.PrecioServicio
                 }).ToList());
             // Act
             var result = await _service.ObtenerPreciosCategoriaPorServicioAsync(servicioId);
@@ -258,7 +258,7 @@ namespace SGHR.Application.Test.Servicios
                 {
                     IdServicio = precio.IdServicio,
                     IdCategoriaHabitacion = precio.IdCategoriaHabitacion,
-                    Precio = precio.Precio
+                    Precio = precio.PrecioServicio
                 });
             // Act
             var result = await _service.ObtenerPrecioServicioCategoriaEspecificoAsync(servicioId, categoriaId);

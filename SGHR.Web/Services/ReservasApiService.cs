@@ -142,7 +142,6 @@ namespace SGHR.Web.Services
                 var url = "/api/Reservas/CrearReserva";
                 var response = await _httpClient.PostAsJsonAsync(url, model);
                 var content = await response.Content.ReadAsStringAsync();
-                Console.WriteLine(content);
                 if (response.IsSuccessStatusCode)
                 {
                     var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<ReservasViewModel>>();
