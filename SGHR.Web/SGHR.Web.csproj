@@ -14,4 +14,8 @@
     <ProjectReference Include="..\SGHR.IOC\SGHR.IOC.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Extencions\" />
+  </ItemGroup>
+
 </Project>

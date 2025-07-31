@@ -1,3 +1,5 @@
+using SGHR.Web.ApiServices;
+using SGHR.Web.ApiServices.Interfaces;
 using SGHR.Web.Services;
 namespace SGHR.Web
 {
@@ -10,7 +12,7 @@ namespace SGHR.Web
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            builder.Services.AddHttpClient<ReservasApiService>(client =>
+            builder.Services.AddHttpClient<IReservasApiService, ReservasApiService>(client =>
             {
                 var baseUrl = builder.Configuration["ApiSettings:BaseUrl"];
                 if (string.IsNullOrEmpty(baseUrl))
@@ -19,6 +21,7 @@ namespace SGHR.Web
                 }
                 client.BaseAddress = new Uri(baseUrl);
             });
+
             builder.Services.AddHttpClient<ServiciosApiService>(client =>
             {
                 var baseUrl = builder.Configuration["ApiSettings:BaseUrl"];

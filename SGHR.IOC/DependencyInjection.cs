@@ -24,6 +24,8 @@ namespace SGHR.IOC
     {
         public static IServiceCollection AddAplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
+            // Api Services
+
             // Application Services 
             services.AddScoped<IReservaApplicationService, ReservaApplicationService>();
             services.AddScoped<IServicioApplicationService, ServicioApplicationService>();

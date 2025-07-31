@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SGHR.Web.Services;
+using SGHR.Web.ApiServices.Interfaces;
 using SGHR.Web.ViewModel.Reservas;
 
 namespace SGHR.Web.Controllers
 {
-    public class ReservasController(ReservasApiService reservasApiService) : Controller
+    public class ReservasController(IReservasApiService reservasApiService) : Controller
     {
-        private readonly ReservasApiService _reservasApiService = reservasApiService;
+        private readonly IReservasApiService _reservasApiService = reservasApiService;
 
         // GET: /Reservas
         /// <summary>
@@ -26,7 +26,7 @@ namespace SGHR.Web.Controllers
                         return View(new List<ReservasViewModel>());
                     }
 
-                    var rangeResponse = await _reservasApiService.ObtenerReservasPorRangoFechasAsync(desde.Value, hasta.Value);
+                    var rangeResponse = await _reservasApiService.ObtenerReservasEnRangoAsync(desde.Value, hasta.Value);
 
                     if (rangeResponse.IsSuccess && rangeResponse.Data != null)
                     {
@@ -131,7 +131,7 @@ namespace SGHR.Web.Controllers
             {
                 return View(model);
             }
-            var apiResponse = await _reservasApiService.ActualizarReservasAsync(id, model);
+            var apiResponse = await _reservasApiService.ActualizarReservaAsync(id, model);
             if (apiResponse.IsSuccess && apiResponse.Data != null)
             {
                 TempData["SuccessMessage"] = "Reserva actualizada exitosamente";
@@ -187,7 +187,7 @@ namespace SGHR.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetByClientId(int id)
         {
-            var result = await _reservasApiService.ObtenerReservasPorCliente(id);
+            var result = await _reservasApiService.ObtenerReservasPorClienteIdAsync(id);
             if (!result.IsSuccess || result.Data == null)
             {
                 return NotFound("No se encontro la reserva.");
