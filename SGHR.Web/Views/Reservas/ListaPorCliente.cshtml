@@ -1,93 +1,39 @@
 ﻿@model IEnumerable<SGHR.Web.ViewModel.Reservas.ReservasViewModel>
 @using SGHR.Domain.Enums;
 @{
-    ViewData["Title"] = "Reservas";
+    ViewData["Title"] = "Reservas por Cliente";
 }
 
-<h1>Reservas</h1>
+<h1>Reservas por Cliente</h1>
 
 <div class="row mb-4">
     <div class="col-md-8">
         <div class="card">
             <div class="card-body">
                 <h6 class="card-title">
-                    <i class="bi bi-search"></i> Buscar reservas por rango de fechas
+                    <i class="bi bi-person"></i> Información del Cliente
                 </h6>
-                <form method="get" asp-action="Index" class="row g-3">
-                    <div class="col-md-4">
-                        <label for="desde" class="form-label">Fecha desde:</label>
-                        <input type="date"
-                               id="desde"
-                               name="desde"
-                               class="form-control"
-                               value="@ViewBag.FechaDesde" />
-                    </div>
-                    <div class="col-md-4">
-                        <label for="hasta" class="form-label">Fecha hasta:</label>
-                        <input type="date"
-                               id="hasta"
-                               name="hasta"
-                               class="form-control"
-                               value="@ViewBag.FechaHasta" />
-                    </div>
-                    <div class="col-md-4 d-flex align-items-end gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-search"></i> Buscar
-                        </button>
-                        <a asp-action="Index" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-clockwise"></i> Limpiar
-                        </a>
-                    </div>
-                </form>
+                @if (Model != null && Model.Any())
+                {
+                    <p class="mb-0">
+                        <strong>Cliente ID:</strong> @Model.First().IdCliente
+                    </p>
+                    <small class="text-muted">Mostrando todas las reservas de este cliente</small>
+                }
             </div>
         </div>
     </div>
     <div class="col-md-4 d-flex align-items-end">
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle"></i> Crear nueva Reserva
-        </a>
-    </div>
-</div>
-
-<!-- Nueva sección de búsqueda por cliente -->
-<div class="row mb-4">
-    <div class="col-md-12">
-        <div class="card border-info">
-            <div class="card-body">
-                <h6 class="card-title text-info">
-                    <i class="bi bi-person-search"></i> Buscar reservas por cliente
-                </h6>
-                <form method="get" asp-action="GetByClientId" class="row g-3">
-                    <div class="col-md-6">
-                        <label for="clienteId" class="form-label">ID del Cliente:</label>
-                        <input type="number"
-                               id="clienteId"
-                               name="id"
-                               class="form-control"
-                               placeholder="Ingresa el ID del cliente"
-                               min="1"
-                               required />
-                    </div>
-                    <div class="col-md-6 d-flex align-items-end">
-                        <button type="submit" class="btn btn-info">
-                            <i class="bi bi-person-lines-fill"></i> Ver reservas del cliente
-                        </button>
-                    </div>
-                </form>
-            </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver a todas las reservas
+            </a>
+            <a asp-action="Create" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Crear nueva Reserva
+            </a>
         </div>
     </div>
 </div>
-
-@if (ViewBag.MostrandoFiltro == true)
-{
-    <div class="alert alert-info" role="alert">
-        <i class="bi bi-info-circle"></i>
-        Mostrando reservas desde <strong>@DateTime.Parse(ViewBag.FechaDesde.ToString()).ToString("dd/MM/yyyy")</strong>
-        hasta <strong>@DateTime.Parse(ViewBag.FechaHasta.ToString()).ToString("dd/MM/yyyy")</strong>
-        <a asp-action="Index" class="btn btn-sm btn-outline-primary ms-2">Ver todas las reservas</a>
-    </div>
-}
 
 @if (TempData["SuccessMessage"] != null)
 {
@@ -140,12 +86,7 @@
                 {
                     <tr>
                         <td>@Html.DisplayFor(modelItem => item.Id)</td>
-                        <td>
-                            <a asp-action="GetByClientId" asp-route-id="@item.IdCliente" class="text-decoration-none fw-bold text-primary" title="Ver todas las reservas de este cliente">
-                                @Html.DisplayFor(modelItem => item.IdCliente)
-                                <i class="bi bi-box-arrow-up-right ms-1 small"></i>
-                            </a>
-                        </td>
+                        <td>@Html.DisplayFor(modelItem => item.IdCliente)</td>
                         <td>@Html.DisplayFor(modelItem => item.IdCategoriaHabitacion)</td>
                         <td>@Html.DisplayFor(modelItem => item.NumeroHuespedes)</td>
                         <td>@item.FechaEntrada.ToString("dd/MM/yyyy")</td>
@@ -209,11 +150,8 @@
                     <td colspan="11" class="text-center py-4">
                         <div class="text-muted">
                             <i class="bi bi-inbox fs-1"></i>
-                            <p class="mt-2">No se encontraron reservas.</p>
-                            @if (ViewBag.MostrandoFiltro == true)
-                            {
-                                <small>Intenta ajustar el rango de fechas o <a asp-action="Index">ver todas las reservas</a>.</small>
-                            }
+                            <p class="mt-2">Este cliente no tiene reservas registradas.</p>
+                            <small><a asp-action="Create">Crear una nueva reserva</a> para este cliente.</small>
                         </div>
                     </td>
                 </tr>
@@ -221,53 +159,3 @@
         </tbody>
     </table>
 </div>
-
-@section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const fechaDesde = document.getElementById('desde');
-            const fechaHasta = document.getElementById('hasta');
-
-            // Establecer fecha minima como hoy
-            const hoy = new Date().toISOString().split('T')[0];
-
-            // Validar que la fecha desde no sea mayor que fecha hasta
-            fechaDesde.addEventListener('change', function () {
-                if (fechaDesde.value && fechaHasta.value && fechaDesde.value > fechaHasta.value) {
-                    fechaHasta.value = fechaDesde.value;
-                }
-                if (fechaDesde.value) {
-                    fechaHasta.setAttribute('min', fechaDesde.value);
-                }
-            });
-
-            fechaHasta.addEventListener('change', function () {
-                if (fechaDesde.value && fechaHasta.value && fechaHasta.value < fechaDesde.value) {
-                    fechaDesde.value = fechaHasta.value;
-                }
-                if (fechaHasta.value) {
-                    fechaDesde.setAttribute('max', fechaHasta.value);
-                }
-            });
-
-            // Validar formulario antes de enviar
-            const form = document.querySelector('form');
-            form.addEventListener('submit', function (e) {
-                const desde = fechaDesde.value;
-                const hasta = fechaHasta.value;
-
-                if (!desde || !hasta) {
-                    alert('Por favor, selecciona ambas fechas para realizar la búsqueda.');
-                    e.preventDefault();
-                    return;
-                }
-
-                if (desde > hasta) {
-                    alert('La fecha desde debe ser anterior o igual a la fecha hasta.');
-                    e.preventDefault();
-                    return;
-                }
-            });
-        });
-    </script>
-}
