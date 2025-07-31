@@ -4,7 +4,7 @@
 }
 <h1>Editar Reserva</h1>
 <h4>Detalles de la Reserva</h4>
-<hr/>
+<hr />
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="alert alert-success" role="alert">
@@ -17,12 +17,11 @@
         @TempData["ErrorMessage"]
     </div>
 }
-
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit" method="post">
             @Html.AntiForgeryToken()
-            
+
             <input asp-for="Id" type="hidden" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group mb-3">
@@ -42,12 +41,16 @@
             </div>
             <div class="form-group mb-3">
                 <label asp-for="FechaEntrada" class="control-label"></label>
-                <input asp-for="FechaEntrada" class="form-control" type="date" />
+                <input type="date" asp-for="FechaEntrada"
+                       min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                       class="form-control" />
                 <span asp-validation-for="FechaEntrada" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
                 <label asp-for="FechaSalida" class="control-label"></label>
-                <input asp-for="FechaSalida" class="form-control" type="date" />
+                <input type="date" asp-for="FechaSalida"
+                       min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                       class="form-control" />
                 <span asp-validation-for="FechaSalida" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
@@ -68,30 +71,44 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
-        document.querySelectorAll('.fecha-input').forEach(function(input) {
-            input.addEventListener('input', function(e) {
-                let value = e.target.value.replace(/\D/g, '');
-                if (value.length >= 2) {
-                    value = value.substring(0,2) + '/' + value.substring(2);
-                }
-                if (value.length >= 5) {
-                    value = value.substring(0,5) + '/' + value.substring(5,7);
-                }
-                e.target.value = value;
-            });
-            // Validación básica al salir del campo
-            input.addEventListener('blur', function(e) {
-                let value = e.target.value;
-                if (value && value.length === 8) {
-                    let parts = value.split('/');
-                    let day = parseInt(parts[0]);
-                    let month = parseInt(parts[1]);
-                    let year = parseInt(parts[2]);
-                    if (day > 31 || month > 12 || day < 1 || month < 1) {
-                        e.target.classList.add('is-invalid');
-                    } else {
-                        e.target.classList.remove('is-invalid');
+        document.addEventListener('DOMContentLoaded', function () {
+            const fechaEntrada = document.querySelector('#FechaEntrada');
+            const fechaSalida = document.querySelector('#FechaSalida');
+
+            const hoy = new Date().toISOString().split('T')[0];
+            fechaEntrada.setAttribute('min', hoy);
+
+            fechaEntrada.addEventListener('change', function () {
+                const entradaValue = fechaEntrada.value;
+                if (entradaValue) {
+                    const fechaEntradaDate = new Date(entradaValue);
+                    fechaEntradaDate.setDate(fechaEntradaDate.getDate() + 1);
+                    const minFechaSalida = fechaEntradaDate.toISOString().split('T')[0];
+
+                    fechaSalida.setAttribute('min', minFechaSalida);
+
+                    if (fechaSalida.value && fechaSalida.value <= entradaValue) {
+                        fechaSalida.value = '';
                     }
+                }
+            });
+
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function (e) {
+                const entrada = new Date(fechaEntrada.value);
+                const salida = new Date(fechaSalida.value);
+                const hoyDate = new Date(hoy);
+
+                if (entrada < hoyDate) {
+                    alert('La fecha de entrada no puede ser menor al día actual.');
+                    e.preventDefault();
+                    return;
+                }
+
+                if (entrada >= salida) {
+                    alert('La fecha de salida debe ser mayor que la de entrada.');
+                    e.preventDefault();
+                    return;
                 }
             });
         });

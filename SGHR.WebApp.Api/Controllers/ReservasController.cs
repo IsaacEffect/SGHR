@@ -195,7 +195,6 @@ namespace SGHR.WebApp.Api.Controllers
                 Data = reservas
             });
         }
-
         /// <summary>
         /// Obtiene todas las reservas
         /// </summary>
@@ -216,6 +215,5 @@ namespace SGHR.WebApp.Api.Controllers
                 Data = reservas
             });
         }
-
     }
 }

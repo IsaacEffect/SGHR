@@ -256,8 +256,6 @@ namespace SGHR.Web.Controllers
                 FechaModificacion = servicioResponse.Data.FechaModificacion, 
                 Eliminado = servicioResponse.Data.Eliminado,
                 FechaEliminacion = servicioResponse.Data.FechaEliminacion,
-                // PrecioServicio = preciosResponse.Data.PrecioServicio
-
                 PreciosPorCategoria = preciosResponse.IsSuccess && preciosResponse.Data != null
                                 ? preciosResponse.Data
                                 : new List<ServicioCategoriaViewModel>()

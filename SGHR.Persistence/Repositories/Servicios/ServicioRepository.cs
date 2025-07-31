@@ -36,7 +36,6 @@ namespace SGHR.Persistence.Repositories.Servicios
                 .Where(s => s.Activo)
                 .ToListAsync();
         }
-
         public Task<List<ServiciosEntity>> ObtenerTodosLosServiciosAsync()
         {
             return _dbSet.Where(s => !s.Eliminado).ToListAsync();    

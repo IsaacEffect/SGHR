@@ -5,25 +5,76 @@
 }
 
 <h1>Reservas</h1>
-<p>
-    <a asp-action="Create" class="btn btn-primary">Crear nueva Reserva</a>
-</p>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="bi bi-search"></i> Buscar reservas por rango de fechas
+                </h6>
+                <form method="get" asp-action="Index" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="desde" class="form-label">Fecha desde:</label>
+                        <input type="date"
+                               id="desde"
+                               name="desde"
+                               class="form-control"
+                               value="@ViewBag.FechaDesde" />
+                    </div>
+                    <div class="col-md-4">
+                        <label for="hasta" class="form-label">Fecha hasta:</label>
+                        <input type="date"
+                               id="hasta"
+                               name="hasta"
+                               class="form-control"
+                               value="@ViewBag.FechaHasta" />
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Buscar
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-clockwise"></i> Limpiar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 d-flex align-items-end">
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Crear nueva Reserva
+        </a>
+    </div>
+</div>
+
+@if (ViewBag.MostrandoFiltro == true)
+{
+    <div class="alert alert-info" role="alert">
+        <i class="bi bi-info-circle"></i>
+        Mostrando reservas desde <strong>@DateTime.Parse(ViewBag.FechaDesde.ToString()).ToString("dd/MM/yyyy")</strong>
+        hasta <strong>@DateTime.Parse(ViewBag.FechaHasta.ToString()).ToString("dd/MM/yyyy")</strong>
+        <a asp-action="Index" class="btn btn-sm btn-outline-primary ms-2">Ver todas las reservas</a>
+    </div>
+}
+
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="alert alert-success" role="alert">
-        @TempData["SuccessMessage"]
+        <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
     </div>
 }
-@if (TempData["ErrorMessage"] != null)  
+@if (TempData["ErrorMessage"] != null)
 {
     <div class="alert alert-danger" role="alert">
-        @TempData["ErrorMessage"]
+        <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
     </div>
 }
 @if (!ViewData.ModelState.IsValid)
 {
     <div class="alert alert-danger" role="alert">
-        <ul>
+        <ul class="mb-0">
             @foreach (var modelStateEntry in ViewData.ModelState.Values)
             {
                 foreach (var error in modelStateEntry.Errors)
@@ -35,64 +86,153 @@
     </div>
 }
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.Id)</th>
-            <th>@Html.DisplayNameFor(model => model.IdCliente)</th>
-            <th>@Html.DisplayNameFor(model => model.IdCategoriaHabitacion)</th>
-            <th>@Html.DisplayNameFor(model => model.NumeroHuespedes)</th>
-            <th>@Html.DisplayNameFor(model => model.FechaEntrada)</th>
-            <th>@Html.DisplayNameFor(model => model.FechaSalida)</th>
-            <th>@Html.DisplayNameFor(model => model.Estado)</th>
-            <th>@Html.DisplayNameFor(model => model.FechaCreacion)</th>
-            <th>@Html.DisplayNameFor(Model => Model.FechaModificacion)</th>
-            <th>@Html.DisplayNameFor(model => model.Activo)</th>
-            <th class="text-center">Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model != null && Model.Any())
-        {
-            @foreach (var item in Model)
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.Id)</th>
+                <th>@Html.DisplayNameFor(model => model.IdCliente)</th>
+                <th>@Html.DisplayNameFor(model => model.IdCategoriaHabitacion)</th>
+                <th>@Html.DisplayNameFor(model => model.NumeroHuespedes)</th>
+                <th>@Html.DisplayNameFor(model => model.FechaEntrada)</th>
+                <th>@Html.DisplayNameFor(model => model.FechaSalida)</th>
+                <th>@Html.DisplayNameFor(model => model.Estado)</th>
+                <th>@Html.DisplayNameFor(model => model.FechaCreacion)</th>
+                <th>@Html.DisplayNameFor(Model => Model.FechaModificacion)</th>
+                <th>@Html.DisplayNameFor(model => model.Activo)</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.Id)</td>
+                        <td>@Html.DisplayFor(modelItem => item.IdCliente)</td>
+                        <td>@Html.DisplayFor(modelItem => item.IdCategoriaHabitacion)</td>
+                        <td>@Html.DisplayFor(modelItem => item.NumeroHuespedes)</td>
+                        <td>@item.FechaEntrada.ToString("dd/MM/yyyy")</td>
+                        <td>@item.FechaSalida.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @switch (item.Estado)
+                            {
+                                case EstadoReserva.Pendiente:
+                                    <span class="badge bg-warning text-dark">@Html.DisplayFor(modelItem => item.EstadoDisplay)</span>
+                                    break;
+                                case EstadoReserva.Confirmada:
+                                    <span class="badge bg-success">@Html.DisplayFor(modelItem => item.EstadoDisplay)</span>
+                                    break;
+                                case EstadoReserva.Cancelada:
+                                    <span class="badge bg-danger">@Html.DisplayFor(modelItem => item.EstadoDisplay)</span>
+                                    break;
+                                case EstadoReserva.Finalizada:
+                                    <span class="badge bg-primary">@Html.DisplayFor(modelItem => item.EstadoDisplay)</span>
+                                    break;
+                                default:
+                                    <span class="badge bg-secondary">@Html.DisplayFor(modelItem => item.EstadoDisplay)</span>
+                                    break;
+                            }
+                        </td>
+                        <td>@item.FechaCreacion.ToString("dd/MM/yyyy hh:mm tt")</td>
+                        <td>@item.FechaModificacion.ToString("dd/MM/yyyy hh:mm tt")</td>
+                        <td>
+                            @if (item.Activo)
+                            {
+                                <span class="badge bg-success">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactivo</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-1">
+                                @if (item.Estado == EstadoReserva.Pendiente || item.Estado == EstadoReserva.Confirmada)
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="Editar reserva">
+                                        <i class="bi bi-pencil">Editar</i>
+                                    </a>
+                                }
+                                @if (item.Estado == EstadoReserva.Confirmada)
+                                {
+                                    <form asp-action="Cancel" asp-controller="Reservas" method="get" asp-route-id="@item.Id" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Cancelar reserva">
+                                            <i class="bi bi-x-circle">Cancelar</i>
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
             {
                 <tr>
-                    <td>@Html.DisplayFor(modelItem => item.Id)</td>
-                    <td>@Html.DisplayFor(modelItem => item.IdCliente)</td>
-                    <td>@Html.DisplayFor(modelItem => item.IdCategoriaHabitacion)</td>
-                    <td>@Html.DisplayFor(modelItem => item.NumeroHuespedes)</td>
-                    <td>@item.FechaEntrada.ToString("dd/MM/yyyy")</td>
-                    <td>@item.FechaSalida.ToString("dd/MM/yyyy")</td>
-                    <td>@Html.DisplayFor(modelItem => item.EstadoDisplay)</td>
-                    <td>@item.FechaCreacion.ToString("dd/MM/yyyy hh:mm tt")</td>
-                    <td>@item.FechaModificacion.ToString("dd/MM/yyyy hh:mm tt")</td>
-                    <td>@Html.DisplayFor(modelItem => item.Activo)</td>
-                    <td class="text-center">
-                        <div class="d-flex justify-content-center gap-2">
-                            @if (item.Estado == EstadoReserva.Pendiente || item.Estado == EstadoReserva.Confirmada)
+                    <td colspan="11" class="text-center py-4">
+                        <div class="text-muted">
+                            <i class="bi bi-inbox fs-1"></i>
+                            <p class="mt-2">No se encontraron reservas.</p>
+                            @if (ViewBag.MostrandoFiltro == true)
                             {
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-pencil"></i> Editar
-                                </a>
-                            }
-                            @if (item.Estado == EstadoReserva.Confirmada)
-                            {
-                                <form asp-action="Cancel" asp-controller="Reservas" method="get" asp-route-id="@item.Id" style="display:inline;">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <i class="bi bi-x-circle"></i> Cancelar
-                                    </button>
-                                </form>
+                                <small>Intenta ajustar el rango de fechas o <a asp-action="Index">ver todas las reservas</a>.</small>
                             }
                         </div>
                     </td>
                 </tr>
             }
-        }
-        else
-        {
-            <tr>
-                <td colspan="10">No se encontraron reservas.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const fechaDesde = document.getElementById('desde');
+            const fechaHasta = document.getElementById('hasta');
+
+            // Establecer fecha minima como hoy
+            const hoy = new Date().toISOString().split('T')[0];
+
+            // Validar que la fecha desde no sea mayor que fecha hasta
+            fechaDesde.addEventListener('change', function () {
+                if (fechaDesde.value && fechaHasta.value && fechaDesde.value > fechaHasta.value) {
+                    fechaHasta.value = fechaDesde.value;
+                }
+                if (fechaDesde.value) {
+                    fechaHasta.setAttribute('min', fechaDesde.value);
+                }
+            });
+
+            fechaHasta.addEventListener('change', function () {
+                if (fechaDesde.value && fechaHasta.value && fechaHasta.value < fechaDesde.value) {
+                    fechaDesde.value = fechaHasta.value;
+                }
+                if (fechaHasta.value) {
+                    fechaDesde.setAttribute('max', fechaHasta.value);
+                }
+            });
+
+            // Validar formulario antes de enviar
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function (e) {
+                const desde = fechaDesde.value;
+                const hasta = fechaHasta.value;
+
+                if (!desde || !hasta) {
+                    alert('Por favor, selecciona ambas fechas para realizar la búsqueda.');
+                    e.preventDefault();
+                    return;
+                }
+
+                if (desde > hasta) {
+                    alert('La fecha desde debe ser anterior o igual a la fecha hasta.');
+                    e.preventDefault();
+                    return;
+                }
+            });
+        });
+    </script>
+}

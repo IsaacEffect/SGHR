@@ -7,7 +7,6 @@ namespace SGHR.Web.Services
     public class ReservasApiService(HttpClient httpClient)
     {
         private readonly HttpClient _httpClient = httpClient;
-
         /// <summary>
         /// Obtiene todas las reservas
         /// </summary>
@@ -86,7 +85,6 @@ namespace SGHR.Web.Services
                 return new ApiResponse<ActualizarReservaViewModel> { IsSuccess = false, Message = $"Error de red al obtener reserva: {ex.Message}" };
             }
         }
-
         /// <summary>
         /// Obtiene reservas en un rango especifico de fechas
         /// </summary>
@@ -131,7 +129,6 @@ namespace SGHR.Web.Services
                 return new ApiResponse<List<ReservasViewModel>> { IsSuccess = false, Message = $"Error al obtener reservas por rango de fechas: {ex.Message}" };
             }
         }
-
         /// <summary>
         /// Crea una nueva reserva a traves de la API
         /// </summary>
@@ -171,7 +168,7 @@ namespace SGHR.Web.Services
             try
             {
                 var url = $"/api/Reservas/{id}";
-                var response = await _httpClient.PutAsJsonAsync(url, Model);// tira ok, pero en una validacion mas adelande tira null en La data del apiResponse por alguna razon que desconosco, lo peor es que si actualiza los datos en la db xd
+                var response = await _httpClient.PutAsJsonAsync(url, Model);// esto me esta dando problemas, como el 500 que viste, que podemos revisar?
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -217,7 +214,6 @@ namespace SGHR.Web.Services
                 };
             }
         }
-
         /// <summary>
         /// Cancela una reserva por su ID a traves de la api
         /// </summary>
@@ -287,7 +283,5 @@ namespace SGHR.Web.Services
                 };
             }
         }
-
-
     }
 }

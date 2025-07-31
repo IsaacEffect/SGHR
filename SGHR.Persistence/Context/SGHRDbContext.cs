@@ -5,10 +5,8 @@ using SGHR.Domain.Entities.Habitaciones;
 using SGHR.Domain.Entities.Users;
 namespace SGHR.Persistence.Context
 {
-    public class SGHRDbContext : DbContext
+    public class SGHRDbContext(DbContextOptions<SGHRDbContext> options) : DbContext(options)
     {
-        public SGHRDbContext(DbContextOptions<SGHRDbContext> options) : base(options) { }
-
         public DbSet<Reserva> Reservas { get; set; }
         public DbSet<Servicios> Servicios { get; set; }
         public DbSet<CategoriaHabitacion> CategoriaHabitacion { get; set; }
