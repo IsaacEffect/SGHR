@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Mi Cuenta";
+}
+
+<h2>Opciones de mi cuenta</h2>
+<p>Selecciona lo que deseas hacer:</p>
+
+<div class="d-grid gap-2 col-6 mx-auto">
+    <a asp-action="PerfilCliente" class="btn btn-info btn-lg mb-2">Ver Perfil</a>
+    <a asp-action="ActualizarPerfil" class="btn btn-warning btn-lg mb-2">Editar Perfil</a>
+    <a asp-action="CambiarContrasena" class="btn btn-secondary btn-lg mb-2">Cambiar Contraseña</a>
+    <a asp-action="EliminarCuenta" class="btn btn-danger btn-lg mb-2">Eliminar Cuenta</a>
+    <a asp-controller="Historial" asp-action="FiltrarHistorial" class="btn btn-primary btn-lg mb-2">Filtrar Reserva</a>
+</div>

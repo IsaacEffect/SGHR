@@ -1,0 +1,29 @@
+﻿@model SGHR.Web.Models.ClientesModel
+
+@{
+    ViewData["Title"] = "Eliminar Cuenta";
+}
+
+<h2>Eliminar Cuenta</h2>
+
+<div class="alert alert-danger">
+    <strong>¿Estás seguro de que deseas eliminar tu cuenta?</strong><br />
+    Esta acción no se puede deshacer.
+</div>
+
+<div class="card mt-3">
+    <div class="card-body">
+        <p><strong>Nombre:</strong> @Model.nombre</p>
+        <p><strong>Apellido:</strong> @Model.apellido</p>
+        <p><strong>Correo electrónico:</strong> @Model.email</p>
+        <p><strong>Teléfono:</strong> @Model.telefono</p>
+        <p><strong>Dirección:</strong> @Model.direccion</p>
+    </div>
+</div>
+
+<form asp-action="EliminarCuenta" method="post" class="mt-4">
+    <input type="hidden" asp-for="idCliente" />
+    <button type="submit" class="btn btn-danger">Sí, eliminar mi cuenta</button>
+    <a asp-action="OpcionesCliente" class="btn btn-secondary">Cancelar</a>
+
+</form>

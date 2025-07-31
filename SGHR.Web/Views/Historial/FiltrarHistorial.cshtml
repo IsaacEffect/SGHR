@@ -1,0 +1,71 @@
+﻿@model List<SGHR.Web.Models.HistorialModel>
+@{
+    ViewData["Title"] = "Historial de Reservas";
+}
+
+<h2>Historial de Reservas</h2>
+
+<form asp-action="FiltrarHistorial" method="get" class="mb-4">
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label>Fecha Inicio</label>
+            <input type="date" name="fechaInicio" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label>Fecha Fin</label>
+            <input type="date" name="fechaFin" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label>Estado</label>
+            <input type="text" name="estado" class="form-control" placeholder="Confirmada, Cancelada..." />
+        </div>
+        <div class="col-md-3">
+            <label>Tipo Habitación</label>
+            <input type="text" name="tipoHabitacion" class="form-control" />
+        </div>
+        <div class="col-md-12 mt-2">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </div>
+    </div>
+</form>
+
+@if (Model != null && Model.Count > 0)
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Fecha Entrada</th>
+                <th>Fecha Salida</th>
+                <th>Estado</th>
+                <th>Tipo Habitación</th>
+                <th>Servicios</th>
+                <th>Detalle</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var reserva in Model)
+            {
+                <tr>
+                    <td>@reserva.fechaEntrada.ToShortDateString()</td>
+                    <td>@reserva.fechaSalida.ToShortDateString()</td>
+                    <td>@reserva.estado</td>
+                    <td>@reserva.tipoHabitacion</td>
+                    <td>@reserva.serviciosAdicionales</td>
+                    <td>
+                        <a asp-action="DetalleReserva" asp-route-id="@reserva.id" class="btn btn-sm btn-info">Ver</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+else
+{
+    <p>No hay reservas para mostrar.</p>
+}
+
+<a asp-controller="Clientes" asp-action="OpcionesCliente" class="btn btn-secondary mt-3">Volver</a>

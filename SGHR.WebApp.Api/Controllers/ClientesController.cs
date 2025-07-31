@@ -6,7 +6,7 @@ using SGHR.WebApp.Api.Extensions;
 
 namespace SGHR.WebApp.Api.Controllers
 {
-    [Authorize(Roles = "Cliente")]
+    [Authorize(Roles = "Administrador,Cliente")]
     [ApiController]
     [Route("api/[controller]")]
     public class ClientesController : ControllerBase
@@ -18,21 +18,21 @@ namespace SGHR.WebApp.Api.Controllers
             _clienteService = clienteService;
         }
 
-        [HttpGet]
+        [HttpGet("GetAllClients")]
         public async Task<IActionResult> Get()
         {
             var result = await _clienteService.ObtenerTodosAsync();
             return result.ToActionResult();
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("GetClientById")]
         public async Task<IActionResult> GetById(int id)
         {
             var result = await _clienteService.ObtenerPorIdAsync(id);
             return result.ToActionResult();
         }
 
-        [HttpPost]
+        [HttpPost("InsertClient")]
         public async Task<IActionResult> Post([FromBody] InsertarClienteDto dto)
         {
             if (!ModelState.IsValid)
@@ -42,7 +42,7 @@ namespace SGHR.WebApp.Api.Controllers
             return result.ToActionResult();
         }
 
-        [HttpPut]
+        [HttpPut("ModifyClient")]
         public async Task<IActionResult> Put([FromBody] ModificarClienteDto dto)
         {
             if (!ModelState.IsValid)
@@ -52,7 +52,7 @@ namespace SGHR.WebApp.Api.Controllers
             return result.ToActionResult();
         }
 
-        [HttpPut("cambiar-contrasena")]
+        [HttpPut("ChangePassword")]
         public async Task<IActionResult> CambiarContrasena([FromBody] CambiarContrasenaDto dto)
         {
             if (!ModelState.IsValid)
@@ -62,7 +62,7 @@ namespace SGHR.WebApp.Api.Controllers
             return result.ToActionResult();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("DeleteClient")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _clienteService.EliminarAsync(id);

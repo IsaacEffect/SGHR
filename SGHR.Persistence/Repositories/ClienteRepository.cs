@@ -15,14 +15,14 @@ public class ClienteRepository : IClienteRepository
     public async Task<Cliente> GetByIdAsync(int id)
     {
         return await _context.Clientes
-            .Where(c => c.Id == id && c.Estado && string.Equals(c.Rol, "Cliente", StringComparison.OrdinalIgnoreCase))
+            .Where(c => c.Id == id && c.Estado && c.Rol.ToLower() == "cliente")
             .FirstOrDefaultAsync();
     }
 
     public async Task<IEnumerable<Cliente>> GetAllAsync()
     {
         return await _context.Clientes
-            .Where(c => c.Estado && string.Equals(c.Rol, "Cliente", StringComparison.OrdinalIgnoreCase))
+            .Where(c => c.Estado && c.Rol.ToLower() == "cliente")
             .ToListAsync();
     }
 
@@ -33,7 +33,7 @@ public class ClienteRepository : IClienteRepository
         if (string.IsNullOrWhiteSpace(cliente.Nombre))
             throw new ArgumentException("El nombre es requerido", nameof(cliente.Nombre));
 
-        await _context.Clientes.AddAsync(cliente); ;
+        await _context.Clientes.AddAsync(cliente);
     }
 
     public async Task UpdateAsync(Cliente cliente)

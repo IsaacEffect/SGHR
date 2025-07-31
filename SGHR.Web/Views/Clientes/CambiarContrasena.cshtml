@@ -1,0 +1,33 @@
+﻿@model SGHR.Web.Models.CambiarContrasenaModel
+
+@{
+    ViewData["Title"] = "Cambiar Contraseña";
+}
+
+<h2 class="mb-4">Cambiar Contraseña</h2>
+<form asp-action="CambiarContrasena" method="post">
+    <div class="form-group mb-3">
+        <label asp-for="contrasenaActual" class="form-label">Contraseña actual</label>
+        <input asp-for="contrasenaActual" type="password" class="form-control" />
+        <span asp-validation-for="contrasenaActual" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="nuevaContrasena" class="form-label">Nueva contraseña</label>
+        <input asp-for="nuevaContrasena" type="password" class="form-control" />
+        <span asp-validation-for="nuevaContrasena" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-4">
+        <label asp-for="confirmarNuevaContrasena" class="form-label">Confirmar nueva contraseña</label>
+        <input asp-for="confirmarNuevaContrasena" type="password" class="form-control" />
+        <span asp-validation-for="confirmarNuevaContrasena" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    <a asp-action="OpcionesCliente" class="btn btn-secondary ms-2">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

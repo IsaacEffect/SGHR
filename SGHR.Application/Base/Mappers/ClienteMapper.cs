@@ -15,7 +15,8 @@ namespace SGHR.Application.Base.Mappers
                 Email = cliente.Correo,
                 Telefono = cliente.Telefono,
                 Direccion = cliente.Direccion,
-                FechaRegistro = cliente.FechaRegistro
+                FechaRegistro = cliente.FechaRegistro,
+                Rol = cliente.Rol
             };
         }
 

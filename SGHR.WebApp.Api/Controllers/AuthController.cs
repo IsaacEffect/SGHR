@@ -24,7 +24,7 @@ namespace SGHR.WebApp.Api.Controllers
             _jwtSettings = jwtSettings;
         }
 
-        [HttpPost("login")]
+        [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
             if (!ModelState.IsValid)
@@ -40,11 +40,14 @@ namespace SGHR.WebApp.Api.Controllers
 
         private string GenerarToken(ObtenerClienteDto cliente)
         {
+            if (string.IsNullOrWhiteSpace(cliente.Rol))
+                throw new Exception("Rol no definido para el cliente.");
+
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, cliente.IdCliente.ToString()),
                 new Claim(ClaimTypes.Email, cliente.Email),
-                new Claim(ClaimTypes.Role, "Cliente")
+                new Claim(ClaimTypes.Role, cliente.Rol)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));

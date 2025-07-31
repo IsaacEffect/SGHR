@@ -1,0 +1,50 @@
+﻿@model IEnumerable<SGHR.Web.Models.ClientesModel>
+
+@{
+    ViewData["Title"] = "Listado de Clientes";
+}
+
+<h2>Clientes Registrados</h2>
+
+@if (Model == null)
+{
+    <div class="alert alert-danger">El modelo está nulo</div>
+}
+else if (!Model.Any())
+{
+    <div class="alert alert-warning">No hay clientes para mostrar</div>
+}
+else
+{
+    <div class="alert alert-success">Clientes cargados correctamente</div>
+}
+
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.idCliente)</th>
+            <th>@Html.DisplayNameFor(model => model.nombre)</th>
+            <th>@Html.DisplayNameFor(model => model.apellido)</th>
+            <th>@Html.DisplayNameFor(model => model.email)</th>
+            <th>@Html.DisplayNameFor(model => model.telefono)</th>
+            <th>@Html.DisplayNameFor(model => model.direccion)</th>
+            <th>@Html.DisplayNameFor(model => model.fechaRegistro)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.idCliente</td>
+                <td>@item.nombre</td>
+                <td>@item.apellido</td>
+                <td>@item.email</td>
+                <td>@item.telefono</td>
+                <td>@item.direccion</td>
+                <td>@item.fechaRegistro.ToString("dd/MM/yyyy")</td>
+
+            </tr>
+        }
+    </tbody>
+</table>

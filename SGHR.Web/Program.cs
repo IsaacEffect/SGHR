@@ -9,6 +9,9 @@ namespace SGHR.Web
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
+            builder.Services.AddSession();
+            builder.Services.AddHttpContextAccessor();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -20,6 +23,9 @@ namespace SGHR.Web
 
             app.UseRouting();
 
+            app.UseSession();
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(

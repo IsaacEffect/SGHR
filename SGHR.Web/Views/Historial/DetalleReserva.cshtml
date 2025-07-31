@@ -1,0 +1,18 @@
+﻿@model SGHR.Web.Models.HistorialModel
+@{
+    ViewData["Title"] = "Detalle de Reserva";
+}
+
+<h2>Detalle de la Reserva</h2>
+
+<table class="table table-bordered">
+    <tr><th>ID</th><td>@Model.id</td></tr>
+    <tr><th>Fecha Entrada</th><td>@Model.fechaEntrada.ToShortDateString()</td></tr>
+    <tr><th>Fecha Salida</th><td>@Model.fechaSalida.ToShortDateString()</td></tr>
+    <tr><th>Estado</th><td>@Model.estado</td></tr>
+    <tr><th>Tarifa</th><td>$@Model.tarifa</td></tr>
+    <tr><th>Tipo de Habitación</th><td>@Model.tipoHabitacion</td></tr>
+    <tr><th>Servicios Adicionales</th><td>@Model.serviciosAdicionales</td></tr>
+</table>
+
+<a asp-action="FiltrarHistorial" class="btn btn-secondary">Volver</a>

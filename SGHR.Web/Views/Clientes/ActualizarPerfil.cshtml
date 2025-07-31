@@ -1,0 +1,45 @@
+﻿@model SGHR.Web.Models.ActualizarClienteModel
+
+@{
+    ViewData["Title"] = "Editar Cliente";
+}
+
+<h2>Editar tu informacion</h2>
+
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+<form asp-action="ActualizarPerfil" method="post">
+    <input type="hidden" asp-for="idCliente" />
+
+    <div class="form-group">
+        <label asp-for="nombre"></label>
+        <input asp-for="nombre" class="form-control" />
+        <span asp-validation-for="nombre" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="apellido"></label>
+        <input asp-for="apellido" class="form-control" />
+        <span asp-validation-for="apellido" class="text-danger"></span>
+
+    </div>
+    <div class="form-group">
+        <label asp-for="email"></label>
+        <input asp-for="email" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="telefono"></label>
+        <input asp-for="telefono" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="direccion"></label>
+        <input asp-for="direccion" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">Guardar Cambios</button>
+    <a asp-action="OpcionesCliente" class="btn btn-secondary mt-2">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

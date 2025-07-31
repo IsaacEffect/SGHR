@@ -9,4 +9,5 @@ public record ObtenerClienteDto
     public string Telefono { get; set; }
     public string Direccion { get; set; }
     public DateTime FechaRegistro { get; set; }
+    public string Rol { get; set; }
 }

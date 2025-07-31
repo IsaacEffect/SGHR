@@ -1,4 +1,20 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var tokenString = Context.Session.GetString("JWToken");
+    var isLoggedIn = !string.IsNullOrEmpty(tokenString);
+    var isAdmin = false;
+    var isCliente = false;
+
+    if (isLoggedIn)
+    {
+        var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadToken(tokenString) as System.IdentityModel.Tokens.Jwt.JwtSecurityToken;
+        var roles = jwtToken?.Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role).Select(c => c.Value).ToList();
+        isAdmin = roles != null && roles.Contains("Administrador");
+        isCliente = roles != null && roles.Contains("Cliente");
+    }
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -20,11 +36,38 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Clientes" asp-action="Registro">Registrarse</a>
+                        </li>
+
+                        @if (isCliente)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Clientes" asp-action="OpcionesCliente">Mi cuenta</a>
+                            </li>
+
+                            @if (isAdmin)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Clientes" asp-action="Index">Clientes</a>
+                                </li>
+                            }
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Logout">Cerrar sesión</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">Iniciar sesión</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
@@ -38,7 +81,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - SGHR.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2025 - SGHR.Web - <a asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

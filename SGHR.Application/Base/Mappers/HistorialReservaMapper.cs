@@ -9,6 +9,7 @@ namespace SGHR.Application.Base.Mappers
         {
             return new HistorialReservaDto
             {
+                Id = entidad.Id,
                 FechaEntrada = entidad.FechaEntrada,
                 FechaSalida = entidad.FechaSalida,
                 Estado = entidad.Estado,

@@ -1,0 +1,66 @@
+﻿@model SGHR.Web.Models.ClientesModel
+
+@{
+    ViewData["Title"] = "Registro de Cliente";
+}
+
+<h2>Registro</h2>
+
+<form asp-action="Registro" method="post">
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            @Html.ValidationSummary(false)
+        </div>
+    }
+
+    <div class="form-group">
+        <label asp-for="nombre">Nombre</label>
+        <input asp-for="nombre" class="form-control" />
+        <span asp-validation-for="nombre" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="apellido">Apellido</label>
+        <input asp-for="apellido" class="form-control" />
+        <span asp-validation-for="apellido" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="email">Correo electrónico</label>
+        <input asp-for="email" class="form-control" />
+        <span asp-validation-for="email" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="telefono">Teléfono</label>
+        <input asp-for="telefono" class="form-control" />
+        <span asp-validation-for="telefono" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="direccion">Dirección</label>
+        <input asp-for="direccion" class="form-control" />
+        <span asp-validation-for="direccion" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="contrasena">Contraseña</label>
+        <input asp-for="contrasena" class="form-control" type="password" />
+        <span asp-validation-for="contrasena" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ConfirmarContrasena"></label>
+        <input asp-for="ConfirmarContrasena" class="form-control" type="password" />
+        <span asp-validation-for="ConfirmarContrasena" class="text-danger"></span>
+    </div>
+
+
+    <button type="submit" class="btn btn-success mt-3">Registrarse</button>
+    <a asp-controller="Auth" asp-action="Login" class="btn btn-link">¿Ya tienes cuenta?</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
