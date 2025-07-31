@@ -12,9 +12,7 @@ namespace SGHR.Web.Services
         {
             try
             {
-                string jsonPayload = JsonSerializer.Serialize(request);
-              
-
+            
                 var url = "/api/ServicioCategoria/AsignarPrecio";
                 var response = await _httpClient.PostAsJsonAsync(url, request);
                 if (response.IsSuccessStatusCode)

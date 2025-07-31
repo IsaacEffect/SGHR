@@ -53,7 +53,6 @@
                                 <th>ID Categoría</th>
                                 <th>Nombre Categoría</th> 
                                 <th>Precio</th>
-                                <th class="text-center">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -63,26 +62,6 @@
                                     <td>@precio.IdCategoriaHabitacion</td>
                                     <td>@precio.NombreCategoriaHabitacion</td> 
                                     <td>@precio.PrecioServicio.ToString("C")</td>
-                                    <td class="text-center">
-                                        <div class="btn-group" role="group">
-                                            <a asp-action="EditarPrecioCategoria"
-                                               asp-route-idServicio="@precio.IdServicio"
-                                               asp-route-idCategoria="@precio.IdCategoriaHabitacion"
-                                               class="btn btn-sm btn-outline-primary">
-                                                <i class="bi bi-pencil"></i> Editar
-                                            </a>
-                                            <button type="button"
-                                                    class="btn btn-sm btn-outline-danger"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#deletePrecioModal"
-                                                    data-servicio="@precio.IdServicio"
-                                                    data-categoria="@precio.IdCategoriaHabitacion"
-                                                    data-precio="@precio.PrecioServicio.ToString("C")"
-                                                    data-nombrecategoria="@precio.NombreCategoriaHabitacion">
-                                                <i class="bi bi-trash"></i> Eliminar
-                                            </button>
-                                        </div>
-                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -100,7 +79,7 @@
                     <a asp-action="AsignarPrecio"
                        asp-route-idServicio="@Model.IdServicio"
                        class="btn btn-success">
-                        <i class="bi bi-plus-circle"></i> Asignar Nuevo Precio
+                        <i class="bi bi-plus-circle"></i> Asignar/Editar Precio
                     </a>
                     <a asp-action="Edit"
                        asp-route-id="@Model.IdServicio"
@@ -116,34 +95,6 @@
     </div>
 </div>
 
-<div class="modal fade" id="deletePrecioModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="bi bi-exclamation-triangle text-warning"></i>
-                    Confirmar Eliminación de Precio
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>
-                    ¿Está seguro que desea eliminar el precio <strong id="precioTexto"></strong>
-                    para la categoría <strong id="categoriaTexto"></strong>?
-                </p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <form id="deletePrecioForm" method="post" style="display: inline;">
-                    <input type="hidden" name="idServicio" id="servicioIdInput" />
-                    <input type="hidden" name="idCategoria" id="categoriaIdInput" />
-                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -154,10 +105,10 @@
                 const servicioId = button.getAttribute('data-servicio');
                 const categoriaId = button.getAttribute('data-categoria');
                 const precio = button.getAttribute('data-precio');
-                const nombreCategoria = button.getAttribute('data-nombrecategoria'); // Obtener el nombre de la categoría
+                const nombreCategoria = button.getAttribute('data-nombrecategoria'); 
 
                 document.getElementById('precioTexto').textContent = precio;
-                document.getElementById('categoriaTexto').textContent = nombreCategoria; // Mostrar el nombre de la categoría
+                document.getElementById('categoriaTexto').textContent = nombreCategoria;
                 document.getElementById('servicioIdInput').value = servicioId;
                 document.getElementById('categoriaIdInput').value = categoriaId;
 
