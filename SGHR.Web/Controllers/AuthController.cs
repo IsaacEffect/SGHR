@@ -1,13 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SGHR.Web.Models;
+using SGHR.Web.Service.Contracts;
 using System.IdentityModel.Tokens.Jwt;
-using System.Text;
-using System.Text.Json;
+using System.Security.Claims;
 
 namespace SGHR.Web.Controllers
 {
     public class AuthController : Controller
     {
+        private readonly IApiAuthService _authService;
+
+        public AuthController(IApiAuthService authService)
+        {
+            _authService = authService;
+        }
+
         [HttpGet]
         public IActionResult Login()
         {
@@ -17,62 +24,28 @@ namespace SGHR.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(AuthModel model)
         {
-            if (!ModelState.IsValid)
-                return View(model);
+            if (!ModelState.IsValid) return View(model);
 
-            try
+            var token = await _authService.AutenticarAsync(model);
+
+            if (string.IsNullOrEmpty(token))
             {
-                using (var client = new HttpClient())
-                {
-                    client.BaseAddress = new Uri("http://localhost:5095/api/");
-
-                    var content = new StringContent(
-                        JsonSerializer.Serialize(model),
-                        Encoding.UTF8,
-                        "application/json"
-                    );
-
-                    var response = await client.PostAsync("Auth/Login", content);
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var loginResult = JsonSerializer.Deserialize<Login>(responseString, new JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true
-                        });
-
-                        // Obtiene el rol
-                        var handler = new JwtSecurityTokenHandler();
-                        var tokenData = handler.ReadJwtToken(loginResult.token);
-                        var roles = tokenData.Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role).Select(c => c.Value).ToList();
-
-                        // Guarda el token en la sesion
-                        HttpContext.Session.SetString("JWToken", loginResult.token);
-
-                        // Redirige al area protegida
-                        if (roles.Contains("Administrador"))
-                            return RedirectToAction("Index", "Clientes");
-                        else if (roles.Contains("Cliente"))
-                            return RedirectToAction("OpcionesCliente", "Clientes");
-                        else
-                            return RedirectToAction("Login");
-
-                        
-
-                    }
-                    else
-                    {
-                        TempData["Error"] = "Credenciales incorrectas.";
-                        return View(model);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "Error inesperado: " + ex.Message;
+                TempData["Error"] = "Credenciales incorrectas.";
                 return View(model);
             }
+
+            HttpContext.Session.SetString("JWToken", token);
+
+            var handler = new JwtSecurityTokenHandler();
+            var tokenData = handler.ReadJwtToken(token);
+            var roles = tokenData.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList();
+
+            if (roles.Contains("Administrador"))
+                return RedirectToAction("Index", "Clientes");
+            else if (roles.Contains("Cliente"))
+                return RedirectToAction("OpcionesCliente", "Clientes");
+            else
+                return RedirectToAction("Login");
         }
 
         public IActionResult Logout()

@@ -1,3 +1,6 @@
+using SGHR.Web.Service;
+using SGHR.Web.Service.Contracts;
+
 namespace SGHR.Web
 {
     public class Program
@@ -11,6 +14,11 @@ namespace SGHR.Web
 
             builder.Services.AddSession();
             builder.Services.AddHttpContextAccessor();
+
+            builder.Services.AddScoped<IApiAuthService, ApiAuthService>();
+            builder.Services.AddScoped<IApiClienteService, ApiClienteService>();
+            builder.Services.AddScoped<IApiHistorialService, ApiHistorialService>();
+
 
             var app = builder.Build();
 

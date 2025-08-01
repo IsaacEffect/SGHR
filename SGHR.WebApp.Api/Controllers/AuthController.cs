@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using SGHR.Application.Contracts.Service;
 using SGHR.Application.Dtos;
+using SGHR.Domain.Base;
 using SGHR.WebApp.Api.Configurations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -35,7 +36,14 @@ namespace SGHR.WebApp.Api.Controllers
                 return Unauthorized(result.Message);
 
             var token = GenerarToken(result.Data);
-            return Ok(new { Token = token });
+
+            return Ok(new OperationResult<string>
+            {
+                Success = true,
+                Message = "Login exitoso",
+                Data = token
+            });
+
         }
 
         private string GenerarToken(ObtenerClienteDto cliente)

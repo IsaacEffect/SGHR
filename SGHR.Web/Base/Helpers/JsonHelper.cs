@@ -1,6 +1,5 @@
-﻿using System;
+﻿using SGHR.Domain.Base;
 using System.Text.Json;
-using SGHR.Domain.Base;
 
 namespace SGHR.Web.Base.Helpers
 {
