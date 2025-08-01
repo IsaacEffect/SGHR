@@ -1,15 +1,13 @@
-﻿using SGHR.Web.ApiServices.Base;
-using SGHR.Web.ApiServices.Interfaces;
-using SGHR.Web.ViewModel;
+﻿using SGHR.Web.ApiRepositories.Base;
+using SGHR.Web.ApiRepositories.Interfaces.Reservas;
+using SGHR.Web.Models;
 using SGHR.Web.ViewModel.Reservas;
 
-namespace SGHR.Web.ApiServices
+namespace SGHR.Web.ApiRepositories
 {
-    public class ReservasApiService : HttpServiceBase, IReservasApiService
+    public class ReservasApiRepository(HttpClient httpClient) : HttpServiceBase(httpClient), IReservasApiRepository
     {
         private const string _baseEndpoint = "api/Reservas";
-
-        public ReservasApiService(HttpClient httpClient) : base(httpClient) { }
 
         public Task<ApiResponse<ReservasViewModel>> CrearReservaAsync(CrearReservaViewModel model)
         {

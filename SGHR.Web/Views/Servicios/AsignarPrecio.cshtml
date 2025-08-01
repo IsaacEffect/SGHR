@@ -21,7 +21,7 @@
         <h2><i class="bi bi-currency-dollar"></i> Asignar Nuevo Precio a @Model.NombreServicio</h2>
     </div>
     <div class="card-body">
-        <form asp-action="AsignarPrecio" method="post">
+        <form asp-action="AsignarEditarPrecio" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <input type="hidden" asp-for="IdServicio" />

@@ -1,8 +1,8 @@
 ﻿using System.Net;
 using System.Text.Json;
-using SGHR.Web.ViewModel;
+using SGHR.Web.Models;
 
-namespace SGHR.Web.ApiServices.Base
+namespace SGHR.Web.ApiRepositories.Base
 {
     public abstract class HttpServiceBase
     {
@@ -17,9 +17,7 @@ namespace SGHR.Web.ApiServices.Base
                 PropertyNameCaseInsensitive = true
             };
         }
-
         #region Métodos Genéricos HTTP
-
         protected async Task<ApiResponse<T>> GetAsync<T>(string endpoint) where T : class
         {
             try
@@ -36,7 +34,6 @@ namespace SGHR.Web.ApiServices.Base
                 return CreateErrorResponse<T>($"Error inesperado: {ex.Message}");
             }
         }
-
         protected async Task<ApiResponse<List<T>>> GetListAsync<T>(string endpoint) where T : class
         {
             try
@@ -53,7 +50,6 @@ namespace SGHR.Web.ApiServices.Base
                 return CreateErrorResponse<List<T>>($"Error inesperado: {ex.Message}");
             }
         }
-
         protected async Task<ApiResponse<T>> PostAsync<T>(string endpoint, object data) where T : class
         {
             try
@@ -70,7 +66,6 @@ namespace SGHR.Web.ApiServices.Base
                 return CreateErrorResponse<T>($"Error inesperado: {ex.Message}");
             }
         }
-
         protected async Task<ApiResponse<T>> PutAsync<T>(string endpoint, object? data = null) 
         {
             try
@@ -90,8 +85,6 @@ namespace SGHR.Web.ApiServices.Base
                 return CreateErrorResponse<T>($"Error inesperado: {ex.Message}");
             }
         }
-     
-
         protected async Task<ApiResponse<bool>> DeleteAsync(string endpoint)
         {
             try
@@ -114,11 +107,9 @@ namespace SGHR.Web.ApiServices.Base
                 return CreateErrorResponse<bool>($"Error inesperado: {ex.Message}");
             }
         }
-
         #endregion
 
         #region Procesamiento de Respuestas
-
         protected async Task<ApiResponse<T>> ProcessApiResponse<T>(HttpResponseMessage response) 
         {
             if (response.IsSuccessStatusCode)
@@ -130,25 +121,46 @@ namespace SGHR.Web.ApiServices.Base
                 return await ProcessErrorResponse<T>(response);
             }
         }
-
-        protected async Task<ApiResponse<T>> ProcessSuccessResponse<T>(HttpResponseMessage response) 
+        protected async Task<ApiResponse<T>> ProcessSuccessResponse<T>(HttpResponseMessage response)
         {
             var content = await response.Content.ReadAsStringAsync();
 
             try
             {
+                if (string.IsNullOrWhiteSpace(content))
+                {
+                    return new ApiResponse<T>
+                    {
+                        IsSuccess = true,
+                        Data = default,
+                        Message = "Respuesta vacía con éxito"
+                    };
+                }
                 var apiResponse = JsonSerializer.Deserialize<ApiResponse<T>>(content, _jsonOptions);
-                if (apiResponse != null)
+                if (apiResponse != null && (apiResponse.IsSuccess || apiResponse.Data != null))
                 {
                     return apiResponse;
                 }
             }
             catch (JsonException)
             {
-                var directData = JsonSerializer.Deserialize<T>(content, _jsonOptions);
-                return new ApiResponse<T> { IsSuccess = true, Data = directData };
+                try
+                {
+                    if (typeof(T) == typeof(bool))
+                    {
+                        return new ApiResponse<T>
+                        {
+                            IsSuccess = true,
+                            Data = (T)(object)true, 
+                            Message = "Estado de servicio actualizado exitosamente."
+                        };
+                    }
+                }
+                catch (JsonException innerEx)
+                {
+                    return CreateErrorResponse<T>($"Error al deserializar respuesta directa: {innerEx.Message}");
+                }
             }
-
             return CreateErrorResponse<T>("Respuesta del API no válida");
         }
 
@@ -185,7 +197,6 @@ namespace SGHR.Web.ApiServices.Base
                 Data = default
             };
         }
-
         #endregion
     }
 }

@@ -7,6 +7,5 @@
         Pendiente = 0,
         Finalizada = 3,
         Rechazada = 4
-
     }
 }

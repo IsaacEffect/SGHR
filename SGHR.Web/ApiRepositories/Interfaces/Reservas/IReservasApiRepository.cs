@@ -1,10 +1,9 @@
-﻿using SGHR.Application.DTOs.Reservas;
-using SGHR.Web.ViewModel;
+﻿using SGHR.Web.Models;
 using SGHR.Web.ViewModel.Reservas;
 
-namespace SGHR.Web.ApiServices.Interfaces
+namespace SGHR.Web.ApiRepositories.Interfaces.Reservas
 {
-    public interface IReservasApiService
+    public interface IReservasApiRepository
     {
         Task<ApiResponse<ReservasViewModel>> CrearReservaAsync(CrearReservaViewModel request);
         Task<ApiResponse<bool>> ActualizarReservaAsync(int id, ActualizarReservaViewModel request);

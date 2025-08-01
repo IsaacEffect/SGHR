@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SGHR.Web.ApiServices.Interfaces;
+using SGHR.Web.ApiRepositories.Interfaces.Reservas;
 using SGHR.Web.ViewModel.Reservas;
 
 namespace SGHR.Web.Controllers
 {
-    public class ReservasController(IReservasApiService reservasApiService) : Controller
+    public class ReservasController(IReservasApiRepository reservasApiService) : Controller
     {
-        private readonly IReservasApiService _reservasApiService = reservasApiService;
+        private readonly IReservasApiRepository _reservasApiService = reservasApiService;
 
         // GET: /Reservas
         /// <summary>

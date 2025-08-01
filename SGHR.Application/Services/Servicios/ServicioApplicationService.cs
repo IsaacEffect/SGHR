@@ -1,6 +1,5 @@
 ﻿using SGHR.Application.DTOs.Servicios;
 using SGHR.Application.Interfaces.Servicios;
-using SGHR.Persistence.Interfaces.Repositories.Habitaciones;
 using SGHR.Persistence.Interfaces.Repositories.Servicios;
 using ServiciosEntity = SGHR.Domain.Entities.Servicios.Servicios;
 using SGHR.Domain.Interfaces;
@@ -10,13 +9,11 @@ namespace SGHR.Application.Services.Servicios
 {
     public class ServicioApplicationService(
         IServicioRepository serviciosRepository,
-        ICategoriaHabitacionRepository categoriaHabitacionRepository,
         IMapper mapper,
         IUnitOfWork unitOfWork,
         IServicioRules servicioRules) : IServicioApplicationService
     {
         private readonly IServicioRepository _serviciosRepository = serviciosRepository;
-        private readonly ICategoriaHabitacionRepository _categoriaHabitacionRepository = categoriaHabitacionRepository;
         private readonly IMapper _mapper = mapper;
         private readonly IUnitOfWork _unitOfWork = unitOfWork;  
         private readonly IServicioRules _servicioRules = servicioRules;
