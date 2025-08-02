@@ -6,6 +6,5 @@ namespace SGHR.Application.Interfaces.Servicios
     {
         Task AsignarActualizarPrecioServicioCategoriaAsync(AsignarPrecioServicioCategoriaRequest request);
         Task<List<ServicioCategoriaDto>> ObtenerPreciosCategoriaPorServicioAsync(int servicioId);
-        Task<ServicioCategoriaDto?> ObtenerPrecioServicioCategoriaEspecificoAsync(int servicioId, int categoriaId);
     }
 }

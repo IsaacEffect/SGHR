@@ -57,20 +57,5 @@ namespace SGHR.Persistence.Repositories.Servicios
             );
             return precios.AsList();
         }
-        public async Task<ServicioCategoria?> ObtenerPrecioServicioCategoriaEspecificoAsync(int servicioId, int categoriaId)
-        {
-            using var connection = _sqlConnectionFactory.CreateConnection();
-            var parameters = new DynamicParameters();
-            parameters.Add("@IdServicio", servicioId, DbType.Int32);
-            parameters.Add("@IdCategoriaHabitacion", categoriaId, DbType.Int32);
-
-           
-            var precio = await connection.QuerySingleOrDefaultAsync<ServicioCategoria>(
-                "ObtenerPrecioServicioCategoriaEspecifico",  
-                parameters,
-                commandType: CommandType.StoredProcedure
-            );
-            return precio;
-        }   
     }
 }

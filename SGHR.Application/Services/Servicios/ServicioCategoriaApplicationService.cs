@@ -40,16 +40,7 @@ namespace SGHR.Application.Services.Servicios
             var precios = await _servicioCategoriaRepository.ObtenerPreciosPorServicioAsync(servicioId);
             return _mapper.Map<List<ServicioCategoriaDto>>(precios);
         }
-        public async Task<ServicioCategoriaDto?> ObtenerPrecioServicioCategoriaEspecificoAsync(int servicioId, int categoriaId)
-        {
-            _servicioRules.ValidarIdPositivo(servicioId);
-            _servicioRules.ValidarIdPositivo(categoriaId);
-            await _servicioRules.ValidarExistenciaSerivicioAsync(servicioId);
-            _ = await _categoriaHabitacionRepository.ObtenerPorIdAsync(categoriaId)
-                    ?? throw new KeyNotFoundException($"Categoría de habitación con el ID {categoriaId} no encontrada.");
-            var precio = await _servicioCategoriaRepository.ObtenerPrecioServicioCategoriaEspecificoAsync(servicioId, categoriaId);
-            return _mapper.Map<ServicioCategoriaDto>(precio);
-        }
+   
      
     }
 }

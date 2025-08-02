@@ -4,7 +4,7 @@ using SGHR.Web.ApiRepositories.Interfaces.Servicios;
 using SGHR.Web.ViewModel.Servicios;
 using AutoMapper;
 using SGHR.Web.Models;
-namespace SGHR.Web.ApiRepositories
+namespace SGHR.Web.ApiRepositories.Servicios
 {
     public class ServiciosApiRepository(HttpClient httpClient, IMapper mapper) : HttpServiceBase(httpClient), IServiciosApiRepository
     {

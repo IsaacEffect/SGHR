@@ -21,7 +21,7 @@ namespace SGHR.Web.ApiRepositories.Base
         protected async Task<ApiResponse<T>> GetAsync<T>(string endpoint) where T : class
         {
             try
-            {
+           {
                 var response = await _httpClient.GetAsync(endpoint);
                 return await ProcessApiResponse<T>(response);
             }
@@ -124,7 +124,6 @@ namespace SGHR.Web.ApiRepositories.Base
         protected async Task<ApiResponse<T>> ProcessSuccessResponse<T>(HttpResponseMessage response)
         {
             var content = await response.Content.ReadAsStringAsync();
-
             try
             {
                 if (string.IsNullOrWhiteSpace(content))

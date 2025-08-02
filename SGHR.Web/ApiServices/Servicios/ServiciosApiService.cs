@@ -2,12 +2,12 @@
 using SGHR.Application.DTOs.Servicios;
 using SGHR.Web.ApiRepositories;
 using SGHR.Web.ApiRepositories.Interfaces.Servicios;
-using SGHR.Web.ApiServices.Interfaces;
+using SGHR.Web.ApiServices.Interfaces.Servicios;
 using SGHR.Web.Models;
 using SGHR.Web.ViewModel.ServicioCategoria;
 using SGHR.Web.ViewModel.Servicios;
 
-namespace SGHR.Web.ApiServices
+namespace SGHR.Web.ApiServices.Servicios
 {
     public class ServiciosApiService(IMapper mapper, IServiciosApiRepository serviciosApiRepository, IServicioCategoriaApiRepository servicioCategoriaApiRepository) : IServicioApiService
     {

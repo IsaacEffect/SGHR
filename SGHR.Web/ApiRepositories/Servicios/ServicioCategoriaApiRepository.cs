@@ -3,7 +3,7 @@ using SGHR.Web.ApiRepositories.Interfaces.Servicios;
 using SGHR.Web.Models;
 using SGHR.Web.ViewModel.ServicioCategoria;
 
-namespace SGHR.Web.ApiRepositories
+namespace SGHR.Web.ApiRepositories.Servicios
 {
     public class ServicioCategoriaApiRepository : HttpServiceBase, IServicioCategoriaApiRepository
     {
@@ -21,10 +21,5 @@ namespace SGHR.Web.ApiRepositories
             return GetListAsync<ServicioCategoriaViewModel>($"{_baseEndpoint}/ObtenerPreciosCategoriaPorServicio/{idServicio}");
         }
 
-        public Task<ApiResponse<ServicioCategoriaViewModel>> ObtenerPrecioEspecificoAsync(int idServicio, int idCategoriaHabitacion)
-        {
-            var endpoint = $"{_baseEndpoint}/ObtenerPrecioServicioCategoriaEspecifico?idServicio={idServicio}&idCategoriaHabitacion={idCategoriaHabitacion}";
-            return GetAsync<ServicioCategoriaViewModel>(endpoint);
-        }
     }
 }

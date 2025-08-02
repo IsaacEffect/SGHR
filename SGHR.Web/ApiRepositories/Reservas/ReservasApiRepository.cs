@@ -2,8 +2,8 @@
 using SGHR.Web.ApiRepositories.Interfaces.Reservas;
 using SGHR.Web.Models;
 using SGHR.Web.ViewModel.Reservas;
-
-namespace SGHR.Web.ApiRepositories
+using SGHR.Application.DTOs.Reservas;
+namespace SGHR.Web.ApiRepositories.Reservas
 {
     public class ReservasApiRepository(HttpClient httpClient) : HttpServiceBase(httpClient), IReservasApiRepository
     {
@@ -14,9 +14,9 @@ namespace SGHR.Web.ApiRepositories
             return PostAsync<ReservasViewModel>($"{_baseEndpoint}/CrearReserva", model);
         }
 
-        public Task<ApiResponse<bool>> ActualizarReservaAsync(int id, ActualizarReservaViewModel model)
+        public Task<ApiResponse<bool>> ActualizarReservaAsync(int id, ActualizarReservaRequest request)
         {
-            return PutAsync<bool>($"{_baseEndpoint}/{id}", model);
+            return PutAsync<bool>($"{_baseEndpoint}/{id}", request);
         }
 
         public Task<ApiResponse<bool>> CancelarReservaAsync(CancelarReservaViewModel model)
@@ -24,9 +24,9 @@ namespace SGHR.Web.ApiRepositories
             return PutAsync<bool>($"{_baseEndpoint}/cancelar/{model.Id}", model);
         }
 
-        public Task<ApiResponse<ReservasViewModel>> ObtenerReservaPorIdAsync(int id)
+        public Task<ApiResponse<ReservaDto>> ObtenerReservaPorIdAsync(int id)
         {
-            return GetAsync<ReservasViewModel>($"{_baseEndpoint}/{id}");
+            return GetAsync<ReservaDto>($"{_baseEndpoint}/{id}");
         }
 
         public Task<ApiResponse<List<ReservasViewModel>>> ObtenerReservasPorClienteIdAsync(int clienteId)

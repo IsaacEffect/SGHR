@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SGHR.Web.ViewModel.Reservas.ReservasViewModel>
+﻿@model SGHR.Web.ViewModel.Reservas.ReservasIndexViewModel
 @using SGHR.Domain.Enums;
 @{
     ViewData["Title"] = "Reservas";
@@ -120,23 +120,23 @@
     <table class="table table-hover">
         <thead class="table-dark">
             <tr>
-                <th>@Html.DisplayNameFor(model => model.Id)</th>
-                <th>@Html.DisplayNameFor(model => model.IdCliente)</th>
-                <th>@Html.DisplayNameFor(model => model.IdCategoriaHabitacion)</th>
-                <th>@Html.DisplayNameFor(model => model.NumeroHuespedes)</th>
-                <th>@Html.DisplayNameFor(model => model.FechaEntrada)</th>
-                <th>@Html.DisplayNameFor(model => model.FechaSalida)</th>
-                <th>@Html.DisplayNameFor(model => model.Estado)</th>
-                <th>@Html.DisplayNameFor(model => model.FechaCreacion)</th>
-                <th>@Html.DisplayNameFor(Model => Model.FechaModificacion)</th>
-                <th>@Html.DisplayNameFor(model => model.Activo)</th>
+                <th>@Html.DisplayNameFor(model => model.Reservas[0].Id)</th>
+                <th>@Html.DisplayNameFor(model => model.Reservas[0].IdCliente)</th>
+                <th>@Html.DisplayNameFor(model => model.Reservas[0].IdCategoriaHabitacion)</th>
+                <th>@Html.DisplayNameFor(model => model.Reservas[0].NumeroHuespedes)</th>
+                <th>@Html.DisplayNameFor(model => model.Reservas[0].FechaEntrada)</th>
+                <th>@Html.DisplayNameFor(model => model.Reservas[0].FechaSalida)</th>
+                <th>@Html.DisplayNameFor(model => model.Reservas[0].Estado)</th>
+                <th>@Html.DisplayNameFor(model => model.Reservas[0].FechaCreacion)</th>
+                <th>@Html.DisplayNameFor(model => model.Reservas[0].FechaModificacion)</th>
+                <th>@Html.DisplayNameFor(model => model.Reservas[0].Activo)</th>
                 <th class="text-center">Acciones</th>
             </tr>
         </thead>
         <tbody>
-            @if (Model != null && Model.Any())
+            @if (Model.Reservas != null && Model.Reservas.Any())
             {
-                @foreach (var item in Model)
+                @foreach (var item in Model.Reservas)
                 {
                     <tr>
                         <td>@Html.DisplayFor(modelItem => item.Id)</td>

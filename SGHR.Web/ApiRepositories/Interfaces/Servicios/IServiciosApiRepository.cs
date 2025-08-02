@@ -11,7 +11,6 @@ namespace SGHR.Web.ApiRepositories.Interfaces.Servicios
         Task<ApiResponse<bool>> EliminarServicioAsync(int id);
         Task<ApiResponse<ServiciosViewModel>> ObtenerServicioPorIdAsync(int id);
         Task<ApiResponse<List<ServiciosViewModel>>> ObtenerTodosLosServiciosAsync();
-        Task<ApiResponse<List<ServiciosViewModel>>> ObtenerServiciosActivosAsync();
         Task<ApiResponse<bool>> ActivarServicioAsync(int id);
         Task<ApiResponse<bool>> DesactivarServicioAsync(int id);
     }

@@ -1,14 +1,14 @@
-﻿using SGHR.Web.Models;
-using SGHR.Web.ViewModel.Reservas;
+﻿using SGHR.Web.ViewModel.Reservas;
+using SGHR.Web.Models;
 using SGHR.Application.DTOs.Reservas;
-namespace SGHR.Web.ApiRepositories.Interfaces.Reservas
+namespace SGHR.Web.ApiServices.Interfaces.Reservas
 {
-    public interface IReservasApiRepository
+    public interface IReservasApiService
     {
         Task<ApiResponse<ReservasViewModel>> CrearReservaAsync(CrearReservaViewModel request);
-        Task<ApiResponse<bool>> ActualizarReservaAsync(int id, ActualizarReservaRequest request);
+        Task<ApiResponse<bool>> ActualizarReservaAsync(int id, ActualizarReservaViewModel request);
         Task<ApiResponse<bool>> CancelarReservaAsync(CancelarReservaViewModel request);
-        Task<ApiResponse<ReservaDto>> ObtenerReservaPorIdAsync(int id);
+        Task<ApiResponse<ActualizarReservaViewModel>> ObtenerReservaPorIdAsync(int id);
         Task<ApiResponse<List<ReservasViewModel>>> ObtenerReservasPorClienteIdAsync(int clienteId);
         Task<ApiResponse<List<ReservasViewModel>>> ObtenerReservasEnRangoAsync(DateTime desde, DateTime hasta);
         Task<ApiResponse<List<ReservasViewModel>>> ObtenerTodasReservasAsync(bool incluirRelaciones = false);

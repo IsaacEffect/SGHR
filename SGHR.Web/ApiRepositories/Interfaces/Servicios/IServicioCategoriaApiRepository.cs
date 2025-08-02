@@ -7,6 +7,5 @@ namespace SGHR.Web.ApiRepositories.Interfaces.Servicios
     {
         Task<ApiResponse<object>> AsignarActualizarPrecioAsync(AsignarPrecioServicioCategoriaViewModel model);
         Task<ApiResponse<List<ServicioCategoriaViewModel>>> ObtenerPreciosPorServicioAsync(int idServicio);
-        Task<ApiResponse<ServicioCategoriaViewModel>> ObtenerPrecioEspecificoAsync(int idServicio, int idCategoriaHabitacion);
     }
 }

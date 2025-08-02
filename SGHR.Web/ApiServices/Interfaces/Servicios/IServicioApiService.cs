@@ -2,7 +2,7 @@
 using SGHR.Web.Models;
 using SGHR.Web.ViewModel.ServicioCategoria;
 using SGHR.Web.ViewModel.Servicios;
-namespace SGHR.Web.ApiServices.Interfaces
+namespace SGHR.Web.ApiServices.Interfaces.Servicios
 {
     public interface IServicioApiService
     {

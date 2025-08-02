@@ -3,18 +3,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SGHR.Application.DTOs.Servicios;
 using SGHR.Web.ApiRepositories.Interfaces.Servicios;
-using SGHR.Web.ApiServices.Interfaces;
+using SGHR.Web.ApiServices.Interfaces.Servicios;
 using SGHR.Web.Validations;
 using SGHR.Web.ViewModel.ServicioCategoria;
 using SGHR.Web.ViewModel.Servicios;
 
 namespace SGHR.Web.Controllers
 {
-    public class ServiciosController(IServiciosApiRepository serviciosApiRepository, IServicioCategoriaApiRepository servicioCategoriaApiRepository, IMapper mapper, IServicioApiService servicioApiService) : Controller
+    public class ServiciosController(IMapper mapper, IServicioApiService servicioApiService) : Controller
     {
-        private readonly IServiciosApiRepository _serviciosApiRepository = serviciosApiRepository;
         private readonly IServicioApiService _servicioApiService = servicioApiService;
-        private readonly IServicioCategoriaApiRepository _servicioCategoriaApiRepository = servicioCategoriaApiRepository;
         private readonly IMapper _mapper = mapper;
         // GET: /Servicios
         /// <summary>
@@ -139,17 +137,6 @@ namespace SGHR.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // Hacer un boton que implemente esto
-        // GET: /Servicios/Activos
-        /// <summary>
-        /// Muestra solo los servicios activos
-        /// </summary>
-        public async Task<IActionResult> Activos()
-        {
-            var apiResponse = await _serviciosApiRepository.ObtenerServiciosActivosAsync();
-            return View();
-        }
-
         /// <summary>
         /// Obtiene los precios y las categorias de un servicio especifico
         /// </summary>
@@ -164,21 +151,7 @@ namespace SGHR.Web.Controllers
             return View("DetallesServicio", apiResponse.Data);
         }
 
-        // GET: /Servicios/GetPrecioEspecifico?idServicio=1&idCategoriaHabitacion=2
-        /// <summary>
-        /// Muestra el precio específico de un servicio por categoría
-        /// </summary>
-        [HttpGet]
-        public async Task<IActionResult> GetPrecioEspecifico(int idServicio, int idCategoriaHabitacion)
-        {
-            var response = await _servicioCategoriaApiRepository.ObtenerPrecioEspecificoAsync(idServicio, idCategoriaHabitacion);
-            if (!response.IsSuccess || response.Data == null)
-            {
-                return NotFound(response.Message ?? "Precio no encontrado");
-            }
-
-            return View("DetallePrecioEspecifico", response.Data);
-        }
+      
         /// <summary>
         /// Muestra el formulario para asignar o editar un nuevo precio a un servicio específico.
         /// Solo requiere el ID del servicio. El ID de categoría y precio se ingresan manualmente.
@@ -199,7 +172,6 @@ namespace SGHR.Web.Controllers
                 IdServicio = idServicio,
                 NombreServicio = servicioResponse.Data.Nombre
             };
-
             return View("AsignarPrecio", viewModel);
         }
 

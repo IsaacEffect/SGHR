@@ -51,17 +51,6 @@ namespace SGHR.WebApp.Api.Controllers
             });
         }
 
-        /// <summary>
-        /// Obtener un precio específico de un servicio por categoría
-        /// </summary>
-        [HttpGet("ObtenerPrecioServicioCategoriaEspecifico")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ObtenerPrecioServicioCategoriaEspecifico([FromQuery] int idServicio, [FromQuery] int idCategoriaHabitacion)
-        {
-            var precio = await _servicioCategoriaApplicationService.ObtenerPrecioServicioCategoriaEspecificoAsync(idServicio, idCategoriaHabitacion);
-            return precio is null ? NotFound() : Ok(precio);
-        }
 
     }
 }

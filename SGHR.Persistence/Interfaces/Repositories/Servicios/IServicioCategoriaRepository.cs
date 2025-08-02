@@ -6,6 +6,5 @@ namespace SGHR.Persistence.Interfaces.Repositories.Servicios
     {
         Task AgregarActualizarPrecioServicioCategoriaAsync(int servicioId, int categoriaId, decimal precio);
         Task<List<ServicioCategoria>> ObtenerPreciosPorServicioAsync(int servicioId);
-        Task<ServicioCategoria?> ObtenerPrecioServicioCategoriaEspecificoAsync(int servicioId, int categoriaId);
     }
 }

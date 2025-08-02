@@ -151,7 +151,11 @@ namespace SGHR.WebApp.Api.Controllers
             {
                 return NotFound();
             }
-            return Ok(reserva);
+            return Ok(new ApiResponse<ReservaDto>{
+                IsSuccess = true,
+                Data = reserva,
+                Message = "Reserva obtenida con exito"
+            });
         }
 
         /// <summary>
@@ -167,7 +171,12 @@ namespace SGHR.WebApp.Api.Controllers
             {
                 return NotFound();
             }
-            return Ok(reservas);
+            return Ok(new ApiResponse<List<ReservaDto>>
+            {
+                IsSuccess = true,
+                Data = reservas,
+                Message = $"Reservas del cliente {clienteId}"
+            });
         }
 
         /// <summary>
