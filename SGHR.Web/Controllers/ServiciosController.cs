@@ -10,10 +10,9 @@ using SGHR.Web.ViewModel.Servicios;
 
 namespace SGHR.Web.Controllers
 {
-    public class ServiciosController(IMapper mapper, IServicioApiService servicioApiService) : Controller
+    public class ServiciosController(IServicioApiService servicioApiService) : Controller
     {
         private readonly IServicioApiService _servicioApiService = servicioApiService;
-        private readonly IMapper _mapper = mapper;
         // GET: /Servicios
         /// <summary>
         /// Muestra la lista de todos los servicios
@@ -50,7 +49,7 @@ namespace SGHR.Web.Controllers
             }
             var apiResponse = await _servicioApiService.AgregarServicioAsync(request);
             ControllerActionHelper.ProcesarApiResponse(this, apiResponse, "Se agrego el servicio correctamente", $"Error al agregar el servicio: {apiResponse.Message}");
-            return View();
+            return RedirectToAction(nameof(Index));
 
         }
         // GET: /Servicios/Edit/{id}
@@ -61,8 +60,8 @@ namespace SGHR.Web.Controllers
         {
             var apiResponse = await _servicioApiService.ObtenerServicioPorIdAsync(id);
             ControllerActionHelper.ProcesarApiResponse(this, apiResponse, "Se cargo el servicio para edicion correctamente", $"No se pudo cargar el servicio para edición: {apiResponse.Message}");
-            var viewModel = _mapper.Map<EditarServiciosViewModel>(apiResponse.Data);
-            return View(viewModel);
+            
+            return View(apiResponse.Data);
         }
         // POST: /Servicios/Edit/
         /// <summary>

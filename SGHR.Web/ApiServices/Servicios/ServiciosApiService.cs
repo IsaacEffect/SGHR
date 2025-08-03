@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using SGHR.Application.DTOs.Servicios;
+using SGHR.Domain.Entities.Servicios;
 using SGHR.Web.ApiRepositories;
 using SGHR.Web.ApiRepositories.Interfaces.Servicios;
 using SGHR.Web.ApiServices.Interfaces.Servicios;
@@ -71,12 +72,16 @@ namespace SGHR.Web.ApiServices.Servicios
 
             return ApiResponse<ServicioConPreciosViewModel>.Success(viewModel);
         }
-        public async Task<ApiResponse<ServiciosViewModel>> ObtenerServicioPorIdAsync(int id)
+        public async Task<ApiResponse<EditarServiciosViewModel>> ObtenerServicioPorIdAsync(int id)
         {
-            var response = await _serviciosApiRepository.ObtenerServicioPorIdAsync(id);
+            var servicio = await _serviciosApiRepository.ObtenerServicioPorIdAsync(id);
 
+            var editarVM = _mapper.Map<EditarServiciosViewModel>(servicio.Data);
+
+            var response = ApiResponse<EditarServiciosViewModel>.Success(editarVM);
             return response;
         }
+
 
         public async Task<ApiResponse<object>> AsignarActualizarPrecioAsync(AsignarPrecioServicioCategoriaViewModel model)
         {
