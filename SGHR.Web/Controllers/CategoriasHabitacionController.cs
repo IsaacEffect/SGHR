@@ -4,22 +4,19 @@ using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using SGHR.Web.Models;
 using System.Text;
-using System.Xml.Serialization;
+using SGHR.Web.Helpers.Abstraction;
 
 namespace SGHR.Web.Controllers
 {
     public class CategoriasHabitacionController : Controller
     {
-        private readonly HttpClient _httpClient;
-        private readonly ILogger _logger;
+        private readonly IHelper _helper;
         private List<CategoriaHabitacion>? categorias;
-        private Object model;
+        
 
-        public CategoriasHabitacionController(HttpClient httpClient, ILogger<CategoriasHabitacionController> logger
-            )
-        {
-            _httpClient = httpClient;
-            _logger = logger;
+        public CategoriasHabitacionController(IHelper helper )
+        { 
+            _helper = helper;
         }
 
         public ActionResult Index()
@@ -32,25 +29,19 @@ namespace SGHR.Web.Controllers
         {
             try
             {
-                using (var client = new HttpClient())
-                {
-                    client.BaseAddress = new Uri("http://localhost:5217/api/");
-
-                    var response = await client.GetAsync("CategoriasHabitacion/GetAllCategoriasHabitacion");
+                var response = await _helper.EjecutarHttpAsync("http://localhost:5217/api/",
+                    cliente => cliente.GetAsync("CategoriasHabitacion/GetAllCategoriasHabitacion"));
 
                     if (response.IsSuccessStatusCode)
                     {
                         var responseString = await response.Content.ReadAsStringAsync();
 
-                        var options = new JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true,
-                        };
+                      
 
-                        categorias = JsonSerializer.Deserialize<List<CategoriaHabitacion>>(responseString, options);
+                        categorias = JsonSerializer.Deserialize<List<CategoriaHabitacion>>(responseString);
 
                     }
-                }
+                
             }
             catch (Exception ex)
             {
@@ -59,7 +50,7 @@ namespace SGHR.Web.Controllers
                 throw;
             }
 
-            model = categorias.Select(c => new CategoriasHabitacionModel
+            var model = categorias.Select(c => new CategoriasHabitacionModel
             {
                 Id = c.Id,
                 nombre = c.Nombre,
@@ -76,21 +67,16 @@ namespace SGHR.Web.Controllers
         {
             try
             {
-                using (var client = new HttpClient())
-                {
-                    client.BaseAddress = new Uri("http://localhost:5217/api/");
+                var json = JsonSerializer.Serialize(categoria);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                    var json = JsonSerializer.Serialize(categoria);
-                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await _helper.EjecutarHttpAsync("http://localhost:5217/api/", cliente => cliente.PostAsync("CategoriasHabitacion/CrearCategoriaHabitacion", content));
 
-                    var response = await client.PostAsync("CategoriasHabitacion/CrearCategoriaHabitacion", content);
-
-                    if (response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                     {
                         ModelState.AddModelError("", "Error al crear la categoria");
-
                     }
-                }
+                
             }
             catch (Exception ex)
             {
@@ -105,23 +91,23 @@ namespace SGHR.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> EditarCategoria(int id)
         {
-            var respuesta = await _httpClient.GetAsync($"http://localhost:5217/api/CategoriasHabitacion/GetAllCategoriasHabitacion");
+            
+            var response = await _helper.EjecutarHttpAsync("http://localhost:5217/api/",
+                      cliente => cliente.GetAsync("CategoriasHabitacion/GetAllCategoriasHabitacion"));
 
-            Console.WriteLine(respuesta);
+                 if (!response.IsSuccessStatusCode)
+                 {
+                      TempData["Error"] = "No se pudo cargar la categoría.";
+                    return RedirectToAction("GetAllCategoriasHabitacion");
+                 }
 
-            if (!respuesta.IsSuccessStatusCode)
-            {
-                TempData["Error"] = "No se pudo cargar la categoría.";
-                return RedirectToAction("GetAllCategoriasHabitacion");
-            }
-
-            var json = await respuesta.Content.ReadAsStringAsync();
+            var json = await response.Content.ReadAsStringAsync();
             var lista = JsonSerializer.Deserialize<List<CategoriaHabitacion>>(json);
 
             var categoria = lista.FirstOrDefault(c => c.Id == id);
 
-            if (categoria == null)
-                return NotFound();
+                 if (categoria == null)
+                     return NotFound();
 
             return View(categoria); 
         }
@@ -136,9 +122,11 @@ namespace SGHR.Web.Controllers
 
             var contenido = new StringContent(JsonSerializer.Serialize(categoria), Encoding.UTF8, "application/json");
 
-            var respuesta = await _httpClient.PutAsync($"http://localhost:5217/api/CategoriasHabitacion/{categoria.Id}/ActualizarCategoria", contenido);
+            var response = await _helper.EjecutarHttpAsync("http://localhost:5217/api/",
+                    cliente => cliente.PutAsync($"CategoriasHabitacion/{categoria.Id}/ActualizarCategoria", contenido));
+      
 
-            if (respuesta.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
                 TempData["Success"] = "Categoría actualizada correctamente.";
                 return RedirectToAction("GetAllCategoriasHabitacion");
@@ -153,7 +141,8 @@ namespace SGHR.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> ConfirmadoEliminarCategoria(int id)
         {
-            var response = await _httpClient.DeleteAsync($"http://localhost:5217/api/CategoriasHabitacion/{id}/EliminarCategoria");
+            var response = await _helper.EjecutarHttpAsync("http://localhost:5217/api/",
+                    cliente => cliente.DeleteAsync($"CategoriasHabitacion/{id}/EliminarCategoria"));
 
             if (response.IsSuccessStatusCode)
             {

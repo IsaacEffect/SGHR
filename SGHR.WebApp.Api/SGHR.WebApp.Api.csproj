@@ -18,6 +18,7 @@
     <ProjectReference Include="..\SGHR.Application\SGHR.Application.csproj" />
     <ProjectReference Include="..\SGHR.Infraestructure\SGHR.Infraestructure.csproj" />
     <ProjectReference Include="..\SGHR.Persistance\SGHR.Persistance.csproj" />
+    <ProjectReference Include="..\SGHR.Web\SGHR.Web.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SGHR.Web.Helpers.Abstraction;
 using SGHR.Web.Models;
 using System.Reflection;
 using System.Text;
@@ -10,11 +11,13 @@ namespace SGHR.Web.Controllers
     public class TarifasController : Controller
     {
         private readonly HttpClient _httpClient;
+        private readonly IHelper _helper;
         private TarifaModel _modelo;
 
-        public TarifasController(HttpClient httpClient) 
+        public TarifasController(HttpClient httpClient, IHelper helper) 
         { 
             _httpClient = httpClient;
+            _helper = helper;
         }
         // GET: TarifasController
         public ActionResult Index()
@@ -26,13 +29,10 @@ namespace SGHR.Web.Controllers
         public async Task<IActionResult> DefinirTarifaBase(int id)
         {
 
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri("http://localhost:5217/api/");
+            var response = await _helper.EjecutarHttpAsync("http://localhost:5217/api/",
+                     cliente => cliente.GetAsync("CategoriasHabitacion/GetAllCategoriasHabitacion"));
 
-                var response = await client.GetAsync("CategoriasHabitacion/GetAllCategoriasHabitacion");
-
-                if (!response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
                     return NotFound();
                 
                     var responseString = await response.Content.ReadAsStringAsync();
@@ -42,8 +42,6 @@ namespace SGHR.Web.Controllers
                         PropertyNameCaseInsensitive = true,
                     };
 
-                responseString = responseString.Replace("\"estado\": true", "\"estado\":\"Activo\"");
-                responseString = responseString.Replace("\"estado\": false", "\"estado\":\"Inactivo\"");
 
                 var Listacategorias = JsonSerializer.Deserialize<List<CategoriasHabitacionModel>>(responseString, options);
 
@@ -60,7 +58,7 @@ namespace SGHR.Web.Controllers
 
 
                 return View("DefinirTarifaBase", modelo);
-            }
+            
         }
 
         [HttpPost]
@@ -76,7 +74,8 @@ namespace SGHR.Web.Controllers
 
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync($"http://localhost:5217/api/Tarifa/DefinirTarifaBase/{model.CategoriaId}", content);
+            var response = await _helper.EjecutarHttpAsync("http://localhost:5217/api/",
+               cliente => cliente.PostAsync($"Tarifa/DefinirTarifaBase/{model.CategoriaId}", content));
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -90,61 +89,6 @@ namespace SGHR.Web.Controllers
 
         }
 
-        // POST: TarifasController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: TarifasController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: TarifasController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: TarifasController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: TarifasController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        
     }
 }

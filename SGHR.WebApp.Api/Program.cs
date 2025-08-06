@@ -12,6 +12,8 @@ using SGHR.Persistance.DBContext;
 using SGHR.Persistance.Repositories;
 using SGHR.Domain.DomainServices;
 using SGHR.Infraestructure.Common.StoredProcedures;
+using SGHR.Web.Helpers.Abstraction;
+using SGHR.Web.Helpers;
 
 namespace SGHR.WebApp.Api
 {

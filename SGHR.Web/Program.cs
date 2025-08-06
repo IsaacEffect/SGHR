@@ -1,4 +1,6 @@
 using SGHR.Web.Controllers;
+using SGHR.Web.Helpers;
+using SGHR.Web.Helpers.Abstraction;
 
 namespace SGHR.Web
 {
@@ -7,6 +9,9 @@ namespace SGHR.Web
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            //
+            builder.Services.AddScoped<IHelper, Helper>();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
