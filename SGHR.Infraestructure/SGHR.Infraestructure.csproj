@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SGHR.Application.Test\SGHR.Application.Test.csproj" />
+    <ProjectReference Include="..\SGHR.Application\SGHR.Application.csproj" />
+  </ItemGroup>
+
 </Project>

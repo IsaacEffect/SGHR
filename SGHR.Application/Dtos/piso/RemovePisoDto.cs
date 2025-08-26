@@ -1,8 +1,6 @@
-﻿
-namespace SGHR.Application.Dtos.Piso
+﻿namespace SGHR.Application.Dtos;
+
+public class RemovePisoDto
 {
-    public class RemovePisoDto
-    {
-        public int Id { get; set; }
-    }
+    public int Id { get; set; }
 }

@@ -1,13 +1,18 @@
 ﻿@model IEnumerable<SGHR.Application.Dtos.PisoDto>
 
+@{
+    ViewData["Title"] = "Lista de Pisos";
+}
+
 <h2>Lista de Pisos</h2>
 
-<a asp-action="Create" class="btn btn-primary">Crear nuevo piso</a>
+<p>
+    <a asp-action="Create" class="btn btn-primary">Crear Nuevo Piso</a>
+</p>
 
-<table class="table">
+<table class="table table-striped">
     <thead>
         <tr>
-            <th>ID</th>
             <th>Número Piso</th>
             <th>Descripción</th>
             <th>Acciones</th>
@@ -17,12 +22,12 @@
         @foreach (var piso in Model)
         {
             <tr>
-                <td>@piso.Id</td>
                 <td>@piso.NumeroPiso</td>
                 <td>@piso.Descripcion</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@piso.Id">Editar</a> |
-                    <a asp-action="Delete" asp-route-id="@piso.Id">Eliminar</a>
+                    <a asp-action="Details" asp-route-id="@piso.Id" class="btn btn-info btn-sm">Detalles</a>
+                    <a asp-action="Edit" asp-route-id="@piso.Id" class="btn btn-warning btn-sm">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@piso.Id" class="btn btn-danger btn-sm">Eliminar</a>
                 </td>
             </tr>
         }

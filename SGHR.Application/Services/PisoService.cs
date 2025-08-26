@@ -1,12 +1,9 @@
 ﻿using SGHR.Application.Dtos;
+using SGHR.Application.Dtos;
 using SGHR.Application.Interfaces;
-using SGHR.Persistence.Domain;
-using SGHR.Persistence.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SGHR.Persistence.Domain; 
-
 
 namespace SGHR.Application.Services
 {
@@ -19,6 +16,7 @@ namespace SGHR.Application.Services
             _pisoRepository = pisoRepository;
         }
 
+        // Obtener todos los pisos
         public async Task<IEnumerable<PisoDto>> GetAllAsync()
         {
             var pisos = await _pisoRepository.GetAllAsync();
@@ -30,42 +28,46 @@ namespace SGHR.Application.Services
             });
         }
 
-        public async Task<PisoDto> GetByIdAsync(int id)
+        // Obtener un piso por id
+        public async Task<PisoDto?> GetByIdAsync(int id)
         {
-            var p = await _pisoRepository.GetByIdAsync(id);
-            if (p == null) return null;
+            var piso = await _pisoRepository.GetByIdAsync(id);
+            if (piso == null) return null;
 
             return new PisoDto
-            {
-                Id = p.Id,
-                NumeroPiso = p.NumeroPiso,
-                Descripcion = p.Descripcion
-            };
-        }
-
-        public async Task AddAsync(PisoDto piso)
-        {
-            var entidad = new Piso
-            {
-                NumeroPiso = piso.NumeroPiso,
-                Descripcion = piso.Descripcion
-            };
-
-            await _pisoRepository.AddAsync(entidad);
-        }
-
-        public async Task UpdateAsync(PisoDto piso)
-        {
-            var entidad = new Piso
             {
                 Id = piso.Id,
                 NumeroPiso = piso.NumeroPiso,
                 Descripcion = piso.Descripcion
             };
-
-            await _pisoRepository.UpdateAsync(entidad);
         }
 
+        // Crear un nuevo piso
+        public async Task AddAsync(SavePisoDto dto)
+        {
+            var piso = new SavePisoDto
+            {
+                NumeroPiso = dto.NumeroPiso,
+                Descripcion = dto.Descripcion
+            };
+
+            await _pisoRepository.CreateAsync(piso);
+        }
+
+        // Actualizar un piso existente
+        public async Task UpdateAsync(UpdatePisoDto dto)
+        {
+            var piso = new UpdatePisoDto
+            {
+                Id = dto.Id,
+                NumeroPiso = dto.NumeroPiso,
+                Descripcion = dto.Descripcion
+            };
+
+            await _pisoRepository.UpdateAsync(piso);
+        }
+
+        // Eliminar un piso
         public async Task DeleteAsync(int id)
         {
             await _pisoRepository.DeleteAsync(id);

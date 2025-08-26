@@ -3,7 +3,7 @@
     public class PisoDto
     {
         public int Id { get; set; }
-        public int NumeroPiso { get; set; }
-        public string Descripcion { get; set; }
+        public string NumeroPiso { get; set; } = string.Empty;   // 🔥 evita CS8618
+        public string Descripcion { get; set; } = string.Empty;  // 🔥 evita CS8618
     }
 }

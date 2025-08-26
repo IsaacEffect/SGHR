@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SGHR.Application.Interfaces;
 using SGHR.Application.Services;
-using SGHR.Persistence.Interfaces;
-using SGHR.Persistence.Repositories;
+using SGHR.Infrastructure.Repositories;
+
 
 namespace SGHR.IOC
 {
